@@ -13,6 +13,7 @@ export default defineConfig(({ command, mode }) => {
         input: {
           main: 'index.html',
           register: 'register.html',
+          demo: 'demo.html',
         },
       },
     },

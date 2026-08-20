@@ -184,9 +184,14 @@ export default function App() {
     window.location.assign(`${baseUrl}register.html?plan=${encodeURIComponent(plan)}`);
   };
 
+  const goToDemo = () => {
+    const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '/');
+    window.location.assign(`${baseUrl}demo.html`);
+  };
+
   const choosePlan = (planName: string) => {
     if (planName === 'Enterprise') {
-      openLeadModal('contact', planName);
+      goToDemo();
       return;
     }
     goToRegister(planName);
@@ -257,7 +262,7 @@ export default function App() {
           <button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button>
           <button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button>
           <button type="button" onClick={() => scrollTo('compare')}>เปรียบเทียบแพ็กเกจ</button>
-          <button type="button" onClick={() => scrollTo('contact')}>ติดต่อเรา</button>
+          <button type="button" onClick={goToDemo}>ติดต่อเรา</button>
         </nav>
 
         <div className="header-actions">
@@ -384,7 +389,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="site-footer section-shell"><div className="footer-brand"><button className="brand" type="button" onClick={() => scrollTo('top')}><span className="brand-mark" aria-hidden="true"><span>N</span></span><span className="brand-word">CUTI<span>NEO</span></span></button><p>รวมทุกแชทให้ทีมขายทำงานได้ง่ายขึ้น</p></div><div className="footer-links"><div><strong>ผลิตภัณฑ์</strong><button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button><button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button></div><div><strong>ช่วยเหลือ</strong><button type="button" onClick={() => announce('ศูนย์ช่วยเหลือกำลังเตรียมเปิดให้บริการครับ')}>ศูนย์ช่วยเหลือ</button><button type="button" onClick={() => openLeadModal('contact')}>ติดต่อเรา</button></div></div><span className="copyright">© 2026 CUTINEO</span></footer>
+      <footer className="site-footer section-shell"><div className="footer-brand"><button className="brand" type="button" onClick={() => scrollTo('top')}><span className="brand-mark" aria-hidden="true"><span>N</span></span><span className="brand-word">CUTI<span>NEO</span></span></button><p>รวมทุกแชทให้ทีมขายทำงานได้ง่ายขึ้น</p></div><div className="footer-links"><div><strong>ผลิตภัณฑ์</strong><button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button><button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button></div><div><strong>ช่วยเหลือ</strong><button type="button" onClick={() => announce('ศูนย์ช่วยเหลือกำลังเตรียมเปิดให้บริการครับ')}>ศูนย์ช่วยเหลือ</button><button type="button" onClick={goToDemo}>ขอเดโม</button></div></div><span className="copyright">© 2026 CUTINEO</span></footer>
 
       {leadMode && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setLeadMode(null); }}>
         <section className="lead-modal" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title">
