@@ -1,7 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
+import { OpenClawAdapter } from './services/openClawAdapter';
 
 type BillingCycle = 'monthly' | 'yearly';
 type ChannelKey = 'all' | 'line' | 'facebook' | 'instagram' | 'marketplace';
+type LeadMode = 'trial' | 'contact' | 'login';
 
 const channels: Array<{ key: ChannelKey; label: string; short: string; className: string; count?: number }> = [
   { key: 'all', label: 'ทุกช่องทาง', short: 'ทั้งหมด', className: 'channel-all', count: 12 },
@@ -116,26 +118,115 @@ function formatPrice(value: number | null) {
 }
 
 export default function App() {
+  const adapter = useMemo(() => new OpenClawAdapter(), []);
   const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [activeChannel, setActiveChannel] = useState<ChannelKey>('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notice, setNotice] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState<'online' | 'offline' | 'connecting'>('offline');
+  const [leadMode, setLeadMode] = useState<LeadMode | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState('Basic');
+  const [demoDraft, setDemoDraft] = useState('');
+  const [demoMessages, setDemoMessages] = useState<Array<{ id: number; role: 'team' | 'neo'; text: string }>>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeConversation = useMemo(() => channelMessages[activeChannel], [activeChannel]);
   const yearlyDiscount = billing === 'yearly' ? 'ประหยัด 20%' : '';
+
+  useEffect(() => {
+    const unsubscribe = adapter.onConnection(setConnectionStatus);
+    adapter.connect();
+    return () => {
+      unsubscribe();
+      adapter.close();
+    };
+  }, [adapter]);
+
+  useEffect(() => {
+    if (!leadMode) return undefined;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLeadMode(null);
+    };
+    document.body.classList.add('modal-open');
+    window.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.classList.remove('modal-open');
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [leadMode]);
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setMobileMenuOpen(false);
   };
 
+  const announce = (message: string) => {
+    setNotice(message);
+    window.setTimeout(() => setNotice(''), 4500);
+  };
+
+  const openLeadModal = (mode: LeadMode, plan = 'Basic') => {
+    setSelectedPlan(plan);
+    setNotice('');
+    setLeadMode(mode);
+    setMobileMenuOpen(false);
+  };
+
   const choosePlan = (planName: string) => {
-    if (planName === 'Enterprise') {
-      setNotice('รับข้อมูลแล้วครับ ทีม CUTINEO จะติดต่อกลับเพื่อออกแบบแพ็กเกจให้เหมาะกับธุรกิจของคุณ');
-    } else {
-      setNotice(`เลือกแพ็กเกจ ${planName} แล้ว — เดโมนี้ยังไม่เรียกเก็บเงินจริงครับ`);
+    openLeadModal(planName === 'Enterprise' ? 'contact' : 'trial', planName);
+  };
+
+  const selectChannel = (channel: ChannelKey) => {
+    setActiveChannel(channel);
+    setDemoDraft('');
+    setDemoMessages([]);
+  };
+
+  const sendDemoMessage = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const text = demoDraft.trim();
+    if (!text) return;
+    adapter.send({ type: 'chat.message', channel: activeConversation.channel, text, source: 'cutineo-demo' });
+    setDemoMessages((current) => [...current, { id: Date.now(), role: 'team', text }]);
+    setDemoDraft('');
+    window.setTimeout(() => {
+      setDemoMessages((current) => [...current, { id: Date.now(), role: 'neo', text: `NEO ช่วยร่างคำตอบให้แล้ว: รับเรื่อง “${text}” เรียบร้อยครับ` }]);
+    }, 500);
+  };
+
+  const handleFileSelected = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    announce(`เลือกไฟล์ ${file.name} แล้ว — เดโมจะไม่อัปโหลดไฟล์ออกจากเครื่องครับ`);
+    event.target.value = '';
+  };
+
+  const handleLeadSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const email = String(form.get('email') ?? '').trim();
+    if (!email.includes('@')) {
+      announce('กรุณากรอกอีเมลให้ถูกต้องครับ');
+      return;
     }
-    window.setTimeout(() => setNotice(''), 4200);
+    const mode = leadMode;
+    setLeadMode(null);
+    if (mode === 'login') {
+      announce('เข้าสู่โหมดเดโมแล้วครับ — ระบบบัญชีจริงจะเชื่อมต่อในขั้นถัดไป');
+      return;
+    }
+    const name = String(form.get('name') ?? '').trim();
+    const business = String(form.get('business') ?? '').trim();
+    announce(mode === 'contact'
+      ? `รับข้อมูลของ ${name || 'คุณ'} แล้วครับ ทีม CUTINEO จะติดต่อกลับเรื่องแพ็กเกจ ${selectedPlan}`
+      : `รับคำขอทดลองใช้ของ ${name || 'คุณ'} แล้วครับ — แพ็กเกจ ${selectedPlan} พร้อมให้ทดลองในเดโมนี้`);
+    if (business) {
+      try {
+        window.localStorage.setItem('cutineo-last-lead', JSON.stringify({ name, email, business, plan: selectedPlan, mode, createdAt: new Date().toISOString() }));
+      } catch {
+        // Storage can be disabled in private browsing; the success state still works.
+      }
+    }
   };
 
   return (
@@ -154,8 +245,8 @@ export default function App() {
         </nav>
 
         <div className="header-actions">
-          <button className="login-link" type="button" onClick={() => setNotice('ระบบเข้าสู่ระบบจะเชื่อมต่อกับ CUTINEO ได้ในขั้นถัดไปครับ')}>เข้าสู่ระบบ</button>
-          <button className="button button-dark button-small" type="button" onClick={() => scrollTo('pricing')}>ทดลองใช้งานฟรี</button>
+          <button className="login-link" type="button" onClick={() => openLeadModal('login')}>เข้าสู่ระบบ</button>
+          <button className="button button-dark button-small" type="button" onClick={() => openLeadModal('trial')}>ทดลองใช้งานฟรี</button>
         </div>
         <button className={`menu-toggle ${mobileMenuOpen ? 'is-active' : ''}`} type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen}>
           <span /><span /><span />
@@ -169,7 +260,7 @@ export default function App() {
             <h1>รวมทุกแชทของร้านคุณ<br /><span>ไว้ในที่เดียว</span></h1>
             <p className="hero-lead">ไม่ต้องสลับหลายแอปให้วุ่นวาย ตอบลูกค้าจาก LINE, Facebook, Instagram และ Marketplace ได้ในกล่องข้อความเดียว</p>
             <div className="hero-actions">
-              <button className="button button-primary" type="button" onClick={() => scrollTo('pricing')}>เริ่มต้นฟรี <span aria-hidden="true">→</span></button>
+              <button className="button button-primary" type="button" onClick={() => openLeadModal('trial')}>เริ่มต้นฟรี <span aria-hidden="true">→</span></button>
               <button className="text-button" type="button" onClick={() => scrollTo('demo')}>ดูการทำงาน <span className="play-icon" aria-hidden="true">▶</span></button>
             </div>
             <div className="hero-trust">
@@ -184,14 +275,14 @@ export default function App() {
             <div className="visual-glow" />
             <div className="inbox-window">
               <div className="window-bar">
-                <div className="window-brand"><span className="mini-mark">N</span><span>รวมแชท</span><span className="online-dot" /> <small>ออนไลน์</small></div>
+                <div className="window-brand"><span className="mini-mark">N</span><span>รวมแชท</span><span className={`online-dot connection-${connectionStatus}`} /> <small>{connectionStatus === 'online' ? 'OpenClaw ออนไลน์' : connectionStatus === 'connecting' ? 'กำลังเชื่อมต่อ' : 'โหมดเดโม'}</small></div>
                 <div className="window-tools"><span>⌕</span><span>⋯</span></div>
               </div>
               <div className="inbox-layout">
                 <aside className="inbox-sidebar">
                   <div className="sidebar-label">กล่องข้อความ</div>
                   {channels.map((channel) => (
-                    <button className={`channel-row ${activeChannel === channel.key ? 'is-active' : ''}`} key={channel.key} type="button" onClick={() => setActiveChannel(channel.key)}>
+                    <button className={`channel-row ${activeChannel === channel.key ? 'is-active' : ''}`} key={channel.key} type="button" onClick={() => selectChannel(channel.key)}>
                       <span className={`channel-icon ${channel.className}`}>{channel.short.slice(0, 2)}</span>
                       <span>{channel.label}</span>
                       {channel.count && <b>{channel.count}</b>}
@@ -203,15 +294,20 @@ export default function App() {
                   <div className="conversation-head">
                     <div className="customer-avatar">{activeConversation.initials}</div>
                     <div><strong>{activeConversation.name}</strong><small><span className={`channel-status ${activeConversation.channelClass}`} /> {activeConversation.channel}</small></div>
-                    <button type="button" aria-label="ตัวเลือกการสนทนา">⋮</button>
+                    <button type="button" aria-label="ตัวเลือกการสนทนา" onClick={() => announce('ตัวเลือกการสนทนาพร้อมใช้งานเมื่อเชื่อมต่อบัญชีจริงครับ')}>⋮</button>
                   </div>
                   <div className="conversation-body">
                     <span className="date-divider">วันนี้ · 10:24</span>
                     <div className="chat-bubble customer-bubble">{activeConversation.message}</div>
                     <div className="chat-bubble neo-bubble"><span className="bubble-label">NEO แนะนำคำตอบ</span>{activeConversation.reply}</div>
                     <div className="chat-bubble customer-bubble short-bubble">ขอบคุณมากค่ะ 😊</div>
+                    {demoMessages.map((message) => <div className={`chat-bubble ${message.role === 'neo' ? 'neo-bubble' : 'team-bubble'}`} key={message.id}>{message.role === 'neo' && <span className="bubble-label">NEO แนะนำคำตอบ</span>}{message.text}</div>)}
                   </div>
-                  <div className="reply-box"><span>พิมพ์ข้อความตอบกลับ...</span><div><button type="button" aria-label="เพิ่มไฟล์">＋</button><button type="button" className="send-button" aria-label="ส่งข้อความ">↑</button></div></div>
+                  <form className="reply-box" onSubmit={sendDemoMessage}>
+                    <input value={demoDraft} onChange={(event) => setDemoDraft(event.target.value)} placeholder="พิมพ์ข้อความตอบกลับ..." aria-label="ข้อความตอบกลับในเดโม" />
+                    <div><button type="button" aria-label="เพิ่มไฟล์" onClick={() => fileInputRef.current?.click()}>＋</button><button type="submit" className="send-button" aria-label="ส่งข้อความ">↑</button></div>
+                    <input ref={fileInputRef} className="visually-hidden" type="file" onChange={handleFileSelected} />
+                  </form>
                 </div>
               </div>
             </div>
@@ -268,11 +364,28 @@ export default function App() {
         </section>
 
         <section className="cta-section section-shell" id="contact">
-          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>ลองใช้ CUTINEO ฟรี แล้วให้ทีมของคุณเห็นความต่างตั้งแต่วันแรก</p><button className="button button-light" type="button" onClick={() => choosePlan('Basic')}>เริ่มต้นฟรี <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><span>N</span></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
+          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>ลองใช้ CUTINEO ฟรี แล้วให้ทีมของคุณเห็นความต่างตั้งแต่วันแรก</p><button className="button button-light" type="button" onClick={() => openLeadModal('trial')}>เริ่มต้นฟรี <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><span>N</span></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
         </section>
       </main>
 
-      <footer className="site-footer section-shell"><div className="footer-brand"><button className="brand" type="button" onClick={() => scrollTo('top')}><span className="brand-mark" aria-hidden="true"><span>N</span></span><span className="brand-word">CUTI<span>NEO</span></span></button><p>รวมทุกแชทให้ทีมขายทำงานได้ง่ายขึ้น</p></div><div className="footer-links"><div><strong>ผลิตภัณฑ์</strong><button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button><button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button></div><div><strong>ช่วยเหลือ</strong><button type="button" onClick={() => setNotice('ศูนย์ช่วยเหลือกำลังเตรียมเปิดให้บริการครับ')}>ศูนย์ช่วยเหลือ</button><button type="button" onClick={() => scrollTo('contact')}>ติดต่อเรา</button></div></div><span className="copyright">© 2026 CUTINEO</span></footer>
+      <footer className="site-footer section-shell"><div className="footer-brand"><button className="brand" type="button" onClick={() => scrollTo('top')}><span className="brand-mark" aria-hidden="true"><span>N</span></span><span className="brand-word">CUTI<span>NEO</span></span></button><p>รวมทุกแชทให้ทีมขายทำงานได้ง่ายขึ้น</p></div><div className="footer-links"><div><strong>ผลิตภัณฑ์</strong><button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button><button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button></div><div><strong>ช่วยเหลือ</strong><button type="button" onClick={() => announce('ศูนย์ช่วยเหลือกำลังเตรียมเปิดให้บริการครับ')}>ศูนย์ช่วยเหลือ</button><button type="button" onClick={() => openLeadModal('contact')}>ติดต่อเรา</button></div></div><span className="copyright">© 2026 CUTINEO</span></footer>
+
+      {leadMode && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setLeadMode(null); }}>
+        <section className="lead-modal" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title">
+          <button className="modal-close" type="button" onClick={() => setLeadMode(null)} aria-label="ปิดหน้าต่าง">×</button>
+          <div className="modal-icon">{leadMode === 'login' ? '↗' : leadMode === 'contact' ? '✦' : 'N'}</div>
+          <div className="eyebrow">{leadMode === 'login' ? 'WELCOME BACK' : leadMode === 'contact' ? 'TALK TO CUTINEO' : 'START YOUR FREE TRIAL'}</div>
+          <h2 id="lead-modal-title">{leadMode === 'login' ? 'เข้าสู่โหมดเดโม' : leadMode === 'contact' ? 'คุยกับทีม CUTINEO' : 'เริ่มทดลองใช้งานฟรี'}</h2>
+          <p>{leadMode === 'login' ? 'กรอกข้อมูลเพื่อทดลองหน้าการเข้าสู่ระบบ ฟังก์ชันนี้ยังไม่เชื่อมต่อบัญชีจริง' : `กรอกข้อมูลสั้น ๆ เพื่อเริ่มต้นกับแพ็กเกจ ${selectedPlan}`}</p>
+          <form className="lead-form" key={`${leadMode}-${selectedPlan}`} onSubmit={handleLeadSubmit}>
+            {leadMode !== 'login' && <label>ชื่อผู้ติดต่อ<input name="name" type="text" placeholder="เช่น คุณนิว" required autoFocus /></label>}
+            <label>อีเมล{leadMode === 'login' ? 'สำหรับเข้าสู่ระบบ' : ''}<input name="email" type="email" placeholder="you@example.com" required autoFocus={leadMode === 'login'} /></label>
+            {leadMode === 'login' ? <label>รหัสผ่านเดโม<input name="password" type="password" placeholder="อย่างน้อย 6 ตัวอักษร" minLength={6} required /></label> : <label>ชื่อธุรกิจ<input name="business" type="text" placeholder="ชื่อร้านหรือบริษัท" required /></label>}
+            <button className="button button-primary modal-submit" type="submit">{leadMode === 'login' ? 'เข้าโหมดเดโม' : leadMode === 'contact' ? 'ส่งข้อมูลให้ทีมงาน' : 'เริ่มทดลองใช้ฟรี'} <span>→</span></button>
+          </form>
+          <small className="modal-note">เดโมนี้ไม่เรียกเก็บเงินและไม่ส่งข้อมูลออกจากเครื่อง</small>
+        </section>
+      </div>}
 
       {notice && <div className="toast" role="status"><span className="toast-icon">✓</span><span>{notice}</span><button type="button" onClick={() => setNotice('')} aria-label="ปิดข้อความ">×</button></div>}
     </div>
