@@ -109,6 +109,8 @@ export default function DemoApp() {
   const baseUrl = getBaseUrl();
   const homeUrl = `${baseUrl}index.html`;
   const registerUrl = `${baseUrl}register.html?plan=Starter`;
+  const requestedPlan = new URLSearchParams(window.location.search).get('plan') === 'Enterprise' ? 'Enterprise' : '';
+  const enterpriseMode = requestedPlan === 'Enterprise';
   const nowForDatePicker = new Date().toISOString().slice(0, 16);
   const t = languageCopy[language];
 
@@ -144,7 +146,13 @@ export default function DemoApp() {
 
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const goHome = () => window.location.assign(homeUrl);
-  const goToRegister = () => window.location.assign(registerUrl);
+  const goToRegister = () => {
+    if (enterpriseMode) {
+      goHome();
+      return;
+    }
+    window.location.assign(registerUrl);
+  };
   const goToLogin = () => window.location.assign(`${baseUrl}login/`);
   const toggleLanguage = () => setLanguage((current) => current === 'th' ? 'en' : 'th');
 
@@ -165,7 +173,7 @@ export default function DemoApp() {
     event.preventDefault();
     if (!validate()) return;
     try {
-      localStorage.setItem('cutineo-demo-request', JSON.stringify({ ...form, countryCode, createdAt: new Date().toISOString() }));
+      localStorage.setItem('cutineo-demo-request', JSON.stringify({ ...form, countryCode, requestedPlan: requestedPlan || 'general-demo', createdAt: new Date().toISOString() }));
     } catch {
       // Private browsing can disable localStorage. The demo still completes successfully.
     }
@@ -195,7 +203,7 @@ export default function DemoApp() {
             <div><span>{t.success.team}</span><strong>{teamSizeLabel(form.teamSize, language)}</strong></div>
           </div>
           <div className="demo-success-actions">
-            <button className="demo-primary-button" type="button" onClick={goToRegister}>{t.success.start} <span>→</span></button>
+            <button className="demo-primary-button" type="button" onClick={goToRegister}>{enterpriseMode ? (language === 'th' ? 'กลับหน้าแรก' : 'Back to home') : t.success.start} <span>→</span></button>
             <button className="demo-secondary-button" type="button" onClick={goHome}>{t.backHome}</button>
           </div>
           <small className="demo-disclaimer">{t.success.disclaimer}</small>
@@ -240,6 +248,7 @@ export default function DemoApp() {
               <span className="demo-kicker">{t.form.kicker}</span>
               <h2 id="demo-form-title">{t.form.title}</h2>
               <p>{t.form.description}</p>
+              {enterpriseMode && <div className="demo-enterprise-note"><strong>{language === 'th' ? 'ขอข้อมูลสำหรับ Enterprise' : 'Enterprise consultation'}</strong><span>{language === 'th' ? 'ทีมฝ่ายขายจะใช้ข้อมูลนี้ประเมินการเชื่อมต่อและนัด Demo ระบบ' : 'Our sales team will use these details to assess integration and schedule a product demo.'}</span></div>}
             </div>
             <form className="demo-form" noValidate onSubmit={handleSubmit}>
               <label className="demo-field">
@@ -276,8 +285,8 @@ export default function DemoApp() {
                 {errors.teamSize && <small className="demo-field-error">{errors.teamSize}</small>}
               </label>
               <label className="demo-field demo-field-full">
-                <span>{t.form.interest}</span>
-                <textarea value={form.interests} onChange={(event) => updateField('interests', event.currentTarget.value)} placeholder={t.form.interestPlaceholder} rows={3} />
+                <span>{enterpriseMode ? (language === 'th' ? 'ระบบเดิมที่ต้องการเชื่อมต่อ' : 'Existing system to integrate') : t.form.interest}</span>
+                <textarea value={form.interests} onChange={(event) => updateField('interests', event.currentTarget.value)} placeholder={enterpriseMode ? (language === 'th' ? 'เช่น POS, SAP, ERP, WMS หรือเว็บไซต์' : 'For example: POS, SAP, ERP, WMS, or your website') : t.form.interestPlaceholder} rows={3} />
               </label>
               <label className="demo-field demo-field-full">
                 <span>{t.form.date}</span>

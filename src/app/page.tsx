@@ -91,11 +91,11 @@ export default function HomePage() {
                   <div className="flex items-center justify-between text-xs text-slate-400">
                     <span>ลูกค้าใหม่</span><span>10:42</span>
                   </div>
-                  <p className="mt-2 text-sm font-semibold">มีโปรส่งฟรีไหมคะ?</p>
+                  <p className="mt-2 text-sm font-semibold">แพ็กเกจ Pro มี AI ช่วยตอบกี่ข้อความคะ?</p>
                 </div>
                 <div className="ml-10 rounded-2xl bg-indigo-500 px-4 py-3 shadow-lg shadow-indigo-500/20">
                   <div className="flex items-center gap-2 text-xs text-indigo-100"><Bot size={13} /> AI Agent</div>
-                  <p className="mt-2 text-sm font-medium">มีครับ แจ้งรหัสไปรษณีย์ได้เลย เดี๋ยวผมเช็กเงื่อนไขให้ครับ</p>
+                  <p className="mt-2 text-sm font-medium">แพ็กเกจ Pro มี AI ตอบอัตโนมัติ 4,000 ข้อความต่อเดือนครับ</p>
                 </div>
               </div>
               <div className="rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-xs text-slate-400">

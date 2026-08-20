@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { OpenClawAdapter } from './services/openClawAdapter';
+import { getNeoPolicyReply } from './core/ai/neo-policy';
 
 type ChannelKey = 'all' | 'line' | 'facebook' | 'instagram' | 'marketplace';
 type LeadMode = 'trial' | 'contact' | 'login';
@@ -42,8 +43,8 @@ const channelMessages: Record<ChannelKey, { name: string; channel: string; chann
     channel: 'Instagram DM',
     channelClass: 'channel-instagram',
     initials: 'P',
-    message: 'มีโปรสำหรับออเดอร์แรกไหมคะ ✨',
-    reply: 'มีค่ะ ใช้โค้ด CUTI10 รับส่วนลด 10% ได้เลย',
+    message: 'แพ็กเกจ Pro มี AI ช่วยตอบกี่ข้อความคะ? ✨',
+    reply: 'แพ็กเกจ Pro มีโควตา AI ตอบอัตโนมัติ 4,000 ข้อความต่อเดือนค่ะ',
   },
   marketplace: {
     name: 'อรทัย ส.',
@@ -92,13 +93,13 @@ const plans = [
   },
   {
     name: 'Enterprise',
-    description: 'สำหรับองค์กรและแบรนด์ใหญ่ที่มีระบบหลังบ้านเฉพาะทาง',
+    description: 'Custom Pricing สำหรับองค์กรและแบรนด์ใหญ่ มีหลายสิบสาขาหรือระบบหลังบ้านเฉพาะทาง',
     monthly: null,
-    priceLabel: '฿19,900–39,900',
-    priceNote: '',
+    priceLabel: 'Custom Pricing',
+    priceNote: 'เริ่มต้นประมาณ ฿19,900–39,900/เดือน',
     suffix: '/เดือน',
     users: 'แอดมินและช่องทางไม่จำกัด',
-    features: ['AI ตอบอัตโนมัติ 100,000–200,000 ข้อความ/เดือน', 'เชื่อมต่อ API / Custom Integration', 'รองรับ ERP / POS / WMS', 'ทีมซัพพอร์ต Dedicated'],
+    features: ['AI ตอบอัตโนมัติ 100,000–200,000+ ข้อความ/เดือน', 'Custom API เชื่อมต่อ POS / ERP (SAP/Express)', 'SLA 99.9% + ทีม Onboarding', 'สัญญาธุรกิจ, PDPA Data Processing และใบกำกับภาษีเต็มรูปแบบ'],
     button: 'ติดต่อทีมงาน',
   },
 ];
@@ -106,14 +107,14 @@ const plans = [
 const compareRows = [
   ['บัญชีและช่องทางที่เชื่อมต่อ', '2 บัญชี: LINE OA / Facebook Page', '5 บัญชี: LINE OA / FB / IG', 'ไม่จำกัด', 'ไม่จำกัด'],
   ['แอดมินในทีม', '2 บัญชี', '5 บัญชี', '15 บัญชี', 'ไม่จำกัด'],
-  ['AI ตอบอัตโนมัติ', 'ไม่มี', '4,000 ข้อความ/เดือน', '15,000 ข้อความ/เดือน', '100,000–200,000 ข้อความ/เดือน'],
+  ['AI ตอบอัตโนมัติ', 'ไม่มี (คนตอบ 100%)', '4,000 ข้อความ/เดือน', '15,000 ข้อความ/เดือน', '100,000–200,000+ ข้อความ/เดือน'],
   ['กล่องข้อความกลาง', '✓', '✓', '✓', '✓'],
   ['Internal Note และแท็กสถานะ', '✓', '✓', '✓', '✓'],
   ['Quick Replies', '✓', '✓', '✓', '✓'],
   ['ประวัติแชท', '90 วัน', 'ไม่จำกัด', 'ไม่จำกัด', 'ไม่จำกัด'],
-  ['PromptPay QR + Slip OCR', '—', '✓', '✓', '✓'],
-  ['จัดส่ง / ดิจิทัล / จองคิว', '—', '✓', '✓', '✓'],
-  ['Webhook / API', '—', '—', 'Webhook พื้นฐาน', 'Custom Integration'],
+  ['PromptPay QR + Slip OCR', '—', '✓', '✓', 'ตามขอบเขต Enterprise'],
+  ['จัดส่ง / ดิจิทัล / จองคิว', '—', '✓', '✓', 'ตามขอบเขต Enterprise'],
+  ['Webhook / API', '—', '—', 'Webhook ส่งข้อมูลไปภายนอก', 'Custom API: POS / ERP'],
   ['Add-on เมื่อข้อความหมด', '—', '฿499 / 3,000 ข้อความ', '฿499 / 3,000 ข้อความ', 'คุยกับทีมงาน'],
 ];
 
@@ -123,11 +124,18 @@ function formatPrice(value: number | null) {
 }
 
 function getNeoDemoReply(customerMessage: string) {
+  const policyReply = getNeoPolicyReply(customerMessage);
+  if (policyReply) return policyReply;
+
   const question = customerMessage.toLowerCase();
   const asksForPrice = question.includes('ราคา') || question.includes('แพ็กเกจ') || question.includes('เท่าไหร่') || question.includes('ค่าใช้จ่าย');
 
-  if (question.includes('enterprise') || question.includes('องค์กร') || question.includes('erp') || question.includes('pos') || question.includes('wms')) {
-    return 'Neo แนะนำ Enterprise ครับ\n• ฿19,900–39,900 / เดือน\n• AI 100,000–200,000 ข้อความ / เดือน\n• เชื่อมต่อ API หรือ Custom Integration\n• ทีมซัพพอร์ต Dedicated\n\nขอส่งต่อให้ทีมงานช่วยประเมินระบบและสรุปการชำระเงินให้ไหมครับ?';
+  if (question.includes('enterprise') || question.includes('องค์กร') || question.includes('หลายสิบสาขา') || question.includes('erp') || question.includes('pos') || question.includes('wms')) {
+    return 'กรณีเป็นองค์กรหรือมีหลายสาขา Neo แนะนำ Enterprise ครับ\n• Custom Pricing เริ่มต้นประมาณ ฿19,900–39,900 / เดือน\n• AI 100,000–200,000+ ข้อความ / เดือน\n• เชื่อมต่อ Custom API กับ POS / ERP (SAP/Express)\n• SLA 99.9% + ทีม Onboarding ดูแลเป็นพิเศษ\n• สัญญาธุรกิจ, PDPA Data Processing และใบกำกับภาษีเต็มรูปแบบ\n\nเพื่อส่งต่อทีมฝ่ายขายขอข้อมูล 3 อย่างครับ\n1. ชื่อบริษัทหรือแบรนด์\n2. ชื่อผู้ติดต่อและเบอร์โทรศัพท์\n3. ระบบเดิมที่ต้องการเชื่อมต่อ เช่น POS, SAP หรือเว็บไซต์\n\nทีมฝ่ายขายจะติดต่อกลับเพื่อนัด Demo ระบบโดยตรงครับ';
+  }
+
+  if (question.includes('ช่องทางชำระ') || question.includes('เลขบัญชี') || question.includes('โอนเข้าบัญชี') || question.includes('payment link')) {
+    return 'เรื่องช่องทางชำระเงินจริง Neo ขอส่งต่อให้แอดมินตรวจสอบข้อมูลให้ครับ เพื่อความถูกต้องและปลอดภัย ระบบจะไม่แสดงเลขบัญชี ลิงก์ชำระเงิน หรือ QR ที่ไม่ได้ยืนยันครับ';
   }
 
   if (question.includes('ตอบเอง') || question.includes('แอดมินอยู่แล้ว') || question.includes('ไม่ใช้ ai') || question.includes('กลัว ai')) {
@@ -143,10 +151,10 @@ function getNeoDemoReply(customerMessage: string) {
   }
 
   if (asksForPrice) {
-    return 'แพ็กเกจ CUTINEO มี 4 ระดับครับ\n• Starter: ฿490 / เดือน — รวมแชท ไม่ใช้ AI\n• Pro: ฿990 / เดือนปีแรก — AI 4,000 ข้อความ + Slip OCR\n• Advanced: ฿1,990 / เดือน — ช่องทางไม่จำกัด + AI 15,000 ข้อความ\n• Enterprise: ฿19,900–39,900 / เดือน — API และทีม Dedicated\n\nถ้าข้อความ Pro หรือ Advanced หมด มี Add-on ฿499 ต่อ 3,000 ข้อความครับ';
+    return 'แพ็กเกจ CUTINEO มี 4 ระดับครับ\n• Starter: ฿490 / เดือน — รวมแชท ไม่ใช้ AI\n• Pro: ฿990 / เดือนปีแรก — AI 4,000 ข้อความ + PromptPay QR + Slip OCR\n• Advanced: ฿1,990 / เดือน — ช่องทางไม่จำกัด + AI 15,000 ข้อความ + Webhook\n• Enterprise: Custom Pricing เริ่มต้นประมาณ ฿19,900–39,900 / เดือน — Custom API, SLA 99.9% และทีม Onboarding\n\nถ้าข้อความ Pro หรือ Advanced หมด มี Add-on ฿499 ต่อ 3,000 ข้อความครับ';
   }
 
-  return 'Neo พร้อมช่วยแนะนำแพ็กเกจครับ บอกผมได้เลยว่าธุรกิจมีแอดมินกี่คน ใช้กี่เพจ และต้องการ AI ช่วยตอบหรือไม่ แล้วผมจะช่วยเลือกแพ็กเกจที่คุ้มที่สุดให้ครับ';
+    return 'Neo พร้อมช่วยแนะนำแพ็กเกจครับ บอกผมได้เลยว่าธุรกิจมีแอดมินกี่คน ใช้กี่เพจ มีระบบ POS/ERP เดิมหรือไม่ และต้องการ AI ช่วยตอบหรือไม่ แล้วผมจะช่วยเลือกแพ็กเกจที่คุ้มที่สุดให้ครับ';
 }
 
 export default function App() {
@@ -213,9 +221,10 @@ export default function App() {
     window.location.assign(`${baseUrl}register.html?plan=${encodeURIComponent(plan)}`);
   };
 
-  const goToDemo = () => {
+  const goToDemo = (plan?: string) => {
     const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '/');
-    window.location.assign(`${baseUrl}demo.html`);
+    const query = plan ? `?plan=${encodeURIComponent(plan)}` : '';
+    window.location.assign(`${baseUrl}demo.html${query}`);
   };
 
   const goToLogin = () => {
@@ -225,7 +234,7 @@ export default function App() {
 
   const choosePlan = (planName: string) => {
     if (planName === 'Enterprise') {
-      goToDemo();
+      goToDemo('Enterprise');
       return;
     }
     goToRegister(planName);

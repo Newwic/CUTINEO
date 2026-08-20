@@ -57,6 +57,9 @@ a { color: inherit; text-decoration: none; }
 .demo-form-card { padding: 33px 36px 31px; border: 1px solid rgba(220, 233, 232, .92); border-radius: 20px; background: rgba(255, 255, 255, .97); box-shadow: 0 24px 70px rgba(22, 73, 73, .13); }
 .demo-form-heading h2 { margin: 13px 0 5px; font-size: 23px; line-height: 1.35; letter-spacing: -.035em; }
 .demo-form-heading p { margin: 0 0 23px; color: var(--demo-muted); font-size: 12px; line-height: 1.75; }
+.demo-enterprise-note { display: grid; gap: 4px; margin: -8px 0 20px; border: 1px solid #bfeae2; border-radius: 10px; padding: 11px 12px; background: #effcf9; color: var(--demo-primary-dark); font-size: 10px; line-height: 1.55; }
+.demo-enterprise-note strong { font-size: 11px; }
+.demo-enterprise-note span { color: #5d7d80; }
 .demo-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px 12px; }
 .demo-field { display: grid; align-content: start; gap: 7px; min-width: 0; color: var(--demo-ink); font-size: 11px; font-weight: 800; }
 .demo-field-full { grid-column: 1 / -1; }
