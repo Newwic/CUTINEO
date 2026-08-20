@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { OpenClawAdapter } from './services/openClawAdapter';
 
-type BillingCycle = 'monthly' | 'yearly';
 type ChannelKey = 'all' | 'line' | 'facebook' | 'instagram' | 'marketplace';
 type LeadMode = 'trial' | 'contact' | 'login';
 
@@ -58,58 +57,64 @@ const channelMessages: Record<ChannelKey, { name: string; channel: string; chann
 
 const plans = [
   {
-    name: 'Basic',
-    description: 'เริ่มต้นรวมแชทของร้านเล็กให้เป็นระบบ',
-    monthly: 0,
-    yearly: 0,
-    suffix: 'เริ่มใช้งานฟรี',
-    users: 'ผู้ใช้งาน 1 คน',
-    features: ['รวมแชท 3 ช่องทาง', '500 ข้อความต่อเดือน', 'กล่องข้อความกลาง', 'ป้ายกำกับลูกค้า', 'รายงานพื้นฐาน'],
-    button: 'เริ่มใช้ฟรี',
+    name: 'Starter',
+    description: 'ระบบรวมแชทสำหรับร้านที่มีแอดมินตอบเอง ไม่ใช้ AI',
+    monthly: 490,
+    priceLabel: null,
+    priceNote: '',
+    suffix: '/เดือน',
+    users: 'แอดมิน 2 บัญชี',
+    features: ['เชื่อมต่อ 2 บัญชี LINE OA / Facebook Page', 'รวม Inbox ทุกช่องทางในหน้าเดียว', 'โน้ตหลังบ้านและแท็กสถานะลูกค้า', 'คลังข้อความตอบด่วน', 'เก็บประวัติแชท 90 วัน', 'ไม่มี AI ตอบอัตโนมัติ'],
+    button: 'เริ่มต้น Starter',
   },
   {
     name: 'Pro',
-    description: 'เหมาะกับทีมขายที่ต้องตอบลูกค้าให้ไวขึ้น',
+    description: 'AI ช่วยตอบและปิดการขาย 24 ชม. สำหรับร้านค้าทั่วไป',
     monthly: 990,
-    yearly: 792,
+    priceLabel: null,
     suffix: '/เดือน',
-    users: 'ผู้ใช้งาน 3 คน',
-    features: ['รวมแชทไม่จำกัดช่องทาง', 'ไม่จำกัดข้อความ', 'มอบหมายแชทให้ทีม', 'ข้อความตอบกลับสำเร็จรูป', 'LINE Broadcast', 'สรุปบทสนทนาด้วย AI'],
-    button: 'ทดลอง Pro ฟรี',
+    priceNote: 'โปรโมชั่นปีแรก · ปีถัดไป ฿1,490/เดือน',
+    users: 'แอดมิน 5 บัญชี',
+    features: ['เชื่อมต่อ 5 บัญชี LINE OA / Facebook / Instagram', 'AI ตอบอัตโนมัติ 4,000 ข้อความ/เดือน', 'PromptPay QR ระบุยอดอัตโนมัติ', 'Slip OCR ตรวจสลิปและป้องกันสลิปซ้ำ', 'รองรับจัดส่ง / สินค้าดิจิทัล / จองคิว', 'ประวัติแชทไม่จำกัด'],
+    button: 'เลือก Pro',
     featured: true,
   },
   {
     name: 'Advanced',
-    description: 'ขยายทีมด้วยระบบอัตโนมัติและข้อมูลเชิงลึก',
+    description: 'สเกลยอดขาย ยิงแอดหนัก และดูแลหลายสาขาหลายเพจ',
     monthly: 1990,
-    yearly: 1592,
+    priceLabel: null,
+    priceNote: '',
     suffix: '/เดือน',
-    users: 'ผู้ใช้งาน 10 คน',
-    features: ['ทุกฟีเจอร์ของ Pro', 'แชทบอท AI ตลอด 24 ชม.', 'Workflow อัตโนมัติ', 'แดชบอร์ดวิเคราะห์ข้อมูล', 'เชื่อมต่อ Webhook', 'จัดการออเดอร์และรีวิว'],
+    users: 'แอดมิน 15 บัญชี',
+    features: ['เชื่อมต่อช่องทางไม่จำกัด', 'AI ตอบอัตโนมัติ 15,000 ข้อความ/เดือน', 'ทุกฟีเจอร์ของ Pro', 'รองรับ Webhook พื้นฐาน', 'เหมาะกับหลายสาขาหรือหลายเพจ'],
     button: 'เลือก Advanced',
   },
   {
     name: 'Enterprise',
-    description: 'โซลูชันที่ปรับตามกระบวนการขององค์กร',
+    description: 'สำหรับองค์กรและแบรนด์ใหญ่ที่มีระบบหลังบ้านเฉพาะทาง',
     monthly: null,
-    yearly: null,
-    suffix: 'คุยกับทีมงาน',
-    users: 'ผู้ใช้งานไม่จำกัด',
-    features: ['ทุกฟีเจอร์ของ Advanced', 'สิทธิ์การใช้งานแบบละเอียด', 'เชื่อมต่อระบบภายใน', 'ทีมดูแลเฉพาะบัญชี', 'SLA และความปลอดภัยระดับองค์กร'],
-    button: 'ติดต่อเรา',
+    priceLabel: '฿19,900–39,900',
+    priceNote: '',
+    suffix: '/เดือน',
+    users: 'แอดมินและช่องทางไม่จำกัด',
+    features: ['AI ตอบอัตโนมัติ 100,000–200,000 ข้อความ/เดือน', 'เชื่อมต่อ API / Custom Integration', 'รองรับ ERP / POS / WMS', 'ทีมซัพพอร์ต Dedicated'],
+    button: 'ติดต่อทีมงาน',
   },
 ];
 
 const compareRows = [
-  ['รวมแชทจากหลายช่องทาง', '3 ช่องทาง', 'ไม่จำกัด', 'ไม่จำกัด', 'ไม่จำกัด'],
-  ['ผู้ใช้งานในทีม', '1 คน', '3 คน', '10 คน', 'ไม่จำกัด'],
+  ['บัญชีและช่องทางที่เชื่อมต่อ', '2 บัญชี: LINE OA / Facebook Page', '5 บัญชี: LINE OA / FB / IG', 'ไม่จำกัด', 'ไม่จำกัด'],
+  ['แอดมินในทีม', '2 บัญชี', '5 บัญชี', '15 บัญชี', 'ไม่จำกัด'],
+  ['AI ตอบอัตโนมัติ', 'ไม่มี', '4,000 ข้อความ/เดือน', '15,000 ข้อความ/เดือน', '100,000–200,000 ข้อความ/เดือน'],
   ['กล่องข้อความกลาง', '✓', '✓', '✓', '✓'],
-  ['มอบหมายแชทให้ทีม', '—', '✓', '✓', '✓'],
-  ['ข้อความตอบกลับสำเร็จรูป', '—', '✓', '✓', '✓'],
-  ['LINE Broadcast', '—', '✓', '✓', '✓'],
-  ['แชทบอทและสรุปด้วย AI', '—', 'สรุปแชท', 'เต็มรูปแบบ', 'เต็มรูปแบบ'],
-  ['ระบบอัตโนมัติ / Webhook', '—', '—', '✓', 'ปรับแต่งได้'],
-  ['ทีมดูแลเฉพาะบัญชี', '—', '—', '—', '✓'],
+  ['Internal Note และแท็กสถานะ', '✓', '✓', '✓', '✓'],
+  ['Quick Replies', '✓', '✓', '✓', '✓'],
+  ['ประวัติแชท', '90 วัน', 'ไม่จำกัด', 'ไม่จำกัด', 'ไม่จำกัด'],
+  ['PromptPay QR + Slip OCR', '—', '✓', '✓', '✓'],
+  ['จัดส่ง / ดิจิทัล / จองคิว', '—', '✓', '✓', '✓'],
+  ['Webhook / API', '—', '—', 'Webhook พื้นฐาน', 'Custom Integration'],
+  ['Add-on เมื่อข้อความหมด', '—', '฿499 / 3,000 ข้อความ', '฿499 / 3,000 ข้อความ', 'คุยกับทีมงาน'],
 ];
 
 function formatPrice(value: number | null) {
@@ -119,20 +124,17 @@ function formatPrice(value: number | null) {
 
 export default function App() {
   const adapter = useMemo(() => new OpenClawAdapter(), []);
-  const [billing, setBilling] = useState<BillingCycle>('monthly');
   const [activeChannel, setActiveChannel] = useState<ChannelKey>('all');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const [connectionStatus, setConnectionStatus] = useState<'online' | 'offline' | 'connecting'>('offline');
   const [leadMode, setLeadMode] = useState<LeadMode | null>(null);
-  const [selectedPlan, setSelectedPlan] = useState('Basic');
+  const [selectedPlan, setSelectedPlan] = useState('Starter');
   const [demoDraft, setDemoDraft] = useState('');
   const [demoMessages, setDemoMessages] = useState<Array<{ id: number; role: 'team' | 'neo'; text: string }>>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeConversation = useMemo(() => channelMessages[activeChannel], [activeChannel]);
-  const yearlyDiscount = billing === 'yearly' ? 'ประหยัด 20%' : '';
-
   useEffect(() => {
     const unsubscribe = adapter.onConnection(setConnectionStatus);
     adapter.connect();
@@ -172,14 +174,14 @@ export default function App() {
     window.setTimeout(() => setNotice(''), 4500);
   };
 
-  const openLeadModal = (mode: LeadMode, plan = 'Basic') => {
+  const openLeadModal = (mode: LeadMode, plan = 'Starter') => {
     setSelectedPlan(plan);
     setNotice('');
     setLeadMode(mode);
     setMobileMenuOpen(false);
   };
 
-  const goToRegister = (plan = 'Basic') => {
+  const goToRegister = (plan = 'Starter') => {
     const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '/');
     window.location.assign(`${baseUrl}register.html?plan=${encodeURIComponent(plan)}`);
   };
@@ -245,7 +247,7 @@ export default function App() {
     const business = String(form.get('business') ?? '').trim();
     announce(mode === 'contact'
       ? `รับข้อมูลของ ${name || 'คุณ'} แล้วครับ ทีม CUTINEO จะติดต่อกลับเรื่องแพ็กเกจ ${selectedPlan}`
-      : `รับคำขอทดลองใช้ของ ${name || 'คุณ'} แล้วครับ — แพ็กเกจ ${selectedPlan} พร้อมให้ทดลองในเดโมนี้`);
+      : `รับข้อมูลของ ${name || 'คุณ'} แล้วครับ ทีม CUTINEO จะติดต่อกลับเรื่องแพ็กเกจ ${selectedPlan}`);
     if (business) {
       try {
         window.localStorage.setItem('cutineo-last-lead', JSON.stringify({ name, email, business, plan: selectedPlan, mode, createdAt: new Date().toISOString() }));
@@ -272,7 +274,7 @@ export default function App() {
 
         <div className="header-actions">
           <button className="login-link" type="button" onClick={goToLogin}>เข้าสู่ระบบ</button>
-          <button className="button button-dark button-small" type="button" onClick={() => goToRegister()}>ทดลองใช้งานฟรี</button>
+          <button className="button button-dark button-small" type="button" onClick={() => goToRegister()}>เริ่มต้นกับ Starter</button>
         </div>
         <button className={`menu-toggle ${mobileMenuOpen ? 'is-active' : ''}`} type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen}>
           <span /><span /><span />
@@ -286,12 +288,12 @@ export default function App() {
             <h1>รวมทุกแชทของร้านคุณ<br /><span>ไว้ในที่เดียว</span></h1>
             <p className="hero-lead">ไม่ต้องสลับหลายแอปให้วุ่นวาย ตอบลูกค้าจาก LINE, Facebook, Instagram และ Marketplace ได้ในกล่องข้อความเดียว</p>
             <div className="hero-actions">
-              <button className="button button-primary" type="button" onClick={() => goToRegister()}>เริ่มต้นฟรี <span aria-hidden="true">→</span></button>
+              <button className="button button-primary" type="button" onClick={() => goToRegister()}>เริ่มต้นกับ Starter <span aria-hidden="true">→</span></button>
               <button className="text-button" type="button" onClick={() => scrollTo('demo')}>ดูการทำงาน <span className="play-icon" aria-hidden="true">▶</span></button>
             </div>
             <div className="hero-trust">
               <span className="trust-avatars" aria-hidden="true"><i>น</i><i>พ</i><i>อ</i></span>
-              <span><strong>เริ่มใช้ฟรีได้ทันที</strong><br />ไม่ต้องใช้บัตรเครดิต</span>
+              <span><strong>Starter ฿490 / เดือน</strong><br />รวม Inbox และเครื่องมือจัดการแชท</span>
             </div>
           </div>
 
@@ -360,18 +362,14 @@ export default function App() {
 
         <section className="pricing-section section-shell" id="pricing">
           <div className="section-heading centered-heading"><div className="eyebrow">SIMPLE, FAIR PRICING</div><h2>แพ็กเกจที่โตไปพร้อมกับธุรกิจคุณ</h2><p>เริ่มจากสิ่งที่จำเป็น แล้วอัปเกรดเมื่อทีมและยอดขายของคุณเติบโต</p></div>
-          <div className="billing-switch" role="group" aria-label="เลือกรอบการชำระเงิน">
-            <button className={billing === 'monthly' ? 'is-active' : ''} type="button" onClick={() => setBilling('monthly')}>รายเดือน</button>
-            <button className={billing === 'yearly' ? 'is-active' : ''} type="button" onClick={() => setBilling('yearly')}>รายปี <span>{yearlyDiscount}</span></button>
-          </div>
           <div className="pricing-grid">
             {plans.map((plan) => {
-              const price = billing === 'yearly' ? plan.yearly : plan.monthly;
+              const price = plan.monthly;
               return <article className={`plan-card ${plan.featured ? 'is-featured' : ''}`} key={plan.name}>
                 {plan.featured && <div className="popular-ribbon">แนะนำสำหรับทีมที่กำลังโต</div>}
                 <div className="plan-top"><span className="plan-label">{plan.name}</span>{plan.featured && <span className="plan-star">✦</span>}</div>
-                <h3>{price === null ? 'คุยกับเรา' : price === 0 ? 'ฟรี' : <>฿{formatPrice(price)}<small>{plan.suffix}</small></>}</h3>
-                {price !== null && price !== 0 && billing === 'yearly' && <span className="billing-note">คิดเป็นรายปี ฿{formatPrice(price * 12)}</span>}
+                <h3>{price === null ? plan.priceLabel : <>฿{formatPrice(price)}<small>{plan.suffix}</small></>}</h3>
+                {plan.priceNote && <span className="billing-note">{plan.priceNote}</span>}
                 <p className="plan-description">{plan.description}</p>
                 <button className={`plan-button ${plan.featured ? 'button-primary' : ''}`} type="button" onClick={() => choosePlan(plan.name)}>{plan.button} <span>→</span></button>
                 <div className="plan-divider" />
@@ -381,16 +379,16 @@ export default function App() {
               </article>;
             })}
           </div>
-          <p className="pricing-footnote">* ราคานี้เป็นราคาเดโมสำหรับออกแบบประสบการณ์ใช้งาน อาจมีการปรับตามจำนวนช่องทางและข้อความจริง</p>
+          <p className="pricing-footnote">Add-on สำหรับ Pro และ Advanced เมื่อข้อความหมด: ฿499 ต่อ 3,000 ข้อความ</p>
         </section>
 
         <section className="compare-section section-shell" id="compare">
           <div className="section-heading"><div className="eyebrow">COMPARE PLANS</div><h2>เลือกฟีเจอร์ที่เหมาะกับทีม</h2><p>ดูรายละเอียดแต่ละแพ็กเกจแบบชัด ๆ ก่อนเริ่มใช้งาน</p></div>
-          <div className="compare-wrap"><table><thead><tr><th>ฟีเจอร์</th><th>Basic</th><th className="highlight-column">Pro</th><th>Advanced</th><th>Enterprise</th></tr></thead><tbody>{compareRows.map((row) => <tr key={row[0]}>{row.map((cell, index) => <td className={`${index === 2 ? 'highlight-column' : ''} ${cell === '✓' ? 'check-cell' : ''}`} key={`${row[0]}-${index}`}>{cell}</td>)}</tr>)}</tbody></table></div>
+          <div className="compare-wrap"><table><thead><tr><th>ฟีเจอร์</th><th>Starter</th><th className="highlight-column">Pro</th><th>Advanced</th><th>Enterprise</th></tr></thead><tbody>{compareRows.map((row) => <tr key={row[0]}>{row.map((cell, index) => <td className={`${index === 2 ? 'highlight-column' : ''} ${cell === '✓' ? 'check-cell' : ''}`} key={`${row[0]}-${index}`}>{cell}</td>)}</tr>)}</tbody></table></div>
         </section>
 
         <section className="cta-section section-shell" id="contact">
-          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>ลองใช้ CUTINEO ฟรี แล้วให้ทีมของคุณเห็นความต่างตั้งแต่วันแรก</p><button className="button button-light" type="button" onClick={() => goToRegister()}>เริ่มต้นฟรี <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><span>N</span></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
+          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>เริ่มต้นด้วย Starter ฿490 / เดือน แล้วอัปเกรดเป็น Pro เมื่ออยากให้ Neo ช่วยตอบและปิดการขาย</p><button className="button button-light" type="button" onClick={() => goToRegister()}>เริ่มต้นกับ Starter <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><span>N</span></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
         </section>
       </main>
 
@@ -400,14 +398,14 @@ export default function App() {
         <section className="lead-modal" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title">
           <button className="modal-close" type="button" onClick={() => setLeadMode(null)} aria-label="ปิดหน้าต่าง">×</button>
           <div className="modal-icon">{leadMode === 'login' ? '↗' : leadMode === 'contact' ? '✦' : 'N'}</div>
-          <div className="eyebrow">{leadMode === 'login' ? 'WELCOME BACK' : leadMode === 'contact' ? 'TALK TO CUTINEO' : 'START YOUR FREE TRIAL'}</div>
-          <h2 id="lead-modal-title">{leadMode === 'login' ? 'เข้าสู่โหมดเดโม' : leadMode === 'contact' ? 'คุยกับทีม CUTINEO' : 'เริ่มทดลองใช้งานฟรี'}</h2>
+          <div className="eyebrow">{leadMode === 'login' ? 'WELCOME BACK' : leadMode === 'contact' ? 'TALK TO CUTINEO' : 'GET STARTED WITH CUTINEO'}</div>
+          <h2 id="lead-modal-title">{leadMode === 'login' ? 'เข้าสู่โหมดเดโม' : leadMode === 'contact' ? 'คุยกับทีม CUTINEO' : 'เริ่มต้นกับ CUTINEO'}</h2>
           <p>{leadMode === 'login' ? 'กรอกข้อมูลเพื่อทดลองหน้าการเข้าสู่ระบบ ฟังก์ชันนี้ยังไม่เชื่อมต่อบัญชีจริง' : `กรอกข้อมูลสั้น ๆ เพื่อเริ่มต้นกับแพ็กเกจ ${selectedPlan}`}</p>
           <form className="lead-form" key={`${leadMode}-${selectedPlan}`} onSubmit={handleLeadSubmit}>
             {leadMode !== 'login' && <label>ชื่อผู้ติดต่อ<input name="name" type="text" placeholder="เช่น คุณนิว" required autoFocus /></label>}
             <label>อีเมล{leadMode === 'login' ? 'สำหรับเข้าสู่ระบบ' : ''}<input name="email" type="email" placeholder="you@example.com" required autoFocus={leadMode === 'login'} /></label>
             {leadMode === 'login' ? <label>รหัสผ่านเดโม<input name="password" type="password" placeholder="อย่างน้อย 6 ตัวอักษร" minLength={6} required /></label> : <label>ชื่อธุรกิจ<input name="business" type="text" placeholder="ชื่อร้านหรือบริษัท" required /></label>}
-            <button className="button button-primary modal-submit" type="submit">{leadMode === 'login' ? 'เข้าโหมดเดโม' : leadMode === 'contact' ? 'ส่งข้อมูลให้ทีมงาน' : 'เริ่มทดลองใช้ฟรี'} <span>→</span></button>
+            <button className="button button-primary modal-submit" type="submit">{leadMode === 'login' ? 'เข้าโหมดเดโม' : leadMode === 'contact' ? 'ส่งข้อมูลให้ทีมงาน' : 'ส่งข้อมูลให้ทีมงาน'} <span>→</span></button>
           </form>
           <small className="modal-note">เดโมนี้ไม่เรียกเก็บเงินและไม่ส่งข้อมูลออกจากเครื่อง</small>
         </section>

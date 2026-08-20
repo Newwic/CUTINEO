@@ -1,6 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 
-type PlanName = 'Basic' | 'Pro' | 'Advanced';
+type PlanName = 'Starter' | 'Pro' | 'Advanced';
 type LegalDocument = 'terms' | 'privacy' | null;
 
 type RegistrationForm = {
@@ -13,12 +13,12 @@ type RegistrationForm = {
   terms: boolean;
 };
 
-const planNames: PlanName[] = ['Basic', 'Pro', 'Advanced'];
+const planNames: PlanName[] = ['Starter', 'Pro', 'Advanced'];
 
 const planCopy: Record<PlanName, { label: string; description: string }> = {
-  Basic: { label: 'Basic', description: 'เริ่มต้นรวมแชทของร้านเล็ก ๆ ได้ทันที' },
-  Pro: { label: 'Pro', description: 'เหมาะกับทีมขายที่ต้องตอบลูกค้าให้ไวขึ้น' },
-  Advanced: { label: 'Advanced', description: 'สำหรับทีมที่ต้องการ automation และข้อมูลเชิงลึก' },
+  Starter: { label: 'Starter', description: 'ระบบรวมแชทล้วนสำหรับแอดมิน 2 บัญชี ราคา 490 บาท / เดือน' },
+  Pro: { label: 'Pro', description: 'AI ช่วยตอบและปิดการขาย 4,000 ข้อความ / เดือน ราคา 990 บาท / เดือนในปีแรก' },
+  Advanced: { label: 'Advanced', description: 'ช่องทางไม่จำกัด แอดมิน 15 บัญชี ราคา 1,990 บาท / เดือน' },
 };
 
 const countryCodes = ['+66', '+65', '+63', '+60', '+62', '+86', '+81', '+1'];
@@ -40,7 +40,7 @@ function getBaseUrl() {
 
 function getInitialPlan(): PlanName {
   const requestedPlan = new URLSearchParams(window.location.search).get('plan');
-  return planNames.includes(requestedPlan as PlanName) ? (requestedPlan as PlanName) : 'Basic';
+  return planNames.includes(requestedPlan as PlanName) ? (requestedPlan as PlanName) : 'Starter';
 }
 
 function isEmail(value: string) {
@@ -181,7 +181,7 @@ export default function RegisterApp() {
           <div className="register-card-heading">
             <span className="register-kicker">START YOUR FREE TRIAL</span>
             <h2 id="register-form-title">สร้างบัญชี CUTINEO</h2>
-            <p>กรอกข้อมูลด้านล่างเพื่อเริ่มทดลองใช้งานฟรี 7 วัน</p>
+            <p>กรอกข้อมูลด้านล่างเพื่อเริ่มต้นใช้งาน CUTINEO ตามแพ็กเกจที่เลือก</p>
           </div>
 
           <div className="selected-plan-row">
@@ -249,7 +249,7 @@ export default function RegisterApp() {
             </label>
             {errors.terms && <small className="field-error terms-error">{errors.terms}</small>}
 
-            <button className="register-primary-button" type="submit">ทดลองใช้ฟรี 7 วัน <span>→</span></button>
+            <button className="register-primary-button" type="submit">ส่งข้อมูลเริ่มต้นใช้งาน <span>→</span></button>
             <small className="form-note">ไม่ต้องใช้บัตรเครดิต • ยกเลิกได้ทุกเมื่อ</small>
           </form>
         </section>
