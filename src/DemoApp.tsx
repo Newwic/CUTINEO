@@ -145,7 +145,7 @@ export default function DemoApp() {
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const goHome = () => window.location.assign(homeUrl);
   const goToRegister = () => window.location.assign(registerUrl);
-  const goToLogin = () => window.location.assign(`${homeUrl}?login=1`);
+  const goToLogin = () => window.location.assign(`${baseUrl}login/`);
   const toggleLanguage = () => setLanguage((current) => current === 'th' ? 'en' : 'th');
 
   const validate = () => {

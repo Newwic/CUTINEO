@@ -14,6 +14,7 @@ export default defineConfig(({ command, mode }) => {
           main: 'index.html',
           register: 'register.html',
           demo: 'demo.html',
+          login: 'login/index.html',
         },
       },
     },

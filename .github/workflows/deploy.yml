@@ -1,4 +1,4 @@
-name: CUTINEO Next.js CI
+name: CUTINEO CI and GitHub Pages
 
 on:
   push:
@@ -9,9 +9,11 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 concurrency:
-  group: cutineo-next-ci-${{ github.ref }}
+  group: cutineo-pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -39,3 +41,43 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+  pages-build:
+    name: Build static website for GitHub Pages
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build static website
+        env:
+          VITE_BASE_PATH: /CUTINEO/
+        run: npm run build:pages
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+  pages-deploy:
+    name: Deploy GitHub Pages
+    if: github.event_name != 'pull_request'
+    needs: pages-build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

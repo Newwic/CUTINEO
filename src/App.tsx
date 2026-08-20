@@ -189,6 +189,11 @@ export default function App() {
     window.location.assign(`${baseUrl}demo.html`);
   };
 
+  const goToLogin = () => {
+    const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '/');
+    window.location.assign(`${baseUrl}login/`);
+  };
+
   const choosePlan = (planName: string) => {
     if (planName === 'Enterprise') {
       goToDemo();
@@ -266,7 +271,7 @@ export default function App() {
         </nav>
 
         <div className="header-actions">
-          <button className="login-link" type="button" onClick={() => openLeadModal('login')}>เข้าสู่ระบบ</button>
+          <button className="login-link" type="button" onClick={goToLogin}>เข้าสู่ระบบ</button>
           <button className="button button-dark button-small" type="button" onClick={() => goToRegister()}>ทดลองใช้งานฟรี</button>
         </div>
         <button className={`menu-toggle ${mobileMenuOpen ? 'is-active' : ''}`} type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen}>

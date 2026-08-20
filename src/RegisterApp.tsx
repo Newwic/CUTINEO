@@ -78,7 +78,7 @@ export default function RegisterApp() {
   };
 
   const goHome = () => window.location.assign(homeUrl);
-  const goToLogin = () => window.location.assign(`${homeUrl}?login=1`);
+  const goToLogin = () => window.location.assign(`${baseUrl}login/`);
 
   const validate = () => {
     const nextErrors: Partial<Record<keyof RegistrationForm, string>> = {};
