@@ -8,6 +8,14 @@ export default defineConfig(({ command, mode }) => {
     base: command === 'build' ? (env.VITE_BASE_PATH || '/') : '/',
     plugins: [react()],
     clearScreen: false,
+    build: {
+      rollupOptions: {
+        input: {
+          main: 'index.html',
+          register: 'register.html',
+        },
+      },
+    },
     server: {
       port: 1420,
       strictPort: true,

@@ -155,6 +155,13 @@ export default function App() {
     };
   }, [leadMode]);
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('login') === '1') {
+      setLeadMode('login');
+      window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.hash}`);
+    }
+  }, []);
+
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setMobileMenuOpen(false);
@@ -172,8 +179,17 @@ export default function App() {
     setMobileMenuOpen(false);
   };
 
+  const goToRegister = (plan = 'Basic') => {
+    const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/$/, '/');
+    window.location.assign(`${baseUrl}register.html?plan=${encodeURIComponent(plan)}`);
+  };
+
   const choosePlan = (planName: string) => {
-    openLeadModal(planName === 'Enterprise' ? 'contact' : 'trial', planName);
+    if (planName === 'Enterprise') {
+      openLeadModal('contact', planName);
+      return;
+    }
+    goToRegister(planName);
   };
 
   const selectChannel = (channel: ChannelKey) => {
@@ -246,7 +262,7 @@ export default function App() {
 
         <div className="header-actions">
           <button className="login-link" type="button" onClick={() => openLeadModal('login')}>เข้าสู่ระบบ</button>
-          <button className="button button-dark button-small" type="button" onClick={() => openLeadModal('trial')}>ทดลองใช้งานฟรี</button>
+          <button className="button button-dark button-small" type="button" onClick={() => goToRegister()}>ทดลองใช้งานฟรี</button>
         </div>
         <button className={`menu-toggle ${mobileMenuOpen ? 'is-active' : ''}`} type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen}>
           <span /><span /><span />
@@ -260,7 +276,7 @@ export default function App() {
             <h1>รวมทุกแชทของร้านคุณ<br /><span>ไว้ในที่เดียว</span></h1>
             <p className="hero-lead">ไม่ต้องสลับหลายแอปให้วุ่นวาย ตอบลูกค้าจาก LINE, Facebook, Instagram และ Marketplace ได้ในกล่องข้อความเดียว</p>
             <div className="hero-actions">
-              <button className="button button-primary" type="button" onClick={() => openLeadModal('trial')}>เริ่มต้นฟรี <span aria-hidden="true">→</span></button>
+              <button className="button button-primary" type="button" onClick={() => goToRegister()}>เริ่มต้นฟรี <span aria-hidden="true">→</span></button>
               <button className="text-button" type="button" onClick={() => scrollTo('demo')}>ดูการทำงาน <span className="play-icon" aria-hidden="true">▶</span></button>
             </div>
             <div className="hero-trust">
@@ -364,7 +380,7 @@ export default function App() {
         </section>
 
         <section className="cta-section section-shell" id="contact">
-          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>ลองใช้ CUTINEO ฟรี แล้วให้ทีมของคุณเห็นความต่างตั้งแต่วันแรก</p><button className="button button-light" type="button" onClick={() => openLeadModal('trial')}>เริ่มต้นฟรี <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><span>N</span></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
+          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>ลองใช้ CUTINEO ฟรี แล้วให้ทีมของคุณเห็นความต่างตั้งแต่วันแรก</p><button className="button button-light" type="button" onClick={() => goToRegister()}>เริ่มต้นฟรี <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><span>N</span></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
         </section>
       </main>
 
