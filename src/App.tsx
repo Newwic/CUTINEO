@@ -122,6 +122,33 @@ function formatPrice(value: number | null) {
   return new Intl.NumberFormat('th-TH').format(value);
 }
 
+function getNeoDemoReply(customerMessage: string) {
+  const question = customerMessage.toLowerCase();
+  const asksForPrice = question.includes('ราคา') || question.includes('แพ็กเกจ') || question.includes('เท่าไหร่') || question.includes('ค่าใช้จ่าย');
+
+  if (question.includes('enterprise') || question.includes('องค์กร') || question.includes('erp') || question.includes('pos') || question.includes('wms')) {
+    return 'Neo แนะนำ Enterprise ครับ\n• ฿19,900–39,900 / เดือน\n• AI 100,000–200,000 ข้อความ / เดือน\n• เชื่อมต่อ API หรือ Custom Integration\n• ทีมซัพพอร์ต Dedicated\n\nขอส่งต่อให้ทีมงานช่วยประเมินระบบและสรุปการชำระเงินให้ไหมครับ?';
+  }
+
+  if (question.includes('ตอบเอง') || question.includes('แอดมินอยู่แล้ว') || question.includes('ไม่ใช้ ai') || question.includes('กลัว ai')) {
+    return 'ถ้ามีแอดมินคอยตอบเอง Neo แนะนำ Starter ครับ\n• ฿490 / เดือน\n• เชื่อมต่อ 2 บัญชี LINE OA / Facebook Page\n• แอดมิน 2 บัญชี\n• รวม Inbox, Internal Note, แท็ก และ Quick Replies\n• เก็บประวัติแชท 90 วัน\n• ไม่มี AI ตอบอัตโนมัติ\n\nเหมาะกับร้านที่ต้องการจัดระเบียบแชทโดยให้ทีมเป็นคนตอบครับ';
+  }
+
+  if (question.includes('ตอบไม่ทัน') || question.includes('ตอนดึก') || question.includes('ตรวจสลิป') || question.includes('slip') || question.includes('promptpay') || question.includes('ai')) {
+    return 'จากความต้องการนี้ Neo แนะนำ Pro ครับ\n• ฿990 / เดือนในปีแรก และปีถัดไป ฿1,490 / เดือน\n• AI ตอบอัตโนมัติ 4,000 ข้อความ / เดือน\n• PromptPay QR ระบุยอดอัตโนมัติ\n• Slip OCR ตรวจสลิปและป้องกันสลิปซ้ำ\n• รองรับจัดส่ง สินค้าดิจิทัล และจองคิว\n\nถ้าข้อความหมด เพิ่มได้ 499 บาท ต่อ 3,000 ข้อความครับ';
+  }
+
+  if (question.includes('ยิงแอด') || question.includes('หลายสาขา') || question.includes('หลายเพจ') || question.includes('webhook') || question.includes('ขนาดกลาง')) {
+    return 'ถ้าธุรกิจมีหลายเพจ ยิงแอดหนัก หรือมีหลายสาขา Neo แนะนำ Advanced ครับ\n• ฿1,990 / เดือน\n• เชื่อมต่อช่องทางไม่จำกัด\n• แอดมิน 15 บัญชี\n• AI ตอบอัตโนมัติ 15,000 ข้อความ / เดือน\n• มีทุกฟีเจอร์ของ Pro และ Webhook พื้นฐาน\n\nเมื่อข้อความหมด เพิ่มได้ 499 บาท ต่อ 3,000 ข้อความครับ';
+  }
+
+  if (asksForPrice) {
+    return 'แพ็กเกจ CUTINEO มี 4 ระดับครับ\n• Starter: ฿490 / เดือน — รวมแชท ไม่ใช้ AI\n• Pro: ฿990 / เดือนปีแรก — AI 4,000 ข้อความ + Slip OCR\n• Advanced: ฿1,990 / เดือน — ช่องทางไม่จำกัด + AI 15,000 ข้อความ\n• Enterprise: ฿19,900–39,900 / เดือน — API และทีม Dedicated\n\nถ้าข้อความ Pro หรือ Advanced หมด มี Add-on ฿499 ต่อ 3,000 ข้อความครับ';
+  }
+
+  return 'Neo พร้อมช่วยแนะนำแพ็กเกจครับ บอกผมได้เลยว่าธุรกิจมีแอดมินกี่คน ใช้กี่เพจ และต้องการ AI ช่วยตอบหรือไม่ แล้วผมจะช่วยเลือกแพ็กเกจที่คุ้มที่สุดให้ครับ';
+}
+
 export default function App() {
   const adapter = useMemo(() => new OpenClawAdapter(), []);
   const [activeChannel, setActiveChannel] = useState<ChannelKey>('all');
@@ -218,7 +245,7 @@ export default function App() {
     setDemoMessages((current) => [...current, { id: Date.now(), role: 'team', text }]);
     setDemoDraft('');
     window.setTimeout(() => {
-      setDemoMessages((current) => [...current, { id: Date.now(), role: 'neo', text: `NEO ช่วยร่างคำตอบให้แล้ว: รับเรื่อง “${text}” เรียบร้อยครับ` }]);
+      setDemoMessages((current) => [...current, { id: Date.now(), role: 'neo', text: getNeoDemoReply(text) }]);
     }, 500);
   };
 
