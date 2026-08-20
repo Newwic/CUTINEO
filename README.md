@@ -1,14 +1,14 @@
-# CUTINEO — NEO Chat
+# CUTINEO — รวมทุกแชทไว้ในที่เดียว
 
-เว็บแชท NEO สำหรับเปิดดูผ่าน GitHub Pages โดยใช้ React + Vite
+หน้าเว็บต้นแบบสำหรับ CUTINEO ระบบรวมแชทสำหรับทีมขาย สร้างด้วย React + Vite และออกแบบให้เปิดดูได้บน GitHub Pages
 
-## ฟีเจอร์
+## ในหน้านี้มีอะไรบ้าง
 
-- Chat Panel ใช้งานได้ทันทีในหน้าเว็บ
-- Offline Demo ตอบกลับข้อความโดยไม่ต้องใช้ API key
-- NEO state animation และ event adapter
-- รองรับการต่อ OpenClaw ผ่าน `VITE_OPENCLAW_WS_URL` เมื่อมี endpoint ที่ยืนยันแล้ว
-- GitHub Actions build และ deploy ไป GitHub Pages อัตโนมัติเมื่อ push เข้า `main`
+- Hero พร้อมตัวอย่างกล่องข้อความกลางจากหลายช่องทาง
+- ฟีเจอร์รวมแชท, NEO ช่วยแนะนำคำตอบ และ Workflow อัตโนมัติ
+- ตารางแพ็กเกจ Basic, Pro, Advanced และ Enterprise
+- สลับราคาการชำระรายเดือน/รายปี
+- ตารางเปรียบเทียบฟีเจอร์และ layout แบบ responsive สำหรับมือถือ
 
 ## รันในเครื่อง
 
@@ -19,14 +19,15 @@ npm.cmd run dev
 
 เปิด `http://127.0.0.1:1420`
 
-## Build
+## ตรวจสอบก่อน deploy
 
 ```powershell
+npm.cmd test
 npm.cmd run build
 ```
 
-หน้าเว็บ GitHub Pages จะอยู่ที่:
+หน้า GitHub Pages:
 
 `https://newwic.github.io/CUTINEO/`
 
-ไม่ควรใส่ API key ลงใน frontend หรือ commit ขึ้น repository สาธารณะ
+อย่าใส่ API key หรือข้อมูลลับลงใน frontend และอย่า commit ข้อมูลลับขึ้น repository สาธารณะ
