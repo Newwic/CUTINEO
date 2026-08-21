@@ -26,11 +26,10 @@ function logoFor(id: string) {
   return integrations.find((integration) => integration.id === id)?.logo ?? '';
 }
 
-function ChannelLogo({ id, name }: { id: string; name: string }) {
+function ChannelLogo({ id }: { id: string }) {
   return (
     <span className={styles.channelLogo}>
       <img src={logoFor(id)} alt="" width="22" height="22" onError={(event) => { event.currentTarget.hidden = true; }} />
-      <span aria-hidden="true">{name.slice(0, 2)}</span>
     </span>
   );
 }
@@ -107,7 +106,7 @@ export default function HeroInboxDemo() {
                 key={item.name}
                 onClick={() => { setSelectedConversation(index); setSentMessage(''); }}
               >
-                <ChannelLogo id={item.integration} name={item.badge} />
+                <ChannelLogo id={item.integration} />
                 <span className={styles.demoConversationCopy}>
                   <strong>{item.name}</strong>
                   <small><span className={styles.demoStatusDot} /> {item.channel} · {index === 0 ? '10:24' : `${9 + index}:5${index}`}</small>

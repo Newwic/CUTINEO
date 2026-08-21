@@ -35,7 +35,7 @@ export default function IntegrationStrip() {
         <div className={styles.integrationGrid}>
           {visibleIntegrations.map((integration) => (
             <article className={styles.integrationCard} key={integration.id}>
-              <div className={styles.integrationLogo}><img src={integration.logo} alt={`${integration.name} logo`} width="32" height="32" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} /><span aria-hidden="true">{integration.name.slice(0, 2)}</span></div>
+              <div className={styles.integrationLogo}><img src={integration.logo} alt={`${integration.name} logo`} width="32" height="32" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} /></div>
               <div className={styles.integrationCopy}>
                 <strong>{integration.name}</strong>
                 <StatusBadge status={integration.status} />

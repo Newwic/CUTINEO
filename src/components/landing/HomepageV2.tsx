@@ -97,13 +97,13 @@ export default function HomepageV2({ basePath = '', signupRoute = 'register', lo
               <div className={styles.floatingChannels} aria-hidden="true">
                 {integrations.slice(0, 5).map((integration, index) => (
                   <div className={`${styles.floatChannel} ${styles[`floatDelay${index}`]}`} style={{ top: `${30 + index * 82}px` }} key={integration.id}>
-                    <img src={integration.logo} alt="" width="28" height="28" onError={(event) => { event.currentTarget.hidden = true; }} /><span aria-hidden="true">{integration.name.slice(0, 2)}</span>
+                    <img src={integration.logo} alt="" width="30" height="30" onError={(event) => { event.currentTarget.hidden = true; }} />
                     <small>{integration.name}</small>
                   </div>
                 ))}
                 {integrations.slice(5, 10).map((integration, index) => (
                   <div className={`${styles.floatChannel} ${styles[`floatDelay${index + 2}`]}`} style={{ top: `${30 + index * 82}px` }} key={integration.id}>
-                    <img src={integration.logo} alt="" width="28" height="28" onError={(event) => { event.currentTarget.hidden = true; }} /><span aria-hidden="true">{integration.name.slice(0, 2)}</span>
+                    <img src={integration.logo} alt="" width="30" height="30" onError={(event) => { event.currentTarget.hidden = true; }} />
                     <small>{integration.name}</small>
                   </div>
                 ))}

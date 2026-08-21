@@ -231,22 +231,22 @@
 .floatChannel {
   position: absolute;
   display: grid;
-  width: 58px;
-  min-height: 58px;
+  width: 66px;
+  min-height: 66px;
+  padding: 8px 5px 7px;
   place-items: center;
-  gap: 2px;
+  gap: 5px;
   border: 1px solid #dfeceb;
-  border-radius: 17px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, .96);
   box-shadow: 0 12px 26px rgba(29, 91, 90, .11);
   animation: cutineoFloat 6s ease-in-out infinite;
 }
 
-.floatChannel:nth-child(-n + 5) { left: -28px; }
-.floatChannel:nth-child(n + 6) { right: -28px; }
-.floatChannel img { width: 27px; height: 27px; object-fit: contain; }
-.floatChannel > span { color: #718391; font-size: 8px; font-weight: 850; }
-.floatChannel small { color: #6a7788; font-size: 7px; font-weight: 750; }
+.floatChannel:nth-child(-n + 5) { left: -32px; }
+.floatChannel:nth-child(n + 6) { right: -32px; }
+.floatChannel img { display: block; width: 30px; height: 30px; object-fit: contain; }
+.floatChannel small { max-width: 100%; overflow: hidden; color: #607386; font-size: 8px; font-weight: 750; line-height: 1.15; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .floatDelay0 { animation-delay: 0s; }
 .floatDelay1 { animation-delay: .6s; }
 .floatDelay2 { animation-delay: 1.2s; }
@@ -329,7 +329,6 @@
 .demoConversationActive { background: #eefaf8; }
 .channelLogo { position: relative; display: grid; width: 27px; height: 27px; flex: 0 0 auto; place-items: center; overflow: hidden; border-radius: 9px; background: #eff5f4; color: #82939d; font-size: 7px; font-weight: 850; }
 .channelLogo img { position: relative; z-index: 1; width: 21px; height: 21px; object-fit: contain; }
-.channelLogo > span { position: absolute; font-size: 7px; }
 .demoConversationCopy { display: grid; min-width: 0; flex: 1; gap: 2px; }
 .demoConversationCopy strong { overflow: hidden; color: #32445e; font-size: 9px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .demoConversationCopy small { overflow: hidden; color: #9aa6b0; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
@@ -387,7 +386,6 @@
 .integrationLogo { display: grid; width: 34px; height: 34px; flex: 0 0 auto; place-items: center; border-radius: 10px; background: #f6faf9; }
 .integrationLogo { position: relative; }
 .integrationLogo img { position: relative; z-index: 1; width: 27px; height: 27px; object-fit: contain; }
-.integrationLogo > span { position: absolute; color: #718391; font-size: 8px; font-weight: 850; }
 .integrationCopy { display: grid; min-width: 0; gap: 4px; }
 .integrationCopy strong { overflow: hidden; color: #32445e; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .integrationStatus { display: inline-flex; width: fit-content; max-width: 100%; border-radius: 99px; padding: 2px 5px; font-size: 7px; font-weight: 800; line-height: 1.4; white-space: nowrap; }
