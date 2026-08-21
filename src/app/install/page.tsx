@@ -1,18 +1,16 @@
-import CutineoSiteHeader, { type CutineoNavItem } from '@/components/CutineoSiteHeader';
+import type { Metadata } from 'next';
+import Header from '@/components/layout/Header';
 import PwaInstallSection from '@/components/pwa/PwaInstallSection';
 
-const navItems: CutineoNavItem[] = [
-  { key: 'features', label: 'ฟีเจอร์', href: '/#features' },
-  { key: 'integrations', label: 'การเชื่อมต่อ', href: '/#integrations' },
-  { key: 'sales', label: 'AI Sales', href: '/#ai-sales' },
-  { key: 'pricing', label: 'ราคา', href: '/pricing' },
-  { key: 'resources', label: 'ทรัพยากร', href: '/#resources' },
-];
+export const metadata: Metadata = {
+  title: 'ติดตั้ง CUTINEO — ใช้งานได้ทุกอุปกรณ์',
+  description: 'เพิ่ม CUTINEO ลงหน้าจอโฮมบนมือถือหรือเปิดเป็นแอปบนเดสก์ท็อปผ่าน PWA',
+};
 
 export default function InstallPage() {
   return (
     <main className="pwa-install-page">
-      <CutineoSiteHeader navItems={navItems} activeKey="resources" />
+      <Header activeKey="resources" />
       <PwaInstallSection />
     </main>
   );

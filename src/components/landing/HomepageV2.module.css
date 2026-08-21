@@ -716,3 +716,36 @@
   .integrationCard,
   .faqItem button svg { animation: none; transition: none; }
 }
+
+/* Homepage route previews */
+.integrationPreview { background: #fff; }
+.previewLinkRow { display: flex; justify-content: flex-end; width: min(100% - 32px, 1160px); margin: -38px auto 34px; }
+.previewSection { padding: 92px 0 88px; background: #f5fbfa; }
+.previewGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 34px; }
+.previewCard { display: grid; gap: 10px; min-width: 0; border: 1px solid #dceceb; border-radius: 20px; padding: 22px; background: #fff; box-shadow: 0 14px 32px rgba(25, 80, 77, .05); }
+.previewCardIcon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 13px; background: #e8faf6; color: #12998d; font-size: 20px; font-weight: 850; }
+.previewCard h3 { margin: 5px 0 0; color: #1d314a; font-size: 16px; line-height: 1.4; }
+.previewCard p { margin: 0; color: #708094; font-size: 11px; line-height: 1.75; }
+.storyPreviewSection { padding: 96px 0 92px; background: #fff; }
+.storyPreviewGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin-top: 34px; }
+.storyPreviewCard { display: grid; gap: 10px; min-width: 0; border: 1px solid #e2eceb; border-radius: 20px; padding: 22px; background: linear-gradient(145deg, #fff, #f5fcfb); }
+.storyPreviewTop { display: flex; align-items: center; justify-content: space-between; color: #159d90; }
+.storyPreviewTop span { font-size: 11px; font-weight: 900; letter-spacing: .12em; }
+.storyPreviewCard h3 { margin: 5px 0 0; color: #203650; font-size: 16px; line-height: 1.45; }
+.storyPreviewCard p { margin: 0; color: #748397; font-size: 11px; line-height: 1.75; }
+.storyPreviewFlow { display: flex; align-items: center; justify-content: center; gap: 13px; margin-top: 28px; color: #718193; font-size: 11px; font-weight: 800; }
+.storyPreviewFlow span { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 8px 12px; background: #eef9f7; color: #198e83; }
+.storyPreviewFlow b { color: #a3b4b8; }
+.footerBrandMark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 9px; background: linear-gradient(135deg, #14b8a6, #06b6d4); color: #fff; font-size: 16px; font-weight: 900; }
+
+@media (max-width: 760px) {
+  .previewGrid,
+  .storyPreviewGrid { grid-template-columns: 1fr; }
+  .previewLinkRow { width: calc(100% - 24px); margin-top: -22px; }
+  .storyPreviewFlow { flex-wrap: wrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storyPreviewCard,
+  .previewCard { transition: none; }
+}

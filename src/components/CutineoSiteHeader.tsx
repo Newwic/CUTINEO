@@ -52,6 +52,7 @@ export default function CutineoSiteHeader({
 }: CutineoSiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [currentPath, setCurrentPath] = useState('');
   const [internalLanguage, setInternalLanguage] = useState<CutineoLanguage>('th');
   const currentLanguage = language ?? internalLanguage;
 
@@ -70,6 +71,17 @@ export default function CutineoSiteHeader({
     return () => {
       window.removeEventListener('scroll', updateHeaderState);
       window.removeEventListener('hashchange', updateHeaderState);
+    };
+  }, []);
+
+  useEffect(() => {
+    const updatePath = () => setCurrentPath(window.location.pathname.replace(/\/+$/, '') || '/');
+    updatePath();
+    window.addEventListener('popstate', updatePath);
+    window.addEventListener('hashchange', updatePath);
+    return () => {
+      window.removeEventListener('popstate', updatePath);
+      window.removeEventListener('hashchange', updatePath);
     };
   }, []);
 
@@ -102,8 +114,17 @@ export default function CutineoSiteHeader({
 
   function isActive(item: CutineoNavItem) {
     if (activeKey === item.key) return true;
-    if (item.key !== 'pricing' || typeof window === 'undefined') return false;
-    return window.location.pathname.endsWith('/pricing') || window.location.hash === '#pricing';
+    if (!currentPath || typeof window === 'undefined') return false;
+
+    try {
+      const target = new URL(item.href, window.location.origin);
+      const targetPath = target.pathname.replace(/\/+$/, '') || '/';
+      if (target.hash) return currentPath === targetPath && window.location.hash === target.hash;
+      if (targetPath === '/') return currentPath === '/';
+      return currentPath === targetPath || currentPath.startsWith(`${targetPath}/`);
+    } catch {
+      return false;
+    }
   }
 
   const languageButton = (className = '') => (

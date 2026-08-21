@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import { ArrowRight } from 'lucide-react';
 import { integrations, integrationCategories, type IntegrationStatus } from '../../config/integrations';
 import styles from './HomepageV2.module.css';
 
@@ -10,11 +11,16 @@ function StatusBadge({ status }: { status: IntegrationStatus }) {
   return <span className={`${styles.integrationStatus} ${styles[`status_${status}`]}`}>{label}</span>;
 }
 
-export default function IntegrationStrip() {
+interface IntegrationStripProps {
+  compact?: boolean;
+}
+
+export default function IntegrationStrip({ compact = false }: IntegrationStripProps) {
   const [activeCategory, setActiveCategory] = useState<'all' | 'messaging' | 'social' | 'email'>('all');
   const visibleIntegrations = activeCategory === 'all'
     ? integrations
     : integrations.filter((integration) => integration.category === activeCategory);
+  const displayedIntegrations = compact ? visibleIntegrations.slice(0, 6) : visibleIntegrations;
 
   return (
     <section className={styles.integrationSection} id="integrations" aria-labelledby="integration-title">
@@ -33,7 +39,7 @@ export default function IntegrationStrip() {
           </div>
         </div>
         <div className={styles.integrationGrid}>
-          {visibleIntegrations.map((integration) => (
+          {displayedIntegrations.map((integration) => (
             <article className={styles.integrationCard} key={integration.id}>
               <div className={styles.integrationLogo}><img src={integration.logo} alt={`${integration.name} logo`} width="32" height="32" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} /></div>
               <div className={styles.integrationCopy}>

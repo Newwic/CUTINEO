@@ -76,7 +76,7 @@ export default function AIUsageCard({ onNotice }: { onNotice?: (message: string)
   }
 
   function upgrade() {
-    window.location.assign('/#pricing');
+    window.location.assign('/pricing');
   }
 
   const percent = Math.min(100, Math.max(0, usage.usagePercent));

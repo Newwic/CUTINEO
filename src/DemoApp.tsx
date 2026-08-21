@@ -117,10 +117,11 @@ export default function DemoApp() {
   const nowForDatePicker = new Date().toISOString().slice(0, 16);
   const t = languageCopy[language];
   const navItems: CutineoNavItem[] = [
-    { key: 'features', label: t.nav.features, href: '#why' },
-    { key: 'how', label: t.nav.how, href: '#how' },
-    { key: 'sales', label: t.nav.sales, href: '#how' },
-    { key: 'pricing', label: t.nav.pricing, href: `${homeUrl}#pricing` },
+    { key: 'features', label: t.nav.features, href: `${baseUrl}features/` },
+    { key: 'integrations', label: 'Integrations', href: `${baseUrl}integrations/` },
+    { key: 'sales', label: t.nav.sales, href: `${baseUrl}ai-sales/` },
+    { key: 'pricing', label: t.nav.pricing, href: `${baseUrl}pricing/` },
+    { key: 'resources', label: 'Resources', href: `${baseUrl}resources/` },
   ];
 
   useEffect(() => {
