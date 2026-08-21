@@ -9,6 +9,7 @@ import { NEO_LOGO_PATH } from '../../lib/branding';
 import { integrations } from '../../config/integrations';
 import HeroInboxDemo from './HeroInboxDemo';
 import IntegrationStrip from './IntegrationStrip';
+import ScrollStory from './ScrollStory';
 import PwaInstallSection from '../pwa/PwaInstallSection';
 import styles from './HomepageV2.module.css';
 
@@ -113,6 +114,8 @@ export default function HomepageV2({ basePath = '', signupRoute = 'register', lo
         </section>
 
         <IntegrationStrip />
+
+        <ScrollStory />
 
         <PwaInstallSection />
 
