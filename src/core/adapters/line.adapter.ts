@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { z } from 'zod';
 import type { OutboundPayload, UnifiedIncomingMessage } from '../types/unified';
 
 interface LineCredentials {
@@ -6,7 +7,38 @@ interface LineCredentials {
   channelSecret?: string;
 }
 
+const LineEventSchema = z.object({
+  type: z.string().max(64),
+  timestamp: z.number().int().positive(),
+  source: z.object({
+    type: z.enum(['user', 'group', 'room']).optional(),
+    userId: z.string().max(100).optional(),
+    groupId: z.string().max(100).optional(),
+    roomId: z.string().max(100).optional(),
+  }).optional(),
+  message: z.object({
+    id: z.string().min(1).max(100),
+    type: z.string().min(1).max(32),
+    text: z.string().max(4_000).optional(),
+  }).optional(),
+  replyToken: z.string().max(200).optional(),
+}).passthrough();
+
+type LineEvent = z.infer<typeof LineEventSchema>;
+
 export class LineAdapter {
+  static sanitizeEvents(rawEvents: unknown[]): LineEvent[] {
+    if (!Array.isArray(rawEvents) || rawEvents.length > 50) {
+      throw new Error('Malformed or excessive LINE events payload.');
+    }
+
+    return rawEvents.map((rawEvent) => {
+      const parsed = LineEventSchema.safeParse(rawEvent);
+      if (!parsed.success) throw new Error('Invalid LINE event structure.');
+      return parsed.data;
+    });
+  }
+
   static verifySignature(body: string, signature: string, secret: string): boolean {
     if (!body || !signature || !secret) return false;
 
@@ -26,21 +58,17 @@ export class LineAdapter {
     tenantId: string,
   ): Promise<UnifiedIncomingMessage[]> {
     const messages: UnifiedIncomingMessage[] = [];
+    if (!Array.isArray(payload.events)) {
+      throw new Error('LINE payload events must be an array.');
+    }
 
-    for (const rawEvent of payload.events ?? []) {
-      const event = rawEvent as {
-        type?: string;
-        timestamp?: number;
-        replyToken?: string;
-        source?: { userId?: string };
-        message?: { id?: string; type?: string; text?: string };
-      };
+    for (const event of LineAdapter.sanitizeEvents(payload.events)) {
 
-      if (event.type !== 'message' || !event.source?.userId || !event.message?.id) {
+      if (event.type !== 'message' || !event.source?.userId || !event.message) {
         continue;
       }
 
-      const lineMessageType = event.message.type ?? 'file';
+      const lineMessageType = event.message.type;
       const messageType =
         lineMessageType === 'text'
           ? 'text'
@@ -58,8 +86,8 @@ export class LineAdapter {
         content: event.message.text ?? `[${lineMessageType}]`,
         attachments: [],
         replyToken: event.replyToken,
-        rawPayload: rawEvent,
-        timestamp: event.timestamp ?? Date.now(),
+        rawPayload: event,
+        timestamp: event.timestamp,
       });
     }
 

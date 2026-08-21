@@ -15,17 +15,20 @@
 }
 
 * { box-sizing: border-box; }
+:where(h1, h2, h3, h4, h5, h6, p, li, label, a, button, span, time) { word-break: break-word; overflow-wrap: break-word; }
+input, textarea, select { min-width: 0; max-width: 100%; }
 body { margin: 0; min-width: 320px; background: #fbfefd; }
 button, input, select, textarea { font: inherit; }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 .demo-modal-open { overflow: hidden; }
-.demo-page { min-height: 100vh; overflow: hidden; background: radial-gradient(circle at 82% 7%, #e4faf4 0, transparent 31rem), #fbfefd; }
+.demo-page { min-height: 100vh; overflow-x: hidden; background: radial-gradient(circle at 82% 7%, #e4faf4 0, transparent 31rem), #fbfefd; }
 .demo-shell { width: min(1180px, calc(100% - 64px)); margin-inline: auto; }
 
 .demo-header { min-height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .demo-brand { display: inline-flex; align-items: center; gap: 11px; padding: 0; border: 0; background: transparent; color: var(--demo-ink); }
-.demo-brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px 13px 13px 5px; background: var(--demo-ink); color: var(--demo-lime); font: 800 20px/1 'DM Sans', sans-serif; transform: rotate(-5deg); }
+.demo-brand-mark { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 13px; background: transparent; color: transparent; }
+.demo-brand-mark img { display: block; width: 100%; height: 100%; border-radius: inherit; object-fit: contain; }
 .demo-brand-word { font: 800 21px/1 'DM Sans', sans-serif; letter-spacing: .08em; }
 .demo-brand-word span { color: var(--demo-primary); }
 .demo-nav { display: flex; align-items: center; gap: 29px; margin-left: auto; margin-right: 18px; color: var(--demo-muted); font-size: 12px; font-weight: 600; }
@@ -44,7 +47,7 @@ a { color: inherit; text-decoration: none; }
 
 .demo-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(470px, 544px); gap: clamp(46px, 8vw, 120px); align-items: start; padding: 74px 0 96px; }
 .demo-hero-copy { padding: 66px 0 0; }
-.demo-hero-copy h1 { margin: 20px 0 18px; color: var(--demo-ink); font-size: clamp(38px, 4.7vw, 60px); line-height: 1.22; letter-spacing: -.06em; }
+.demo-hero-copy h1 { margin: 20px 0 18px; color: var(--demo-ink); font-size: clamp(28px, 4vw, 44px); line-height: 1.25; letter-spacing: -.045em; }
 .demo-hero-copy h1 span { color: var(--demo-primary); }
 .demo-hero-copy > p { max-width: 510px; margin: 0; color: var(--demo-muted); font-size: 15px; line-height: 1.9; }
 .demo-hero-points { display: grid; gap: 11px; margin: 27px 0 30px; color: var(--demo-ink); font-size: 12px; font-weight: 600; }
@@ -85,7 +88,7 @@ a { color: inherit; text-decoration: none; }
 
 .demo-benefits { padding: 10px 0 100px; }
 .demo-section-heading { max-width: 750px; margin: 0 auto 37px; text-align: center; }
-.demo-section-heading h2 { margin: 13px 0 8px; font-size: clamp(26px, 3vw, 37px); line-height: 1.35; letter-spacing: -.05em; }
+.demo-section-heading h2 { margin: 13px 0 8px; font-size: clamp(22px, 3vw, 32px); line-height: 1.3; letter-spacing: -.045em; }
 .demo-section-heading p { margin: 0; color: var(--demo-muted); font-size: 13px; line-height: 1.8; }
 .demo-benefit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .demo-benefit-card { min-height: 210px; padding: 25px 25px 22px; border: 1px solid var(--demo-line); border-radius: 15px; background: #fff; }

@@ -22,7 +22,7 @@ const features = [
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-slate-950 text-white">
+    <main className="min-h-screen overflow-x-hidden bg-slate-950 text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.32),_transparent_45%),radial-gradient(circle_at_bottom_left,_rgba(16,185,129,0.18),_transparent_42%)]" />
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-12">
         <header className="flex items-center justify-between">
@@ -54,7 +54,7 @@ export default function HomePage() {
             <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-300/25 bg-indigo-300/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-indigo-200">
               <MessageSquareText size={14} aria-hidden="true" /> Social commerce OS
             </p>
-            <h1 className="max-w-3xl text-4xl font-black leading-tight tracking-tight sm:text-6xl">
+            <h1 className="max-w-3xl text-[clamp(28px,4vw,44px)] font-black leading-[1.25] tracking-tight">
               ปิดการขายทุกแชท จากพื้นที่ทำงานเดียว
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
@@ -111,7 +111,7 @@ export default function HomePage() {
             return (
               <div key={feature.title} className="rounded-2xl border border-white/10 bg-white/[0.05] p-5">
                 <Icon size={21} className="text-indigo-300" aria-hidden="true" />
-                <h2 className="mt-4 font-bold">{feature.title}</h2>
+                <h2 className="mt-4 text-[17px] font-bold leading-[1.4]">{feature.title}</h2>
                 <p className="mt-2 text-sm leading-6 text-slate-400">{feature.description}</p>
               </div>
             );

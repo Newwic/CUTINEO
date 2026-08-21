@@ -1,11 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 import { LineAdapter } from '@/core/adapters/line.adapter';
 import { getUserFromRequest } from '@/lib/supabase/auth';
+import { enforceRateLimit } from '@/lib/rate-limit';
 import { requireSupabaseServer } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 
-type SendMessageType = 'text' | 'internal_note';
+const MAX_BODY_BYTES = 16 * 1024;
+
+const SendMessageSchema = z.object({
+  conversationId: z.string().uuid(),
+  content: z.string().trim().min(1).max(4_000),
+  messageType: z.enum(['text', 'internal_note']).default('text'),
+  // This is accepted only as a consistency check. Authorization is always
+  // derived from the conversation and the authenticated user's membership.
+  tenantId: z.string().uuid().optional(),
+}).strict();
+
+function clientAddress(request: NextRequest): string {
+  return (
+    request.headers.get('x-real-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
+    'unknown'
+  );
+}
 
 function getRelatedRecord<T>(value: T | T[] | null | undefined): T | null {
   if (!value) return null;
@@ -14,33 +33,42 @@ function getRelatedRecord<T>(value: T | T[] | null | undefined): T | null {
 
 export async function POST(request: NextRequest) {
   try {
+    const declaredLength = Number(request.headers.get('content-length') ?? 0);
+    if (declaredLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Request is too large' }, { status: 413 });
+    }
+
+    const ipRate = await enforceRateLimit(`messages:send:ip:${clientAddress(request)}`, 60, 60);
+    if (!ipRate.allowed) {
+      return NextResponse.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': String(ipRate.retryAfter) } },
+      );
+    }
+
     const user = await getUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    const body = (await request.json()) as {
-      conversationId?: unknown;
-      content?: unknown;
-      messageType?: unknown;
-      tenantId?: unknown;
-    };
-
-    const conversationId = typeof body.conversationId === 'string' ? body.conversationId : '';
-    const content = typeof body.content === 'string' ? body.content.trim() : '';
-    const messageType: SendMessageType =
-      body.messageType === 'internal_note' ? 'internal_note' : 'text';
-
-    if (!conversationId || !content) {
-      return NextResponse.json(
-        { error: 'conversationId and non-empty content are required' },
-        { status: 400 },
-      );
+    const bodyText = await request.text();
+    if (new TextEncoder().encode(bodyText).byteLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Request is too large' }, { status: 413 });
     }
 
-    if (content.length > 4_000) {
-      return NextResponse.json({ error: 'Message is too long' }, { status: 400 });
+    let rawBody: unknown;
+    try {
+      rawBody = JSON.parse(bodyText);
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 });
     }
+
+    const parsedBody = SendMessageSchema.safeParse(rawBody);
+    if (!parsedBody.success) {
+      return NextResponse.json({ error: 'Invalid message payload' }, { status: 400 });
+    }
+
+    const { conversationId, content, messageType, tenantId } = parsedBody.data;
 
     const db = requireSupabaseServer();
     const { data: conversation, error: conversationError } = await db
@@ -56,12 +84,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
     }
 
-    const requestedTenantId =
-      typeof body.tenantId === 'string'
-        ? body.tenantId
-        : request.headers.get('x-tenant-id') ?? conversation.tenant_id;
-
-    if (requestedTenantId !== conversation.tenant_id) {
+    if (tenantId && tenantId !== conversation.tenant_id) {
       return NextResponse.json({ error: 'Tenant scope mismatch' }, { status: 403 });
     }
 
@@ -77,6 +100,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'You are not a member of this workspace' }, { status: 403 });
     }
 
+    const userRate = await enforceRateLimit(
+      `messages:send:user:${user.id}:tenant:${conversation.tenant_id}`,
+      120,
+      60,
+    );
+    if (!userRate.allowed) {
+      return NextResponse.json(
+        { error: 'User message rate limit exceeded' },
+        { status: 429, headers: { 'Retry-After': String(userRate.retryAfter) } },
+      );
+    }
+
+    const tenantRate = await enforceRateLimit(
+      `messages:send:tenant:${conversation.tenant_id}`,
+      300,
+      60,
+    );
+    if (!tenantRate.allowed) {
+      return NextResponse.json(
+        { error: 'Tenant message rate limit exceeded' },
+        { status: 429, headers: { 'Retry-After': String(tenantRate.retryAfter) } },
+      );
+    }
+
     const channel = getRelatedRecord<{
       id: string;
       tenant_id: string;
@@ -86,6 +133,9 @@ export async function POST(request: NextRequest) {
 
     if (!channel) {
       return NextResponse.json({ error: 'Channel not found' }, { status: 404 });
+    }
+    if (channel.tenant_id !== conversation.tenant_id) {
+      return NextResponse.json({ error: 'Tenant scope mismatch' }, { status: 403 });
     }
 
     if (messageType === 'text') {
@@ -99,6 +149,7 @@ export async function POST(request: NextRequest) {
       const { data: identity, error: identityError } = await db
         .from('channel_identities')
         .select('platform_user_id')
+        .eq('tenant_id', conversation.tenant_id)
         .eq('channel_id', conversation.channel_id)
         .eq('contact_id', conversation.contact_id)
         .maybeSingle();

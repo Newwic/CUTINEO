@@ -1,42 +1,159 @@
 'use client';
 
 import Link from 'next/link';
-import { LogOut, MessageSquareText, Settings } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import {
+  BarChart3,
+  Bell,
+  Bot,
+  ChevronDown,
+  HelpCircle,
+  LayoutDashboard,
+  LogOut,
+  MessageSquareText,
+  PackageCheck,
+  Settings2,
+  Sparkles,
+  UsersRound,
+  X,
+} from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabaseClient } from '@/lib/supabase/client';
-import ConversationList from './components/ConversationList';
+import { NEO_LOGO_PATH } from '@/lib/branding';
 import ChatArea from './components/ChatArea';
-import CustomerCRMDrawer from './components/CustomerCRMDrawer';
+import ConversationList from './components/ConversationList';
+import type { InboxConversation } from './types';
+
+const DEMO_CONVERSATIONS: InboxConversation[] = [
+  {
+    id: 'demo-aom',
+    tenant_id: 'demo-tenant',
+    contact_id: 'demo-contact-aom',
+    assigned_to: 'ai_agent',
+    status: 'open',
+    last_message_preview: 'โอเคเลยค่ะ ขอให้ช่วยแนะนำขั้นตอนสมัครด้วยนะคะ',
+    last_message_at: '2026-08-21T10:42:00+07:00',
+    contacts: { display_name: 'Aom S.', phone: '080-123-4567', tags: ['Pro lead'] },
+    channels: { platform: 'line', name: 'LINE OA', is_active: true },
+    isDemo: true,
+  },
+  {
+    id: 'demo-bua',
+    tenant_id: 'demo-tenant',
+    contact_id: 'demo-contact-bua',
+    assigned_to: 'ai_agent',
+    status: 'pending_human',
+    last_message_preview: 'ขอเช็กสถานะออเดอร์ล่าสุดให้หน่อยค่ะ',
+    last_message_at: '2026-08-21T10:35:00+07:00',
+    contacts: { display_name: 'Bua K.', phone: '081-222-4188', tags: ['Order'] },
+    channels: { platform: 'line', name: 'LINE OA', is_active: true },
+    isDemo: true,
+  },
+  {
+    id: 'demo-chai',
+    tenant_id: 'demo-tenant',
+    contact_id: 'demo-contact-chai',
+    assigned_to: 'human_agent',
+    status: 'pending_human',
+    last_message_preview: 'มีแพ็กเกจสำหรับทีมเล็กไหมครับ',
+    last_message_at: '2026-08-21T09:58:00+07:00',
+    contacts: { display_name: 'Chai T.', phone: '089-500-1240', tags: ['Starter'] },
+    channels: { platform: 'facebook', name: 'Facebook', is_active: true },
+    isDemo: true,
+  },
+  {
+    id: 'demo-fern',
+    tenant_id: 'demo-tenant',
+    contact_id: 'demo-contact-fern',
+    assigned_to: 'ai_agent',
+    status: 'open',
+    last_message_preview: 'ขอบคุณมากนะคะ เดี๋ยวลองเข้าไปดูค่ะ',
+    last_message_at: '2026-08-21T09:41:00+07:00',
+    contacts: { display_name: 'Fern P.', phone: '086-910-8890', tags: ['Returning'] },
+    channels: { platform: 'instagram', name: 'Instagram', is_active: true },
+    isDemo: true,
+  },
+  {
+    id: 'demo-kim',
+    tenant_id: 'demo-tenant',
+    contact_id: 'demo-contact-kim',
+    assigned_to: 'ai_agent',
+    status: 'open',
+    last_message_preview: 'สนใจรายละเอียดแพ็กเกจ Enterprise ค่ะ',
+    last_message_at: '2026-08-21T09:20:00+07:00',
+    contacts: { display_name: 'Kim A.', phone: '082-003-7811', tags: ['Enterprise'] },
+    channels: { platform: 'line', name: 'LINE OA', is_active: true },
+    isDemo: true,
+  },
+  {
+    id: 'demo-mew',
+    tenant_id: 'demo-tenant',
+    contact_id: 'demo-contact-mew',
+    assigned_to: 'human_agent',
+    status: 'open',
+    last_message_preview: 'สะดวกให้ติดต่อกลับช่วงบ่ายค่ะ',
+    last_message_at: '2026-08-21T08:52:00+07:00',
+    contacts: { display_name: 'Mew R.', phone: '094-440-3312', tags: ['Callback'] },
+    channels: { platform: 'facebook', name: 'Facebook', is_active: true },
+    isDemo: true,
+  },
+];
+
+const navItems = [
+  { label: 'Dashboard', icon: LayoutDashboard },
+  { label: 'Conversations', icon: MessageSquareText, badge: '6' },
+  { label: 'Contacts', icon: UsersRound },
+  { label: 'Fulfillment', icon: PackageCheck },
+  { label: 'AI Agent', icon: Bot, badge: 'Live' },
+  { label: 'Settings', icon: Settings2 },
+];
+
+function isLiveConversationList(value: unknown): value is InboxConversation[] {
+  return Array.isArray(value) && value.every((conversation) => (
+    Boolean(conversation)
+    && typeof conversation === 'object'
+    && typeof (conversation as InboxConversation).id === 'string'
+  ));
+}
 
 export default function InboxPage() {
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [activeConvId, setActiveConvId] = useState<string | null>(null);
+  const [conversations, setConversations] = useState<InboxConversation[]>(DEMO_CONVERSATIONS);
+  const [activeConvId, setActiveConvId] = useState<string | null>(DEMO_CONVERSATIONS[0].id);
   const [loading, setLoading] = useState(true);
-  const [authRequired, setAuthRequired] = useState(false);
-  const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [activeNav, setActiveNav] = useState('Conversations');
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [mobileConversationsOpen, setMobileConversationsOpen] = useState(false);
+  const [notice, setNotice] = useState('');
 
   useEffect(() => {
-    const client = supabaseClient;
-    if (!client) {
-      setError('ยังไม่ได้ตั้งค่า Supabase กรุณาสร้างไฟล์ .env.local ก่อน');
-      setLoading(false);
-      return;
-    }
-    const db = client;
-
     let mounted = true;
+    const client = supabaseClient;
 
-    async function fetchConversations() {
-      const { data: sessionData } = await db.auth.getSession();
-      if (!sessionData.session) {
-        if (mounted) {
-          setAuthRequired(true);
-          setLoading(false);
-        }
+    function setDemoPreview() {
+      if (!mounted) return;
+      setConversations(DEMO_CONVERSATIONS);
+      setActiveConvId((current) => current || DEMO_CONVERSATIONS[0].id);
+      setIsDemoMode(true);
+      setLoadError('');
+      setLoading(false);
+    }
+
+    async function fetchLiveConversations() {
+      if (!client) {
+        setDemoPreview();
         return;
       }
 
-      const { data, error: fetchError } = await db
+      const { data: sessionData } = await client.auth.getSession();
+      if (!mounted) return;
+      if (!sessionData.session) {
+        setDemoPreview();
+        return;
+      }
+
+      const { data, error } = await client
         .from('conversations')
         .select(
           'id, tenant_id, channel_id, contact_id, status, assigned_to, last_message_preview, last_message_at, created_at, updated_at, contacts(id, display_name, phone, email, avatar_url, tags, notes, created_at), channels(id, tenant_id, platform, name, is_active)',
@@ -44,132 +161,275 @@ export default function InboxPage() {
         .order('last_message_at', { ascending: false });
 
       if (!mounted) return;
-      if (fetchError) {
-        setError(fetchError.message);
+      if (error) {
+        console.error('[CUTINEO inbox] failed to load conversations', error);
+        setConversations([]);
+        setActiveConvId(null);
+        setIsDemoMode(false);
+        setLoadError(`โหลด conversations ไม่สำเร็จ: ${error.message}`);
         setLoading(false);
         return;
       }
 
-      setConversations(data ?? []);
-      setActiveConvId((current) => current ?? data?.[0]?.id ?? null);
+      if (!isLiveConversationList(data)) {
+        setConversations([]);
+        setActiveConvId(null);
+        setIsDemoMode(false);
+        setLoadError('รูปแบบข้อมูล conversations จาก Supabase ไม่ถูกต้อง');
+        setLoading(false);
+        return;
+      }
+
+      if (data.length === 0) {
+        setConversations([]);
+        setActiveConvId(null);
+        setIsDemoMode(false);
+        setLoadError('ยังไม่พบ conversation ใน workspace นี้ หรือบัญชีนี้ยังไม่ได้เป็นสมาชิกของ tenant');
+        setLoading(false);
+        return;
+      }
+
+      setConversations(data);
+      setActiveConvId((current) => current && data.some((item) => item.id === current) ? current : data[0].id);
+      setIsDemoMode(false);
       setLoading(false);
     }
 
-    void fetchConversations();
+    void fetchLiveConversations();
 
-    const realtime = db
-      .channel('realtime_inbox')
+    if (!client) {
+      return () => {
+        mounted = false;
+      };
+    }
+
+    const realtime = client
+      .channel('cutineo-inbox-list')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'conversations' },
-        () => void fetchConversations(),
+        () => void fetchLiveConversations(),
       )
       .subscribe();
 
-    const authSubscription = db.auth.onAuthStateChange((_event, session) => {
-      if (!session) {
-        setAuthRequired(true);
-        setConversations([]);
-        setActiveConvId(null);
-      } else {
-        setAuthRequired(false);
-        void fetchConversations();
-      }
+    const authSubscription = client.auth.onAuthStateChange((_event, session) => {
+      if (!session) setDemoPreview();
+      else void fetchLiveConversations();
     });
 
     return () => {
       mounted = false;
-      void db.removeChannel(realtime);
+      void client.removeChannel(realtime);
       authSubscription.data.subscription.unsubscribe();
     };
   }, []);
 
-  async function signOut() {
-    await supabaseClient?.auth.signOut();
+  useEffect(() => {
+    if (!notice) return undefined;
+    const timer = window.setTimeout(() => setNotice(''), 3_500);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+
+  const activeConversation = useMemo(
+    () => conversations.find((conversation) => conversation.id === activeConvId) || null,
+    [activeConvId, conversations],
+  );
+
+  function selectConversation(id: string) {
+    setActiveConvId(id);
+    setMobileConversationsOpen(false);
   }
 
-  const activeConversation = conversations.find((item) => item.id === activeConvId);
+  function updatePreview(conversationId: string, preview: string) {
+    setConversations((current) => current.map((conversation) => (
+      conversation.id === conversationId
+        ? { ...conversation, last_message_preview: preview, last_message_at: new Date().toISOString() }
+        : conversation
+    )));
+  }
 
-  if (authRequired) {
+  function retryConversationLoad() {
+    window.location.reload();
+  }
+
+  function handleNavClick(label: string) {
+    setActiveNav(label);
+    setMobileNavOpen(false);
+    if (label !== 'Conversations') {
+      setNotice(`${label} module พร้อมเชื่อมต่อใน workspace นี้`);
+    }
+  }
+
+  async function signOut() {
+    if (!supabaseClient) {
+      setNotice('กำลังดูอยู่ใน Demo mode — ยังไม่มี session ให้ sign out');
+      return;
+    }
+    await supabaseClient.auth.signOut();
+    setNotice('ออกจากระบบแล้ว');
+  }
+
+  if (loading) {
     return (
-      <main className="grid min-h-screen place-items-center bg-slate-950 px-5 text-white">
-        <section className="max-w-md rounded-3xl border border-white/10 bg-white/[0.07] p-8 text-center shadow-2xl">
-          <MessageSquareText className="mx-auto text-indigo-300" size={34} aria-hidden="true" />
-          <h1 className="mt-5 text-2xl font-black">เข้าสู่ระบบก่อนใช้งาน Inbox</h1>
-          <p className="mt-3 text-sm leading-6 text-slate-400">
-            บทสนทนาและข้อมูลลูกค้าจะแสดงเฉพาะสมาชิกของ workspace ที่ได้รับสิทธิ์เท่านั้น
-          </p>
-          <Link href="/login" className="mt-6 inline-flex rounded-xl bg-indigo-500 px-5 py-3 text-sm font-bold hover:bg-indigo-400">
-            ไปหน้าเข้าสู่ระบบ
-          </Link>
-        </section>
+      <main className="cutineo-loading">
+        <Image
+          className="brand-logo brand-logo-loading"
+          src={NEO_LOGO_PATH}
+          alt="Neo"
+          width={36}
+          height={36}
+          priority
+        />
+        <div>
+          <strong>Loading CUTINEO Inbox</strong>
+          <span>กำลังเตรียม workspace ของคุณ...</span>
+        </div>
       </main>
     );
   }
 
-  if (loading) {
-    return <div className="grid h-dvh place-items-center bg-slate-50 text-sm font-semibold text-slate-500">กำลังโหลด Unified Inbox…</div>;
-  }
-
   return (
-    <main className="flex h-dvh w-full flex-col overflow-hidden bg-slate-50 font-sans text-slate-900">
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 font-black tracking-tight text-slate-900">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-indigo-600 text-white">
-            <MessageSquareText size={16} aria-hidden="true" />
-          </span>
-          CUTINEO <span className="hidden text-xs font-semibold text-slate-400 sm:inline">/ Unified Inbox</span>
-        </Link>
-        <div className="flex items-center gap-2">
-          <button type="button" className="hidden rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-800 sm:inline-flex" aria-label="ตั้งค่า">
-            <Settings size={18} aria-hidden="true" />
+    <main className="cutineo-shell">
+      <div
+        className={`mobile-scrim ${mobileNavOpen || mobileConversationsOpen ? 'is-visible' : ''}`}
+        onClick={() => {
+          setMobileNavOpen(false);
+          setMobileConversationsOpen(false);
+        }}
+        aria-hidden="true"
+      />
+
+      <aside className={`cutineo-sidebar ${mobileNavOpen ? 'is-mobile-open' : ''}`} aria-label="เมนูหลัก">
+        <div className="sidebar-top">
+          <div className="sidebar-brand-row">
+            <Link href="/" className="sidebar-brand" aria-label="CUTINEO home">
+              <Image
+                className="brand-logo"
+                src={NEO_LOGO_PATH}
+                alt="CUTINEO"
+                width={36}
+                height={36}
+                priority
+              />
+              <span className="brand-wordmark">
+                <strong>CUTINEO</strong>
+                <small>OMNICHANNEL OS</small>
+              </span>
+            </Link>
+            <button
+              type="button"
+              className="mobile-close-button"
+              onClick={() => setMobileNavOpen(false)}
+              aria-label="ปิดเมนู"
+            >
+              <X size={18} aria-hidden="true" />
+            </button>
+          </div>
+
+          <button type="button" className="workspace-switcher" onClick={() => setNotice('Workspace switcher พร้อมใช้งานเร็ว ๆ นี้')}>
+            <span className="workspace-avatar">CS</span>
+            <span className="workspace-switcher-copy">
+              <small>WORKSPACE</small>
+              <strong>Cutineo Studio</strong>
+            </span>
+            <ChevronDown size={15} aria-hidden="true" />
           </button>
-          <button type="button" onClick={signOut} className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-900">
-            <LogOut size={16} aria-hidden="true" /> <span className="hidden sm:inline">ออกจากระบบ</span>
+
+          <nav className="primary-nav">
+            <p className="nav-section-label">Workspace</p>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const active = activeNav === item.label;
+              return (
+                <button
+                  key={item.label}
+                  type="button"
+                  className={`nav-item ${active ? 'is-active' : ''}`}
+                  onClick={() => handleNavClick(item.label)}
+                >
+                  <Icon size={18} strokeWidth={active ? 2.3 : 1.8} aria-hidden="true" />
+                  <span>{item.label}</span>
+                  {item.badge && <span className={`nav-item-badge ${item.badge === 'Live' ? 'is-live' : ''}`}>{item.badge}</span>}
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        <div className="sidebar-bottom">
+          <div className="ai-usage-card">
+            <div className="usage-title"><span><Sparkles size={13} aria-hidden="true" /> Neo AI credits</span><strong>78%</strong></div>
+            <div className="usage-bar"><span /></div>
+            <p>2,340 of 3,000 responses used</p>
+            <button type="button" onClick={() => setNotice('Plan & billing พร้อมเชื่อมต่อใน Settings')}>View plan <span>→</span></button>
+          </div>
+
+          <button type="button" className="help-link" onClick={() => setNotice('ทีม support จะช่วยคุณจากหน้านี้เร็ว ๆ นี้')}>
+            <HelpCircle size={17} aria-hidden="true" /> Help center
+          </button>
+          <div className="sidebar-profile">
+            <span className="profile-avatar">NS</span>
+            <span className="profile-copy"><strong>New S.</strong><small>Admin</small></span>
+            <button type="button" className="profile-action" onClick={() => void signOut()} aria-label="ออกจากระบบ" title="Sign out">
+              <LogOut size={16} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <aside className={`conversations-column ${mobileConversationsOpen ? 'is-mobile-open' : ''}`} aria-label="รายการ Conversations">
+        <ConversationList
+          conversations={conversations}
+          activeId={activeConvId}
+          onSelect={selectConversation}
+          onNewConversation={() => setNotice('สร้าง conversation ใหม่ได้จากการเชื่อมต่อ channel')}
+        />
+      </aside>
+
+      <section className="chat-column">
+        {activeConversation ? (
+          <ChatArea
+            conversation={activeConversation}
+            onOpenNav={() => setMobileNavOpen(true)}
+            onOpenConversations={() => setMobileConversationsOpen(true)}
+            onPreviewUpdate={updatePreview}
+            onNotice={setNotice}
+          />
+        ) : (
+          <div className="chat-column-empty">
+            <Image
+              className="neo-avatar neo-avatar-large"
+              src={NEO_LOGO_PATH}
+              alt="Neo AI"
+              width={45}
+              height={45}
+            />
+            <strong>{loadError ? 'โหลดห้องแชทไม่สำเร็จ' : 'ยังไม่มีห้องแชท'}</strong>
+            <span>{loadError || 'เลือกห้องสนทนาจากรายการเพื่อเริ่มตอบกลับ'}</span>
+            {loadError && (
+              <button type="button" className="empty-retry-button" onClick={retryConversationLoad}>
+                ลองโหลดใหม่
+              </button>
+            )}
+          </div>
+        )}
+      </section>
+
+      <div className="topbar-status" aria-label="สถานะระบบ">
+        <span className="system-online-dot" />
+        <span>{isDemoMode ? 'Demo preview' : 'Live workspace'}</span>
+        <Bell size={15} aria-hidden="true" />
+      </div>
+
+      {notice && (
+        <div className="dashboard-toast" role="status">
+          <BarChart3 size={16} aria-hidden="true" />
+          <span>{notice}</span>
+          <button type="button" onClick={() => setNotice('')} aria-label="ปิดการแจ้งเตือน">
+            <X size={15} aria-hidden="true" />
           </button>
         </div>
-      </header>
-
-      {error && <div className="border-b border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">โหลดข้อมูลไม่สำเร็จ: {error}</div>}
-
-      <div className="flex min-h-0 flex-1">
-        <aside className="hidden w-80 shrink-0 border-r border-slate-200 bg-white md:flex md:flex-col">
-          <ConversationList
-            activeId={activeConvId}
-            conversations={conversations}
-            onSelect={(id: string) => setActiveConvId(id)}
-          />
-        </aside>
-
-        <section className="flex min-w-0 flex-1 flex-col bg-white">
-          {activeConversation ? (
-            <ChatArea conversation={activeConversation} />
-          ) : (
-            <div className="grid flex-1 place-items-center px-6 text-center text-slate-400">
-              <div>
-                <MessageSquareText className="mx-auto mb-3 text-slate-300" size={42} aria-hidden="true" />
-                <p className="font-semibold">ยังไม่มีบทสนทนาใน workspace นี้</p>
-                <p className="mt-1 text-sm">เชื่อมต่อ LINE แล้วข้อความใหม่จะปรากฏที่นี่</p>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {activeConversation && (
-          <aside className="hidden w-80 shrink-0 border-l border-slate-200 bg-white lg:flex lg:flex-col">
-            <CustomerCRMDrawer conversation={activeConversation} />
-          </aside>
-        )}
-      </div>
-
-      <div className="border-t border-slate-200 bg-white p-2 md:hidden">
-        <ConversationList
-          activeId={activeConvId}
-          conversations={conversations}
-          onSelect={(id: string) => setActiveConvId(id)}
-          compact
-        />
-      </div>
+      )}
     </main>
   );
 }

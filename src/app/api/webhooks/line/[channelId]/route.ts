@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { AIAgentService } from '@/core/ai/agent.service';
 import { LineAdapter } from '@/core/adapters/line.adapter';
-import { requireRedis } from '@/lib/redis';
 import { requireSupabaseServer } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+const MAX_BODY_BYTES = 2 * 1024 * 1024;
 
 function isUniqueViolation(error: { code?: string } | null): boolean {
   return error?.code === '23505';
@@ -114,10 +113,18 @@ export async function POST(
   { params }: { params: { channelId: string } },
 ) {
   try {
+    const declaredLength = Number(request.headers.get('content-length') ?? 0);
+    if (declaredLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+    }
+
     const bodyText = await request.text();
+    if (new TextEncoder().encode(bodyText).byteLength > MAX_BODY_BYTES) {
+      return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
+    }
+
     const signature = request.headers.get('x-line-signature') ?? '';
     const db = requireSupabaseServer();
-    const dedup = requireRedis();
 
     const { data: channel, error: channelError } = await db
       .from('channels')
@@ -148,19 +155,18 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 });
     }
 
-    const messages = await LineAdapter.normalize(payload, channel.id, channel.tenant_id);
+    let messages;
+    try {
+      messages = await LineAdapter.normalize(payload, channel.id, channel.tenant_id);
+    } catch {
+      return NextResponse.json({ error: 'Invalid LINE payload' }, { status: 400 });
+    }
 
     for (const message of messages) {
-      const isNew = await dedup.set(`dedup:${message.platformMessageId}`, '1', {
-        nx: true,
-        ex: 86_400,
-      });
-      if (!isNew) continue;
-
       const identity = await findOrCreateIdentity(db, channel, message.platformUserId);
       const conversation = await findOrCreateConversation(db, channel, identity.contact_id);
 
-      const { error: messageError } = await db.from('messages').insert({
+      const { data: insertedMessage, error: messageError } = await db.from('messages').insert({
         tenant_id: channel.tenant_id,
         conversation_id: conversation.id,
         sender_type: 'customer',
@@ -171,9 +177,17 @@ export async function POST(
         platform_message_id: message.platformMessageId,
         is_read: false,
         created_at: new Date(message.timestamp).toISOString(),
-      });
+      }).select('id').single();
 
-      if (messageError && !isUniqueViolation(messageError)) throw messageError;
+      // The database unique index on platform_message_id is the durable
+      // idempotency boundary. Redis is intentionally not used before this
+      // insert, otherwise a transient DB failure could permanently drop an
+      // inbound customer message.
+      if (messageError) {
+        if (isUniqueViolation(messageError)) continue;
+        throw messageError;
+      }
+      if (!insertedMessage) throw new Error('Inbound message was not persisted.');
 
       const { error: conversationError } = await db
         .from('conversations')
@@ -188,20 +202,22 @@ export async function POST(
       if (conversationError) throw conversationError;
 
       if (conversation.assigned_to === 'ai_agent') {
-        try {
-          await AIAgentService.processMessage(channel, conversation, message);
-        } catch (error) {
-          console.error('[LINE webhook] AI processing failed', error);
-          await db
-            .from('conversations')
-            .update({ assigned_to: 'human_agent', status: 'pending_human' })
-            .eq('id', conversation.id)
-            .eq('tenant_id', channel.tenant_id);
-        }
+        const { error: queueError } = await db.from('webhook_jobs').upsert(
+          {
+            tenant_id: channel.tenant_id,
+            channel_id: channel.id,
+            conversation_id: conversation.id,
+            message_id: insertedMessage.id,
+            status: 'pending',
+            available_at: new Date().toISOString(),
+          },
+          { onConflict: 'message_id', ignoreDuplicates: true },
+        );
+        if (queueError) throw queueError;
       }
     }
 
-    return NextResponse.json({ status: 'ok' }, { status: 200 });
+    return NextResponse.json({ status: 'queued', count: messages.length }, { status: 200 });
   } catch (error) {
     console.error('[LINE webhook] request failed', error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });

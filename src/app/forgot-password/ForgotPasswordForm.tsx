@@ -47,7 +47,7 @@ export default function ForgotPasswordForm() {
       </header>
 
       <section className="mx-auto flex w-full max-w-[560px] flex-col items-center px-5 pb-10 pt-16 sm:pt-24">
-        <div className="w-full rounded-2xl border border-slate-100 bg-white px-6 py-10 shadow-[0_5px_18px_rgba(15,23,42,0.07)] sm:px-12 sm:py-14">
+        <div className="w-full min-w-0 rounded-2xl border border-slate-100 bg-white px-6 py-10 shadow-[0_5px_18px_rgba(15,23,42,0.07)] sm:px-12 sm:py-14">
           <div className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-teal-50 text-teal-600"><Mail size={22} aria-hidden="true" /></div>
           <h1 className="mt-5 text-center text-3xl font-bold tracking-tight text-[#12233c]">รีเซ็ตรหัสผ่าน</h1>
           <p className="mx-auto mt-3 max-w-sm text-center text-sm leading-6 text-slate-500">กรอกอีเมลที่ใช้สมัครบัญชี แล้วเราจะส่งลิงก์สำหรับตั้งรหัสผ่านใหม่ให้คุณ</p>
@@ -61,13 +61,13 @@ export default function ForgotPasswordForm() {
                 autoComplete="email"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="mt-3 h-[53px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                className="mt-3 min-h-[53px] h-auto w-full rounded-xl border border-slate-200 px-4 py-3 text-[15px] leading-[1.5] outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 placeholder="name@example.com"
               />
             </label>
             {error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
             {notice && <p role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">{notice}</p>}
-            <button type="submit" disabled={loading} className="inline-flex h-[53px] w-full items-center justify-center gap-2 rounded-xl bg-[#1d2b3f] text-sm font-bold text-white transition hover:bg-[#263952] disabled:cursor-not-allowed disabled:opacity-60">
+            <button type="submit" disabled={loading} className="inline-flex min-h-[53px] h-auto w-full items-center justify-center gap-2 rounded-xl bg-[#1d2b3f] px-4 py-3 text-sm leading-[1.4] font-bold text-white transition hover:bg-[#263952] disabled:cursor-not-allowed disabled:opacity-60">
               {loading && <Loader2 size={17} className="animate-spin" aria-hidden="true" />}
               ส่งลิงก์รีเซ็ตรหัสผ่าน
             </button>

@@ -1,4 +1,6 @@
+/* eslint-disable @next/next/no-img-element -- shared with the Vite static pages. */
 import { useMemo, useState, type FormEvent } from 'react';
+import { NEO_LOGO_PATH } from './lib/branding';
 
 type PlanName = 'Starter' | 'Pro' | 'Advanced';
 type LegalDocument = 'terms' | 'privacy' | null;
@@ -111,7 +113,7 @@ export default function RegisterApp() {
       <div className="register-page register-success-page">
         <header className="register-header register-shell">
           <button className="register-brand" type="button" onClick={goHome} aria-label="กลับหน้าแรก CUTINEO">
-            <span className="register-brand-mark">N</span>
+            <span className="register-brand-mark"><img src={NEO_LOGO_PATH} alt="Neo" /></span>
             <span className="register-brand-word">CUTI<span>NEO</span></span>
           </button>
           <button className="register-back-link" type="button" onClick={goHome}>กลับหน้าแรก</button>
@@ -137,7 +139,7 @@ export default function RegisterApp() {
     <div className="register-page">
       <header className="register-header register-shell">
         <button className="register-brand" type="button" onClick={goHome} aria-label="กลับหน้าแรก CUTINEO">
-          <span className="register-brand-mark">N</span>
+          <span className="register-brand-mark"><img src={NEO_LOGO_PATH} alt="Neo" /></span>
           <span className="register-brand-word">CUTI<span>NEO</span></span>
         </button>
         <div className="register-header-actions">

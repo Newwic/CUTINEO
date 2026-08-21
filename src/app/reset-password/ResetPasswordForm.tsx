@@ -65,13 +65,13 @@ export default function ResetPasswordForm() {
               <h1 className="mt-5 text-center text-3xl font-bold tracking-tight text-[#12233c]">ตั้งรหัสผ่านใหม่</h1>
               <form onSubmit={handleSubmit} className="mt-8 space-y-5">
                 <label className="block text-[15px] font-semibold text-[#17263c]">รหัสผ่านใหม่
-                  <input required minLength={8} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-3 h-[53px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100" placeholder="อย่างน้อย 8 ตัวอักษร" />
+                <input required minLength={8} type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="mt-3 min-h-[53px] h-auto w-full rounded-xl border border-slate-200 px-4 py-3 text-[15px] leading-[1.5] outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100" placeholder="อย่างน้อย 8 ตัวอักษร" />
                 </label>
                 <label className="block text-[15px] font-semibold text-[#17263c]">ยืนยันรหัสผ่าน
-                  <input required minLength={8} type="password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="mt-3 h-[53px] w-full rounded-xl border border-slate-200 px-4 text-[15px] outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100" placeholder="กรอกรหัสผ่านอีกครั้ง" />
+                <input required minLength={8} type="password" value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="mt-3 min-h-[53px] h-auto w-full rounded-xl border border-slate-200 px-4 py-3 text-[15px] leading-[1.5] outline-none transition focus:border-slate-400 focus:ring-4 focus:ring-slate-100" placeholder="กรอกรหัสผ่านอีกครั้ง" />
                 </label>
                 {error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">{error}</p>}
-                <button type="submit" disabled={loading} className="inline-flex h-[53px] w-full items-center justify-center gap-2 rounded-xl bg-[#1d2b3f] text-sm font-bold text-white transition hover:bg-[#263952] disabled:cursor-not-allowed disabled:opacity-60">
+                <button type="submit" disabled={loading} className="inline-flex min-h-[53px] h-auto w-full items-center justify-center gap-2 rounded-xl bg-[#1d2b3f] px-4 py-3 text-sm leading-[1.4] font-bold text-white transition hover:bg-[#263952] disabled:cursor-not-allowed disabled:opacity-60">
                   {loading && <Loader2 size={17} className="animate-spin" aria-hidden="true" />}
                   บันทึกรหัสผ่านใหม่
                 </button>

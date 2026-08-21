@@ -1,6 +1,9 @@
+/* eslint-disable @next/next/no-img-element -- shared with the Vite static pages. */
 import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { OpenClawAdapter } from './services/openClawAdapter';
 import { getNeoPolicyReply } from './core/ai/neo-policy';
+import CustomerChatWidget from './components/CustomerChatWidget';
+import { NEO_LOGO_PATH } from './lib/branding';
 
 type ChannelKey = 'all' | 'line' | 'facebook' | 'instagram' | 'marketplace';
 type LeadMode = 'trial' | 'contact' | 'login';
@@ -297,7 +300,7 @@ export default function App() {
     <div className="cutineo-site">
       <header className="site-header">
         <button className="brand" type="button" onClick={() => scrollTo('top')} aria-label="กลับหน้าแรก CUTINEO">
-          <span className="brand-mark" aria-hidden="true"><span>N</span></span>
+          <img className="brand-logo-image" src={NEO_LOGO_PATH} alt="Neo" />
           <span className="brand-word">CUTI<span>NEO</span></span>
         </button>
 
@@ -318,6 +321,7 @@ export default function App() {
       </header>
 
       <main>
+        <CustomerChatWidget apiUrl={import.meta.env.VITE_CHAT_API_URL || '/api/chat-stream'} />
         <section className="hero section-shell" id="top">
           <div className="hero-copy">
             <div className="eyebrow"><span className="eyebrow-dot" /> CENTRAL INBOX FOR YOUR BUSINESS</div>
@@ -339,7 +343,7 @@ export default function App() {
             <div className="visual-glow" />
             <div className="inbox-window">
               <div className="window-bar">
-                <div className="window-brand"><span className="mini-mark">N</span><span>รวมแชท</span><span className={`online-dot connection-${connectionStatus}`} /> <small>{connectionStatus === 'online' ? 'OpenClaw ออนไลน์' : connectionStatus === 'connecting' ? 'กำลังเชื่อมต่อ' : 'โหมดเดโม'}</small></div>
+                <div className="window-brand"><img className="mini-logo-image" src={NEO_LOGO_PATH} alt="Neo" /><span>รวมแชท</span><span className={`online-dot connection-${connectionStatus}`} /> <small>{connectionStatus === 'online' ? 'OpenClaw ออนไลน์' : connectionStatus === 'connecting' ? 'กำลังเชื่อมต่อ' : 'โหมดเดโม'}</small></div>
                 <div className="window-tools"><span>⌕</span><span>⋯</span></div>
               </div>
               <div className="inbox-layout">
@@ -363,9 +367,9 @@ export default function App() {
                   <div className="conversation-body">
                     <span className="date-divider">วันนี้ · 10:24</span>
                     <div className="chat-bubble customer-bubble">{activeConversation.message}</div>
-                    <div className="chat-bubble neo-bubble"><span className="bubble-label">NEO แนะนำคำตอบ</span>{activeConversation.reply}</div>
+                    <div className="chat-bubble neo-bubble"><img className="bubble-neo-logo" src={NEO_LOGO_PATH} alt="Neo" /><span className="bubble-label">NEO แนะนำคำตอบ</span>{activeConversation.reply}</div>
                     <div className="chat-bubble customer-bubble short-bubble">ขอบคุณมากค่ะ 😊</div>
-                    {demoMessages.map((message) => <div className={`chat-bubble ${message.role === 'neo' ? 'neo-bubble' : 'team-bubble'}`} key={message.id}>{message.role === 'neo' && <span className="bubble-label">NEO แนะนำคำตอบ</span>}{message.text}</div>)}
+                    {demoMessages.map((message) => <div className={`chat-bubble ${message.role === 'neo' ? 'neo-bubble' : 'team-bubble'}`} key={message.id}>{message.role === 'neo' && <><img className="bubble-neo-logo" src={NEO_LOGO_PATH} alt="Neo" /><span className="bubble-label">NEO แนะนำคำตอบ</span></>}{message.text}</div>)}
                   </div>
                   <form className="reply-box" onSubmit={sendDemoMessage}>
                     <input value={demoDraft} onChange={(event) => setDemoDraft(event.target.value)} placeholder="พิมพ์ข้อความตอบกลับ..." aria-label="ข้อความตอบกลับในเดโม" />
@@ -424,16 +428,16 @@ export default function App() {
         </section>
 
         <section className="cta-section section-shell" id="contact">
-          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>เริ่มต้นด้วย Starter ฿490 / เดือน แล้วอัปเกรดเป็น Pro เมื่ออยากให้ Neo ช่วยตอบและปิดการขาย</p><button className="button button-light" type="button" onClick={() => goToRegister()}>เริ่มต้นกับ Starter <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><span>N</span></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
+          <div className="cta-card"><div className="cta-glow" /><div className="cta-copy"><div className="eyebrow eyebrow-light">READY WHEN YOU ARE</div><h2>เริ่มดูแลทุกแชท<br />ให้เป็นเรื่องง่าย</h2><p>เริ่มต้นด้วย Starter ฿490 / เดือน แล้วอัปเกรดเป็น Pro เมื่ออยากให้ Neo ช่วยตอบและปิดการขาย</p><button className="button button-light" type="button" onClick={() => goToRegister()}>เริ่มต้นกับ Starter <span>→</span></button></div><div className="cta-visual"><div className="cta-orb"><img className="cta-logo-image" src={NEO_LOGO_PATH} alt="Neo" /></div><div className="cta-ring ring-a" /><div className="cta-ring ring-b" /><span className="cta-spark spark-a">✦</span><span className="cta-spark spark-b">✦</span></div></div>
         </section>
       </main>
 
-      <footer className="site-footer section-shell"><div className="footer-brand"><button className="brand" type="button" onClick={() => scrollTo('top')}><span className="brand-mark" aria-hidden="true"><span>N</span></span><span className="brand-word">CUTI<span>NEO</span></span></button><p>รวมทุกแชทให้ทีมขายทำงานได้ง่ายขึ้น</p></div><div className="footer-links"><div><strong>ผลิตภัณฑ์</strong><button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button><button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button></div><div><strong>ช่วยเหลือ</strong><button type="button" onClick={() => announce('ศูนย์ช่วยเหลือกำลังเตรียมเปิดให้บริการครับ')}>ศูนย์ช่วยเหลือ</button><button type="button" onClick={goToDemo}>ขอเดโม</button></div></div><span className="copyright">© 2026 CUTINEO</span></footer>
+      <footer className="site-footer section-shell"><div className="footer-brand"><button className="brand" type="button" onClick={() => scrollTo('top')}><img className="brand-logo-image" src={NEO_LOGO_PATH} alt="Neo" /><span className="brand-word">CUTI<span>NEO</span></span></button><p>รวมทุกแชทให้ทีมขายทำงานได้ง่ายขึ้น</p></div><div className="footer-links"><div><strong>ผลิตภัณฑ์</strong><button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button><button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button></div><div><strong>ช่วยเหลือ</strong><button type="button" onClick={() => announce('ศูนย์ช่วยเหลือกำลังเตรียมเปิดให้บริการครับ')}>ศูนย์ช่วยเหลือ</button><button type="button" onClick={goToDemo}>ขอเดโม</button></div></div><span className="copyright">© 2026 CUTINEO</span></footer>
 
       {leadMode && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setLeadMode(null); }}>
         <section className="lead-modal" role="dialog" aria-modal="true" aria-labelledby="lead-modal-title">
           <button className="modal-close" type="button" onClick={() => setLeadMode(null)} aria-label="ปิดหน้าต่าง">×</button>
-          <div className="modal-icon">{leadMode === 'login' ? '↗' : leadMode === 'contact' ? '✦' : 'N'}</div>
+          <div className="modal-icon">{leadMode === 'login' ? '↗' : leadMode === 'contact' ? '✦' : <img className="modal-logo-image" src={NEO_LOGO_PATH} alt="Neo" />}</div>
           <div className="eyebrow">{leadMode === 'login' ? 'WELCOME BACK' : leadMode === 'contact' ? 'TALK TO CUTINEO' : 'GET STARTED WITH CUTINEO'}</div>
           <h2 id="lead-modal-title">{leadMode === 'login' ? 'เข้าสู่โหมดเดโม' : leadMode === 'contact' ? 'คุยกับทีม CUTINEO' : 'เริ่มต้นกับ CUTINEO'}</h2>
           <p>{leadMode === 'login' ? 'กรอกข้อมูลเพื่อทดลองหน้าการเข้าสู่ระบบ ฟังก์ชันนี้ยังไม่เชื่อมต่อบัญชีจริง' : `กรอกข้อมูลสั้น ๆ เพื่อเริ่มต้นกับแพ็กเกจ ${selectedPlan}`}</p>

@@ -38,9 +38,27 @@ export default function LoginForm({ initialMode = 'signin' }: LoginFormProps) {
 
   useEffect(() => {
     if (!supabaseClient) return;
+
+    let mounted = true;
+
     void supabaseClient.auth.getSession().then(({ data }) => {
-      if (data.session) router.replace('/dashboard/inbox');
+      if (mounted && data.session) {
+        router.replace('/dashboard/inbox');
+        router.refresh();
+      }
     });
+
+    const authSubscription = supabaseClient.auth.onAuthStateChange((event, session) => {
+      if (mounted && session && (event === 'SIGNED_IN' || event === 'INITIAL_SESSION')) {
+        router.replace('/dashboard/inbox');
+        router.refresh();
+      }
+    });
+
+    return () => {
+      mounted = false;
+      authSubscription.data.subscription.unsubscribe();
+    };
   }, [router]);
 
   function switchMode(nextMode: AuthMode) {
@@ -54,6 +72,10 @@ export default function LoginForm({ initialMode = 'signin' }: LoginFormProps) {
     setIdentifier('');
     setError('');
     setNotice('');
+  }
+
+  function openDemoInbox() {
+    router.replace('/dashboard/inbox');
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -101,7 +123,13 @@ export default function LoginForm({ initialMode = 'signin' }: LoginFormProps) {
       return;
     }
 
+    if (!authResult.data.session) {
+      setError('เข้าสู่ระบบสำเร็จแต่ยังไม่พบ session กรุณาลองใหม่อีกครั้ง');
+      return;
+    }
+
     router.replace('/dashboard/inbox');
+    router.refresh();
   }
 
   const identifierLabel = method === 'email' ? 'อีเมล' : 'เบอร์โทรศัพท์';
@@ -114,8 +142,8 @@ export default function LoginForm({ initialMode = 'signin' }: LoginFormProps) {
       </header>
 
       <section className="mx-auto flex w-full max-w-[680px] flex-col items-center px-5 pb-10 pt-16 sm:pt-24">
-        <div className="w-full rounded-2xl border border-slate-100 bg-white px-6 py-10 shadow-[0_5px_18px_rgba(15,23,42,0.07)] sm:px-[53px] sm:py-14">
-          <h1 className="text-center text-[30px] font-bold tracking-[-0.03em] text-[#12233c] sm:text-[34px]">
+        <div className="w-full min-w-0 rounded-2xl border border-slate-100 bg-white px-6 py-10 shadow-[0_5px_18px_rgba(15,23,42,0.07)] sm:px-[53px] sm:py-14">
+          <h1 className="text-center text-[30px] font-bold leading-[1.25] tracking-[-0.03em] text-[#12233c] sm:text-[34px]">
             {mode === 'signin' ? 'เข้าสู่ระบบ' : 'สร้างบัญชี'}
           </h1>
 
@@ -149,7 +177,7 @@ export default function LoginForm({ initialMode = 'signin' }: LoginFormProps) {
                 autoComplete={method === 'email' ? 'email' : 'tel'}
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
-                className="mt-3 h-[53px] w-full rounded-xl border border-slate-200 bg-white px-4 text-[15px] font-normal text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                className="mt-3 min-h-[53px] h-auto w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-[15px] font-normal leading-[1.5] text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                 placeholder={method === 'email' ? 'name@example.com' : '08x-xxx-xxxx'}
               />
             </label>
@@ -164,7 +192,7 @@ export default function LoginForm({ initialMode = 'signin' }: LoginFormProps) {
                   autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="h-[53px] w-full rounded-xl border border-slate-200 bg-white px-4 pr-12 text-[15px] font-normal text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
+                  className="min-h-[53px] h-auto w-full rounded-xl border border-slate-200 bg-white px-4 py-3 pr-12 text-[15px] font-normal leading-[1.5] text-slate-800 outline-none transition placeholder:text-slate-300 focus:border-slate-400 focus:ring-4 focus:ring-slate-100"
                   placeholder="อย่างน้อย 8 ตัวอักษร"
                 />
                 <button
@@ -193,11 +221,20 @@ export default function LoginForm({ initialMode = 'signin' }: LoginFormProps) {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex h-[53px] w-full items-center justify-center gap-2 rounded-xl bg-[#1d2b3f] px-4 text-[15px] font-bold text-white shadow-sm transition hover:bg-[#263952] disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex min-h-[53px] h-auto w-full items-center justify-center gap-2 rounded-xl bg-[#1d2b3f] px-4 py-3 text-[15px] leading-[1.4] font-bold text-white shadow-sm transition hover:bg-[#263952] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading && <Loader2 size={17} className="animate-spin" aria-hidden="true" />}
               {mode === 'signin' ? 'เข้าสู่ระบบ' : 'สร้างบัญชี'}
             </button>
+            {!supabaseClient && (
+              <button
+                type="button"
+                onClick={openDemoInbox}
+                className="inline-flex min-h-[48px] h-auto w-full items-center justify-center rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-[14px] leading-[1.4] font-bold text-teal-700 transition hover:bg-teal-100"
+              >
+                เปิด Demo Inbox โดยไม่ใช้บัญชีจริง
+              </button>
+            )}
           </form>
         </div>
 

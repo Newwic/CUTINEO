@@ -1,6 +1,8 @@
+/* eslint-disable @next/next/no-img-element -- shared with the Vite static pages. */
 import { StrictMode, useEffect, useState, type FormEvent } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ArrowLeft, Eye, EyeOff, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { NEO_LOGO_PATH } from './lib/branding';
 import './login.css';
 
 type Language = 'th' | 'en';
@@ -58,7 +60,7 @@ const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/?$/, '/');
 function Logo() {
   return (
     <a className="login-brand" href={baseUrl} aria-label="CUTINEO home">
-      <span className="login-brand-mark"><Sparkles size={21} strokeWidth={2.8} aria-hidden="true" /></span>
+      <span className="login-brand-mark"><img className="login-brand-logo" src={NEO_LOGO_PATH} alt="Neo" /></span>
       <span>cutineo</span>
     </a>
   );
@@ -122,6 +124,9 @@ function LoginApp() {
     window.setTimeout(() => {
       setLoading(false);
       showMessage(t.success, 'success');
+      window.setTimeout(() => {
+        window.location.assign(`${baseUrl}demo.html`);
+      }, 450);
     }, 650);
   };
 

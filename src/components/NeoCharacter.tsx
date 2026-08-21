@@ -1,4 +1,6 @@
+/* eslint-disable @next/next/no-img-element -- shared with the Vite static pages. */
 import { getAnimation } from '../animation/animationRegistry';
+import { NEO_LOGO_PATH } from '../lib/branding';
 import type { NeoState } from '../types/neo';
 
 interface NeoCharacterProps {
@@ -32,7 +34,7 @@ export function NeoCharacter({ state, onClick }: NeoCharacterProps) {
         <div className="neo-neck" />
         <div className="neo-torso">
           <div className="neo-chest-line" />
-          <div className="neo-core"><span>N</span></div>
+          <div className="neo-core"><img src={NEO_LOGO_PATH} alt="Neo" /></div>
           <div className="neo-core-glow" />
         </div>
         <div className="neo-arm neo-arm-left"><span className="neo-palm" /></div>

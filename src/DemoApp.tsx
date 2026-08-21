@@ -1,4 +1,6 @@
+/* eslint-disable @next/next/no-img-element -- shared with the Vite static pages. */
 import { useEffect, useState, type FormEvent } from 'react';
+import { NEO_LOGO_PATH } from './lib/branding';
 
 type DemoDocument = 'terms' | 'privacy' | null;
 type Language = 'th' | 'en';
@@ -185,7 +187,7 @@ export default function DemoApp() {
       <div className="demo-page demo-success-page">
         <header className="demo-header demo-shell">
           <button className="demo-brand" type="button" onClick={goHome} aria-label="CUTINEO home">
-            <span className="demo-brand-mark">N</span>
+            <span className="demo-brand-mark"><img src={NEO_LOGO_PATH} alt="Neo" /></span>
             <span className="demo-brand-word">CUTI<span>NEO</span></span>
           </button>
           <div className="demo-header-actions">
@@ -216,7 +218,7 @@ export default function DemoApp() {
     <div className="demo-page">
       <header className="demo-header demo-shell">
         <button className="demo-brand" type="button" onClick={goHome} aria-label="CUTINEO home">
-          <span className="demo-brand-mark">N</span>
+          <span className="demo-brand-mark"><img src={NEO_LOGO_PATH} alt="Neo" /></span>
           <span className="demo-brand-word">CUTI<span>NEO</span></span>
         </button>
         <nav className="demo-nav" aria-label="เมนูหน้าเดโม">
@@ -328,7 +330,7 @@ export default function DemoApp() {
         <section className="demo-cta demo-shell"><div><span className="demo-kicker demo-kicker-light">{t.cta.kicker}</span><h2>{t.cta.title}<br />{t.cta.titleAccent}</h2><p>{t.cta.description}</p></div><div className="demo-cta-actions"><button className="demo-cta-light" type="button" onClick={() => scrollTo('top')}>{t.cta.book} <span>↑</span></button><button className="demo-cta-ghost" type="button" onClick={goToRegister}>{t.cta.start} <span>→</span></button></div></section>
       </main>
 
-      <footer className="demo-footer demo-shell"><button className="demo-brand" type="button" onClick={goHome}><span className="demo-brand-mark">N</span><span className="demo-brand-word">CUTI<span>NEO</span></span></button><span>{t.footer}</span><span>© 2026 CUTINEO</span></footer>
+      <footer className="demo-footer demo-shell"><button className="demo-brand" type="button" onClick={goHome}><span className="demo-brand-mark"><img src={NEO_LOGO_PATH} alt="Neo" /></span><span className="demo-brand-word">CUTI<span>NEO</span></span></button><span>{t.footer}</span><span>© 2026 CUTINEO</span></footer>
 
       {videoOpen && <div className="demo-modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setVideoOpen(false); }}><section className="demo-video-modal" role="dialog" aria-modal="true" aria-labelledby="video-modal-title"><button className="demo-modal-close" type="button" onClick={() => setVideoOpen(false)} aria-label="Close video">×</button><span className="demo-kicker">{t.modal.kicker}</span><h2 id="video-modal-title">{t.modal.title}</h2><div className="demo-modal-player"><div className="modal-player-glow" /><span>▶</span><small>{t.modal.videoNote}</small></div><p>{t.modal.videoText}</p><button className="demo-primary-modal-button" type="button" onClick={goHome}>{t.modal.videoButton} <span>→</span></button></section></div>}
 
