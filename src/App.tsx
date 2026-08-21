@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent 
 import { OpenClawAdapter } from './services/openClawAdapter';
 import { getNeoPolicyReply } from './core/ai/neo-policy';
 import CustomerChatWidget from './components/CustomerChatWidget';
+import CutineoSiteHeader, { type CutineoNavItem } from './components/CutineoSiteHeader';
 import { NEO_LOGO_PATH } from './lib/branding';
 import { AI_BOOST, PUBLIC_PLAN_CARDS } from './core/billing/catalog';
 
@@ -187,7 +188,6 @@ function getNeoDemoReply(customerMessage: string) {
 export default function App() {
   const adapter = useMemo(() => new OpenClawAdapter(), []);
   const [activeChannel, setActiveChannel] = useState<ChannelKey>('all');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const [connectionStatus, setConnectionStatus] = useState<'online' | 'offline' | 'connecting'>('offline');
   const [leadMode, setLeadMode] = useState<LeadMode | null>(null);
@@ -228,7 +228,6 @@ export default function App() {
 
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    setMobileMenuOpen(false);
   };
 
   const announce = (message: string) => {
@@ -240,7 +239,6 @@ export default function App() {
     setSelectedPlan(plan);
     setNotice('');
     setLeadMode(mode);
-    setMobileMenuOpen(false);
   };
 
   const goToRegister = (plan = 'Starter') => {
@@ -320,29 +318,25 @@ export default function App() {
     }
   };
 
+  const baseUrl = (import.meta.env.BASE_URL || '/').replace(/\/?$/, '/');
+  const navItems: CutineoNavItem[] = [
+    { key: 'features', label: 'ฟีเจอร์', href: '#features' },
+    { key: 'how', label: 'วิธีการทำงาน', href: '#demo' },
+    { key: 'sales', label: 'AI Sales', href: '#compare' },
+    { key: 'pricing', label: 'ราคา', href: '#pricing' },
+  ];
+
   return (
     <div className="cutineo-site">
-      <header className="site-header">
-        <button className="brand" type="button" onClick={() => scrollTo('top')} aria-label="กลับหน้าแรก CUTINEO">
-          <img className="brand-logo-image" src={NEO_LOGO_PATH} alt="Neo" />
-          <span className="brand-word">CUTI<span>NEO</span></span>
-        </button>
-
-        <nav className={`main-nav ${mobileMenuOpen ? 'is-open' : ''}`} aria-label="เมนูหลัก">
-          <button type="button" onClick={() => scrollTo('features')}>ฟีเจอร์</button>
-          <button type="button" onClick={() => scrollTo('pricing')}>แพ็กเกจราคา</button>
-          <button type="button" onClick={() => scrollTo('compare')}>เปรียบเทียบแพ็กเกจ</button>
-          <button type="button" onClick={goToDemo}>ติดต่อเรา</button>
-        </nav>
-
-        <div className="header-actions">
-          <button className="login-link" type="button" onClick={goToLogin}>เข้าสู่ระบบ</button>
-          <button className="button button-dark button-small" type="button" onClick={() => goToRegister()}>เริ่มต้นกับ Starter</button>
-        </div>
-        <button className={`menu-toggle ${mobileMenuOpen ? 'is-active' : ''}`} type="button" onClick={() => setMobileMenuOpen((open) => !open)} aria-label="เปิดเมนู" aria-expanded={mobileMenuOpen}>
-          <span /><span /><span />
-        </button>
-      </header>
+      <CutineoSiteHeader
+        navItems={navItems}
+        logoHref="#top"
+        loginHref={`${baseUrl}login/`}
+        startHref={`${baseUrl}register.html?plan=Starter`}
+        onLogin={goToLogin}
+        onStart={() => goToRegister()}
+        ariaLabel="เมนูหลัก"
+      />
 
       <main>
         <CustomerChatWidget apiUrl={import.meta.env.VITE_CHAT_API_URL || '/api/chat-stream'} />

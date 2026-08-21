@@ -1,21 +1,25 @@
 import Link from 'next/link';
 import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import { AI_BOOST, PLAN_ORDER, PLAN_CATALOG, formatPlanPrice } from '@/core/billing/catalog';
+import CutineoSiteHeader from '@/components/CutineoSiteHeader';
 
 export default function PricingPage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#071016] text-white">
       <div className="mx-auto max-w-7xl px-5 py-7 sm:px-8 lg:px-12">
-        <header className="flex flex-wrap items-center justify-between gap-4">
-          <Link href="/" className="flex items-center gap-3 text-lg font-black tracking-tight">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-teal-400 to-cyan-500 shadow-lg shadow-teal-500/25">N</span>
-            CUTINEO
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 hover:bg-white/10">เข้าสู่ระบบ</Link>
-            <Link href="/dashboard/inbox" className="rounded-full bg-teal-400 px-4 py-2 text-sm font-bold text-slate-950 hover:bg-teal-300">เปิด Inbox</Link>
-          </div>
-        </header>
+        <CutineoSiteHeader
+          navItems={[
+            { key: 'features', label: 'ฟีเจอร์', href: '/#features' },
+            { key: 'how', label: 'วิธีการทำงาน', href: '/#features' },
+            { key: 'sales', label: 'AI Sales', href: '/pricing' },
+            { key: 'pricing', label: 'ราคา', href: '/pricing' },
+          ]}
+          logoHref="/"
+          loginHref="/login"
+          startHref="/register?plan=Starter"
+          activeKey="pricing"
+          ariaLabel="เมนูหลัก"
+        />
 
         <section className="mx-auto max-w-3xl py-16 text-center sm:py-20">
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-300/20 bg-teal-300/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-teal-200"><Sparkles size={14} /> AI-powered pricing</p>

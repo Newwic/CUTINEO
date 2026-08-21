@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element -- shared with the Vite static pages. */
 import { useEffect, useState, type FormEvent } from 'react';
+import CutineoSiteHeader, { type CutineoNavItem } from './components/CutineoSiteHeader';
 import { NEO_LOGO_PATH } from './lib/branding';
 
 type DemoDocument = 'terms' | 'privacy' | null;
@@ -32,8 +33,8 @@ const countryCodes = ['+66', '+65', '+63', '+60', '+62', '+86', '+81', '+1'];
 
 const languageCopy = {
   th: {
-    languageName: 'ไทย', languageButton: 'EN', backHome: 'กลับหน้าแรก', login: 'เข้าสู่ระบบ', trial: 'เริ่มต้นใช้งาน',
-    nav: { features: 'ฟีเจอร์', how: 'วิธีใช้งาน', pricing: 'ราคา' },
+    languageName: 'ไทย', languageButton: 'EN', backHome: 'กลับหน้าแรก', login: 'เข้าสู่ระบบ', trial: 'เริ่มต้นใช้งานฟรี',
+    nav: { features: 'ฟีเจอร์', how: 'วิธีการทำงาน', sales: 'AI Sales', pricing: 'ราคา' },
     hero: {
       kicker: 'SEE CUTINEO IN ACTION', title: 'นัดหมายเวลาสาธิต', titleAccent: 'การใช้งานจริง',
       description: 'เราจะปรับการสาธิตให้เหมาะกับธุรกิจของคุณ แสดงให้ดูว่า CUTINEO ช่วยรวมแชท เพิ่มประสิทธิภาพทีม และปิดการขายได้อย่างไร',
@@ -54,7 +55,7 @@ const languageCopy = {
   },
   en: {
     languageName: 'English', languageButton: 'TH', backHome: 'Back to home', login: 'Log in', trial: 'Get started',
-    nav: { features: 'Features', how: 'How it works', pricing: 'Pricing' },
+    nav: { features: 'Features', how: 'How it works', sales: 'AI Sales', pricing: 'Pricing' },
     hero: {
       kicker: 'SEE CUTINEO IN ACTION', title: 'Book a live demo', titleAccent: 'for your team',
       description: 'We will tailor the demo to your business and show how CUTINEO unifies conversations, improves team productivity, and helps close more sales.',
@@ -115,6 +116,12 @@ export default function DemoApp() {
   const enterpriseMode = requestedPlan === 'Enterprise';
   const nowForDatePicker = new Date().toISOString().slice(0, 16);
   const t = languageCopy[language];
+  const navItems: CutineoNavItem[] = [
+    { key: 'features', label: t.nav.features, href: '#why' },
+    { key: 'how', label: t.nav.how, href: '#how' },
+    { key: 'sales', label: t.nav.sales, href: '#how' },
+    { key: 'pricing', label: t.nav.pricing, href: `${homeUrl}#pricing` },
+  ];
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -185,16 +192,19 @@ export default function DemoApp() {
   if (submitted) {
     return (
       <div className="demo-page demo-success-page">
-        <header className="demo-header demo-shell">
-          <button className="demo-brand" type="button" onClick={goHome} aria-label="CUTINEO home">
-            <span className="demo-brand-mark"><img src={NEO_LOGO_PATH} alt="Neo" /></span>
-            <span className="demo-brand-word">CUTI<span>NEO</span></span>
-          </button>
-          <div className="demo-header-actions">
-            <button className="demo-language-button" type="button" onClick={toggleLanguage} aria-label={`Switch language to ${t.languageButton}`}><span className="demo-language-flag">{language === 'th' ? '🇹🇭' : '🇬🇧'}</span><span>{language.toUpperCase()}</span><span className="demo-language-chevron">⌄</span></button>
-            <button className="demo-header-link" type="button" onClick={goHome}>{t.backHome}</button>
-          </div>
-        </header>
+        <CutineoSiteHeader
+          navItems={navItems}
+          logoHref={homeUrl}
+          loginHref={`${baseUrl}login/`}
+          startHref={registerUrl}
+          loginLabel={t.login}
+          startLabel={t.trial}
+          language={language}
+          onLogin={goToLogin}
+          onStart={goToRegister}
+          onLanguageToggle={toggleLanguage}
+          ariaLabel="เมนูหน้าเดโม"
+        />
         <main className="demo-success-card" role="status">
           <div className="demo-success-icon">✓</div>
           <span className="demo-kicker">{t.success.kicker}</span>
@@ -216,22 +226,19 @@ export default function DemoApp() {
 
   return (
     <div className="demo-page">
-      <header className="demo-header demo-shell">
-        <button className="demo-brand" type="button" onClick={goHome} aria-label="CUTINEO home">
-          <span className="demo-brand-mark"><img src={NEO_LOGO_PATH} alt="Neo" /></span>
-          <span className="demo-brand-word">CUTI<span>NEO</span></span>
-        </button>
-        <nav className="demo-nav" aria-label="เมนูหน้าเดโม">
-          <button type="button" onClick={() => scrollTo('why')}>{t.nav.features}</button>
-          <button type="button" onClick={() => scrollTo('how')}>{t.nav.how}</button>
-          <a href={`${baseUrl}index.html#pricing`}>{t.nav.pricing}</a>
-        </nav>
-        <div className="demo-header-actions">
-          <button className="demo-language-button" type="button" onClick={toggleLanguage} aria-label={`Switch language to ${t.languageButton}`}><span className="demo-language-flag">{language === 'th' ? '🇹🇭' : '🇬🇧'}</span><span>{language.toUpperCase()}</span><span className="demo-language-chevron">⌄</span></button>
-          <button className="demo-login-link" type="button" onClick={goToLogin}>{t.login}</button>
-          <button className="demo-trial-button" type="button" onClick={goToRegister}>{t.trial}</button>
-        </div>
-      </header>
+      <CutineoSiteHeader
+        navItems={navItems}
+        logoHref={homeUrl}
+        loginHref={`${baseUrl}login/`}
+        startHref={registerUrl}
+        loginLabel={t.login}
+        startLabel={t.trial}
+        language={language}
+        onLogin={goToLogin}
+        onStart={goToRegister}
+        onLanguageToggle={toggleLanguage}
+        ariaLabel="เมนูหน้าเดโม"
+      />
 
       <main>
         <section className="demo-hero demo-shell" id="top">

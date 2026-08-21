@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, Bot, Inbox, MessageSquareText, ShieldCheck, Sparkles } from 'lucide-react';
-import LanguageSwitcher from './components/LanguageSwitcher';
+import { ArrowRight, Bot, Inbox, MessageSquareText, ShieldCheck } from 'lucide-react';
+import CutineoSiteHeader from '@/components/CutineoSiteHeader';
 
 const features = [
   {
@@ -25,35 +25,18 @@ export default function HomePage() {
     <main className="min-h-screen overflow-x-hidden bg-slate-950 text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(99,102,241,0.32),_transparent_45%),radial-gradient(circle_at_bottom_left,_rgba(16,185,129,0.18),_transparent_42%)]" />
       <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col px-5 py-6 sm:px-8 lg:px-12">
-        <header className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-lg font-black tracking-tight">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-500 shadow-lg shadow-indigo-500/30">
-              <Sparkles size={18} aria-hidden="true" />
-            </span>
-            CUTINEO
-          </Link>
-          <nav className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/30 hover:bg-white/10 hover:text-white"
-            >
-              เข้าสู่ระบบ
-            </Link>
-            <Link
-              href="/dashboard/inbox"
-              className="hidden rounded-full px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white sm:inline-flex"
-            >
-              เปิด Inbox
-            </Link>
-            <Link
-              href="/pricing"
-              className="hidden rounded-full px-4 py-2 text-sm font-semibold text-teal-200 transition hover:bg-teal-300/10 sm:inline-flex"
-            >
-              ดูแพ็กเกจ
-            </Link>
-            <LanguageSwitcher />
-          </nav>
-        </header>
+        <CutineoSiteHeader
+          navItems={[
+            { key: 'features', label: 'ฟีเจอร์', href: '#features' },
+            { key: 'how', label: 'วิธีการทำงาน', href: '#features' },
+            { key: 'sales', label: 'AI Sales', href: '/pricing' },
+            { key: 'pricing', label: 'ราคา', href: '/pricing' },
+          ]}
+          logoHref="/"
+          loginHref="/login"
+          startHref="/register?plan=Starter"
+          ariaLabel="เมนูหลัก"
+        />
 
         <section className="grid flex-1 items-center gap-14 py-20 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
           <div>
