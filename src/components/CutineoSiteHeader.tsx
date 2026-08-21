@@ -5,7 +5,7 @@ import { useEffect, useState, type MouseEvent } from 'react';
 import { NEO_LOGO_PATH } from '../lib/branding';
 
 export type CutineoLanguage = 'th' | 'en';
-export type CutineoNavKey = 'features' | 'how' | 'sales' | 'pricing';
+export type CutineoNavKey = 'features' | 'how' | 'integrations' | 'sales' | 'pricing' | 'resources';
 
 export interface CutineoNavItem {
   key: CutineoNavKey;
@@ -147,7 +147,7 @@ export default function CutineoSiteHeader({
 
         <div className="cutineo-site-actions">
           <a className="cutineo-site-login" href={loginHref} onClick={(event) => handleAction(event, onLogin)}>{loginLabel}</a>
-          <a className="cutineo-site-cta" href={startHref} onClick={(event) => handleAction(event, onStart)}>{startLabel}</a>
+          <a className="cutineo-site-cta" href={startHref} data-cta="header-start" onClick={(event) => handleAction(event, onStart)}>{startLabel}</a>
           {languageButton('cutineo-desktop-language')}
         </div>
 

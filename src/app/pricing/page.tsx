@@ -10,9 +10,10 @@ export default function PricingPage() {
         <CutineoSiteHeader
           navItems={[
             { key: 'features', label: 'ฟีเจอร์', href: '/#features' },
-            { key: 'how', label: 'วิธีการทำงาน', href: '/#features' },
-            { key: 'sales', label: 'AI Sales', href: '/pricing' },
+            { key: 'integrations', label: 'การเชื่อมต่อ', href: '/#integrations' },
+            { key: 'sales', label: 'AI Sales', href: '/#ai-sales' },
             { key: 'pricing', label: 'ราคา', href: '/pricing' },
+            { key: 'resources', label: 'ทรัพยากร', href: '/#resources' },
           ]}
           logoHref="/"
           loginHref="/login"

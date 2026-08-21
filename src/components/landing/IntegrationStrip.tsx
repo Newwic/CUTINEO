@@ -1,0 +1,50 @@
+/* eslint-disable @next/next/no-img-element -- shared Vite/Next marketing assets */
+'use client';
+
+import { useState } from 'react';
+import { integrations, integrationCategories, type IntegrationStatus } from '../../config/integrations';
+import styles from './HomepageV2.module.css';
+
+function StatusBadge({ status }: { status: IntegrationStatus }) {
+  const label = status === 'available' ? 'พร้อมใช้งาน' : status === 'beta' ? 'Beta' : 'เร็ว ๆ นี้';
+  return <span className={`${styles.integrationStatus} ${styles[`status_${status}`]}`}>{label}</span>;
+}
+
+export default function IntegrationStrip() {
+  const [activeCategory, setActiveCategory] = useState<'all' | 'messaging' | 'social' | 'email'>('all');
+  const visibleIntegrations = activeCategory === 'all'
+    ? integrations
+    : integrations.filter((integration) => integration.category === activeCategory);
+
+  return (
+    <section className={styles.integrationSection} id="integrations" aria-labelledby="integration-title">
+      <div className={styles.sectionShell}>
+        <div className={styles.sectionKicker}>CONNECT YOUR WORKSPACE</div>
+        <div className={styles.integrationHeadingRow}>
+          <div>
+            <h2 id="integration-title">เชื่อมต่อช่องทางที่ลูกค้าของคุณใช้อยู่</h2>
+            <p>ดูสถานะตาม adapter ที่มีในระบบจริง ช่องที่ยังไม่พร้อมจะถูกระบุเป็น Beta หรือเร็ว ๆ นี้อย่างชัดเจน</p>
+          </div>
+          <div className={styles.integrationFilters} role="tablist" aria-label="กรองช่องทาง">
+            <button type="button" className={activeCategory === 'all' ? styles.filterActive : ''} onClick={() => setActiveCategory('all')}>ทั้งหมด</button>
+            {integrationCategories.map((category) => (
+              <button type="button" className={activeCategory === category.id ? styles.filterActive : ''} onClick={() => setActiveCategory(category.id)} key={category.id}>{category.label}</button>
+            ))}
+          </div>
+        </div>
+        <div className={styles.integrationGrid}>
+          {visibleIntegrations.map((integration) => (
+            <article className={styles.integrationCard} key={integration.id}>
+              <div className={styles.integrationLogo}><img src={integration.logo} alt={`${integration.name} logo`} width="32" height="32" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} /><span aria-hidden="true">{integration.name.slice(0, 2)}</span></div>
+              <div className={styles.integrationCopy}>
+                <strong>{integration.name}</strong>
+                <StatusBadge status={integration.status} />
+              </div>
+            </article>
+          ))}
+        </div>
+        <p className={styles.trademarkNote}>ชื่อ ผลิตภัณฑ์ โลโก้ และเครื่องหมายการค้าของบุคคลที่สามเป็นทรัพย์สินของเจ้าของแต่ละราย การแสดงเครื่องหมายดังกล่าวใช้เพื่อระบุบริการที่ CUTINEO รองรับหรือมีแผนรองรับ และไม่ได้หมายถึงการรับรอง CUTINEO โดยเจ้าของเครื่องหมายการค้า</p>
+      </div>
+    </section>
+  );
+}

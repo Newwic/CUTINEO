@@ -45,6 +45,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
 
 .cutineo-site-header-inner {
   display: flex;
+  min-width: 0;
   min-height: 72px;
   align-items: center;
   gap: clamp(18px, 3vw, 42px);
@@ -125,6 +126,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
 
 .cutineo-site-actions {
   display: flex;
+  min-width: 0;
   flex: 0 0 auto;
   align-items: center;
   gap: 18px;
@@ -145,23 +147,27 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
 
 .cutineo-site-cta {
   display: inline-flex;
+  min-width: 0;
   min-height: 42px;
   align-items: center;
   justify-content: center;
   border-radius: 13px;
   padding: 0 17px;
-  background: #14213a;
-  box-shadow: 0 9px 20px rgba(20, 33, 58, .14);
+  background: #159f91;
+  box-shadow: 0 9px 20px rgba(21, 159, 145, .2);
   color: #fff;
   font-size: 13px;
   font-weight: 800;
   text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
 .cutineo-site-cta:hover {
-  background: #1c2d4b;
-  box-shadow: 0 13px 25px rgba(20, 33, 58, .2);
+  background: #0f887e;
+  box-shadow: 0 13px 25px rgba(21, 159, 145, .25);
   transform: translateY(-1px) scale(1.015);
 }
 
@@ -334,10 +340,12 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
 @media (max-width: 560px) {
   .cutineo-site-header {
     width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
     border-radius: 18px;
   }
 
   .cutineo-site-header-inner {
+    width: 100%;
     gap: 9px;
     padding-left: 11px;
   }
@@ -357,6 +365,7 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
   }
 
   .cutineo-site-cta {
+    max-width: 145px;
     min-height: 38px;
     padding: 0 11px;
     border-radius: 11px;
