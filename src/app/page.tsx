@@ -45,6 +45,12 @@ export default function HomePage() {
             >
               เปิด Inbox
             </Link>
+            <Link
+              href="/pricing"
+              className="hidden rounded-full px-4 py-2 text-sm font-semibold text-teal-200 transition hover:bg-teal-300/10 sm:inline-flex"
+            >
+              ดูแพ็กเกจ
+            </Link>
             <LanguageSwitcher />
           </nav>
         </header>
@@ -95,7 +101,7 @@ export default function HomePage() {
                 </div>
                 <div className="ml-10 rounded-2xl bg-indigo-500 px-4 py-3 shadow-lg shadow-indigo-500/20">
                   <div className="flex items-center gap-2 text-xs text-indigo-100"><Bot size={13} /> AI Agent</div>
-                  <p className="mt-2 text-sm font-medium">แพ็กเกจ Pro มี AI ตอบอัตโนมัติ 4,000 ข้อความต่อเดือนครับ</p>
+                  <p className="mt-2 text-sm font-medium">แพ็กเกจ Pro มี AI ตอบอัตโนมัติ 30,000 AI Messages ต่อเดือนครับ</p>
                 </div>
               </div>
               <div className="rounded-xl border border-white/10 bg-black/10 px-4 py-3 text-xs text-slate-400">

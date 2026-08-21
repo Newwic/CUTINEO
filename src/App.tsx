@@ -4,6 +4,7 @@ import { OpenClawAdapter } from './services/openClawAdapter';
 import { getNeoPolicyReply } from './core/ai/neo-policy';
 import CustomerChatWidget from './components/CustomerChatWidget';
 import { NEO_LOGO_PATH } from './lib/branding';
+import { AI_BOOST, PUBLIC_PLAN_CARDS } from './core/billing/catalog';
 
 type ChannelKey = 'all' | 'line' | 'facebook' | 'instagram' | 'marketplace';
 type LeadMode = 'trial' | 'contact' | 'login';
@@ -47,7 +48,7 @@ const channelMessages: Record<ChannelKey, { name: string; channel: string; chann
     channelClass: 'channel-instagram',
     initials: 'P',
     message: 'แพ็กเกจ Pro มี AI ช่วยตอบกี่ข้อความคะ? ✨',
-    reply: 'แพ็กเกจ Pro มีโควตา AI ตอบอัตโนมัติ 4,000 ข้อความต่อเดือนค่ะ',
+    reply: 'แพ็กเกจ Pro มีโควตา AI 30,000 AI Messages ต่อเดือนค่ะ',
   },
   marketplace: {
     name: 'อรทัย ส.',
@@ -59,7 +60,9 @@ const channelMessages: Record<ChannelKey, { name: string; channel: string; chann
   },
 };
 
-const plans = [
+/* Legacy pricing copy kept below only as migration reference. */
+/*
+const legacyPlans = [
   {
     name: 'Starter',
     description: 'ระบบรวมแชทสำหรับร้านที่มีแอดมินตอบเอง ไม่ใช้ AI',
@@ -106,8 +109,11 @@ const plans = [
     button: 'ติดต่อทีมงาน',
   },
 ];
+*/
+const plans = PUBLIC_PLAN_CARDS;
 
-const compareRows = [
+/*
+const legacyCompareRows = [
   ['บัญชีและช่องทางที่เชื่อมต่อ', '2 บัญชี: LINE OA / Facebook Page', '5 บัญชี: LINE OA / FB / IG', 'ไม่จำกัด', 'ไม่จำกัด'],
   ['แอดมินในทีม', '2 บัญชี', '5 บัญชี', '15 บัญชี', 'ไม่จำกัด'],
   ['AI ตอบอัตโนมัติ', 'ไม่มี (คนตอบ 100%)', '4,000 ข้อความ/เดือน', '15,000 ข้อความ/เดือน', '100,000–200,000+ ข้อความ/เดือน'],
@@ -120,6 +126,19 @@ const compareRows = [
   ['Webhook / API', '—', '—', 'Webhook ส่งข้อมูลไปภายนอก', 'Custom API: POS / ERP'],
   ['Add-on เมื่อข้อความหมด', '—', '฿499 / 3,000 ข้อความ', '฿499 / 3,000 ข้อความ', 'คุยกับทีมงาน'],
 ];
+*/
+const compareRows = [
+  ['AI Messages / เดือน', '3,000', '30,000', '100,000', '300,000–1,000,000+'],
+  ['AI positioning', 'AI ช่วยตอบ', 'AI ช่วยตอบ + จำ + ตาม + ขาย', 'AI Sales Automation', 'AI Platform สำหรับองค์กร'],
+  ['Admin สูงสุด', '2 คน', '5 คน', '15 คน', 'Custom'],
+  ['Channels สูงสุด', '2 ช่องทาง', '5 ช่องทาง', 'มากกว่า Pro', 'Custom'],
+  ['Chat History', '90 วัน', 'ไม่จำกัด', 'Unlimited', 'Custom'],
+  ['Sales Memory / Follow-up', '—', '✓', 'Advanced', 'Custom'],
+  ['Quotation', '—', 'Basic', 'Full', 'Custom'],
+  ['PromptPay QR + Slip OCR', '—', '✓', '✓', 'Custom'],
+  ['Webhook / API Access', '—', '—', '✓', 'Custom'],
+  ['AI Boost +20,000', '✓', '✓', '✓', 'คุยกับทีมขาย'],
+];
 
 function formatPrice(value: number | null) {
   if (value === null) return null;
@@ -129,6 +148,11 @@ function formatPrice(value: number | null) {
 function getNeoDemoReply(customerMessage: string) {
   const policyReply = getNeoPolicyReply(customerMessage);
   if (policyReply) return policyReply;
+
+  const pricingQuestion = customerMessage.toLowerCase();
+  if (pricingQuestion.includes('ราคา') || pricingQuestion.includes('แพ็กเกจ') || pricingQuestion.includes('โควตา') || pricingQuestion.includes('ai message')) {
+    return 'แพ็กเกจ CUTINEO ปัจจุบันมี 4 ระดับครับ\n• Starter: ฿490 / เดือน — AI Messages 3,000 — AI ช่วยตอบ\n• Pro: ฿990 / เดือน — AI Messages 30,000 — AI ช่วยตอบ + จำ + ตาม + ขาย\n• Advanced: ฿1,990 / เดือน — AI Messages 100,000 — AI Sales Automation\n• Enterprise: 19,900–39,900+ / เดือน — Custom AI Platform\n\nAI Boost ราคา ฿490 เพิ่ม 20,000 AI Messages ใช้ได้กับ Starter, Pro และ Advanced ใน Billing Cycle ปัจจุบันครับ';
+  }
 
   const question = customerMessage.toLowerCase();
   const asksForPrice = question.includes('ราคา') || question.includes('แพ็กเกจ') || question.includes('เท่าไหร่') || question.includes('ค่าใช้จ่าย');
@@ -419,7 +443,19 @@ export default function App() {
               </article>;
             })}
           </div>
-          <p className="pricing-footnote">Add-on สำหรับ Pro และ Advanced เมื่อข้อความหมด: ฿499 ต่อ 3,000 ข้อความ</p>
+          <p className="pricing-footnote">AI Boost ราคา ฿490 เพิ่ม 20,000 AI Messages ใช้ได้กับ Starter, Pro และ Advanced ใน Billing Cycle ปัจจุบัน</p>
+        </section>
+
+        <section className="ai-boost-section section-shell" aria-labelledby="ai-boost-title">
+          <div className="ai-boost-card">
+            <div>
+              <div className="eyebrow">AI BOOST ADD-ON</div>
+              <h2 id="ai-boost-title">เพิ่มพลัง AI ให้รอบบิลนี้</h2>
+              <p>{AI_BOOST.description} · ใช้ได้กับ Starter, Pro และ Advanced</p>
+            </div>
+            <div className="ai-boost-price"><strong>฿{AI_BOOST.priceThb.toLocaleString('th-TH')}</strong><span>+{AI_BOOST.messages.toLocaleString('th-TH')} messages</span></div>
+            <button className="button button-dark" type="button" onClick={() => openLeadModal('contact', 'Pro')}>สอบถาม AI Boost <span>→</span></button>
+          </div>
         </section>
 
         <section className="compare-section section-shell" id="compare">

@@ -19,8 +19,15 @@ const planNames: PlanName[] = ['Starter', 'Pro', 'Advanced'];
 
 const planCopy: Record<PlanName, { label: string; description: string }> = {
   Starter: { label: 'Starter', description: 'ระบบรวมแชทล้วนสำหรับแอดมิน 2 บัญชี ราคา 490 บาท / เดือน' },
-  Pro: { label: 'Pro', description: 'AI ช่วยตอบและปิดการขาย 4,000 ข้อความ / เดือน ราคา 990 บาท / เดือนในปีแรก' },
+  Pro: { label: 'Pro', description: 'AI ช่วยตอบ + จำ + ตาม + ขาย 30,000 ข้อความ / เดือน ราคา 990 บาท / เดือน' },
   Advanced: { label: 'Advanced', description: 'ช่องทางไม่จำกัด แอดมิน 15 บัญชี ราคา 1,990 บาท / เดือน' },
+};
+
+const currentPlanCopy: Record<PlanName, { label: string; description: string }> = {
+  ...planCopy,
+  Starter: { label: 'Starter', description: 'AI Messages 3,000 / เดือน · AI ช่วยตอบ · ราคา 490 บาท / เดือน' },
+  Pro: { label: 'Pro', description: 'AI Messages 30,000 / เดือน · AI ช่วยตอบ + จำ + ตาม + ขาย · ราคา 990 บาท / เดือน' },
+  Advanced: { label: 'Advanced', description: 'AI Messages 100,000 / เดือน · AI Sales Automation · ราคา 1,990 บาท / เดือน' },
 };
 
 const countryCodes = ['+66', '+65', '+63', '+60', '+62', '+86', '+81', '+1'];
@@ -60,7 +67,7 @@ export default function RegisterApp() {
 
   const baseUrl = getBaseUrl();
   const homeUrl = `${baseUrl}index.html`;
-  const selectedPlanCopy = planCopy[selectedPlan];
+  const selectedPlanCopy = currentPlanCopy[selectedPlan];
 
   const passwordStrength = useMemo(() => {
     const password = form.password;

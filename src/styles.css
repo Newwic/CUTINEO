@@ -180,6 +180,13 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
 .plan-card li { display: flex; align-items: flex-start; min-width: 0; gap: 8px; color: #67758a; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
 .plan-card li span { flex: 0 0 auto; color: #1ab19e; font-weight: 800; }
 .pricing-footnote { margin: 24px 0 0; color: #96a3ae; text-align: center; font-size: 10px; }
+.ai-boost-section { padding-top: 0; }
+.ai-boost-card { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 22px; padding: 20px 24px; border: 1px solid #b9e6df; border-radius: 18px; background: linear-gradient(135deg, #f2fffc, #ffffff); box-shadow: 0 12px 28px rgba(31, 183, 166, .08); }
+.ai-boost-card h2 { margin-top: 5px; color: #14213a; font-size: 20px; line-height: 1.35; }
+.ai-boost-card p { margin-top: 5px; color: #718096; font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.ai-boost-price { display: grid; gap: 3px; min-width: 125px; text-align: right; }
+.ai-boost-price strong { color: #138e82; font-size: 25px; line-height: 1.15; }
+.ai-boost-price span { color: #718096; font-size: 10px; white-space: nowrap; }
 
 .compare-section { padding-bottom: 115px; }
 .compare-section .section-heading { margin-bottom: 36px; }
@@ -425,4 +432,10 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
     flex-wrap: wrap;
     gap: 24px 48px;
   }
+}
+
+@media (max-width: 680px) {
+  .ai-boost-card { grid-template-columns: 1fr; gap: 12px; padding: 18px; }
+  .ai-boost-price { min-width: 0; text-align: left; }
+  .ai-boost-price span { white-space: normal; }
 }

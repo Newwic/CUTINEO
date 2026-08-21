@@ -22,6 +22,7 @@ import { supabaseClient } from '@/lib/supabase/client';
 import { NEO_LOGO_PATH } from '@/lib/branding';
 import ChatArea from './components/ChatArea';
 import ConversationList from './components/ConversationList';
+import AIUsageCard from '../components/AIUsageCard';
 import type { InboxConversation } from './types';
 
 const DEMO_CONVERSATIONS: InboxConversation[] = [
@@ -357,7 +358,8 @@ export default function InboxPage() {
         </div>
 
         <div className="sidebar-bottom">
-          <div className="ai-usage-card">
+          <AIUsageCard onNotice={setNotice} />
+          <div className="legacy-ai-usage-card">
             <div className="usage-title"><span><Sparkles size={13} aria-hidden="true" /> Neo AI credits</span><strong>78%</strong></div>
             <div className="usage-bar"><span /></div>
             <p>2,340 of 3,000 responses used</p>

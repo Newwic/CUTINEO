@@ -82,3 +82,22 @@ Next.js API routes และ LINE webhook ต้องรันบน Node.js ru
 ไฟล์ Vite/HTML เดิมยังเก็บไว้ใน repository เพื่อ rollback และอ้างอิงงานเดิม แต่แอปหลักของโครงสร้างใหม่อยู่ที่ `src/app`
 
 อย่า commit `.env.local`, API keys, LINE tokens หรือ Supabase service role key ลง repository
+
+## Pricing, Subscription และ AI Usage
+
+รัน migration ตามลำดับ `001_initial_schema.sql`, `002_security_hardening.sql` และ `003_billing_ai_usage.sql` ใน Supabase SQL Editor โดย migration ใหม่ใช้ `tenants` เดิมเป็น company boundary และไม่ลบข้อมูลแชทเดิม
+
+ระบบใหม่มี:
+
+- Plan catalog กลาง: Starter ฿490 / 3,000, Pro ฿990 / 30,000, Advanced ฿1,990 / 100,000 และ Enterprise แบบ Custom
+- AI Boost ฿490 เพิ่ม 20,000 messages เฉพาะ billing cycle ปัจจุบัน
+- Feature Entitlement Service กลางสำหรับ permission ของ package
+- AI Router ที่รองรับ Gemini และ OpenAI พร้อม server-side failover
+- Usage ledger ราย request และ aggregate รายวันใน `ai_usage` / `ai_usage_daily`
+- Customer usage: `/dashboard/ai-usage`
+- Pricing: `/pricing`
+- Admin cost dashboard: `/admin/ai-usage`
+
+ตั้งค่า `AI_DEFAULT_PROVIDER`, `GEMINI_API_KEY` หรือ `OPENAI_API_KEY`, `AI_USD_TO_THB` และ `CUTINEO_PLATFORM_ADMIN_USER_IDS` ใน environment ฝั่ง server เท่านั้น ห้ามส่ง API key ไป frontend
+
+AI Boost API สร้างคำสั่งซื้อสถานะ `pending` และยังไม่เพิ่ม quota จนกว่าจะมี payment webhook หรือกระบวนการ billing มา activate เป็น `active` เพื่อป้องกันการให้ quota ฟรี
