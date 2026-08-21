@@ -12,6 +12,7 @@ import {
   Send,
   Smile,
   Sparkles,
+  X,
   Zap,
 } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
@@ -28,6 +29,8 @@ interface ChatAreaProps {
   conversation: InboxConversation;
   onOpenNav?: () => void;
   onOpenConversations?: () => void;
+  onOpenCustomerDetails?: () => void;
+  openAiSignal?: number;
   onPreviewUpdate?: (conversationId: string, preview: string) => void;
   onNotice?: (message: string) => void;
 }
@@ -145,6 +148,8 @@ export default function ChatArea({
   conversation,
   onOpenNav,
   onOpenConversations,
+  onOpenCustomerDetails,
+  openAiSignal,
   onPreviewUpdate,
   onNotice,
 }: ChatAreaProps) {
@@ -158,8 +163,13 @@ export default function ChatArea({
   const [streamingId, setStreamingId] = useState<string | null>(null);
   const [copilotOn, setCopilotOn] = useState(conversation.assigned_to !== 'human_agent');
   const [error, setError] = useState('');
+  const [aiSheetOpen, setAiSheetOpen] = useState(false);
   const feedRef = useRef<HTMLDivElement>(null);
   const streamTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (openAiSignal) setAiSheetOpen(true);
+  }, [openAiSignal]);
 
   const clearStreamTimer = () => {
     if (streamTimerRef.current !== null) {
@@ -373,6 +383,19 @@ export default function ChatArea({
     }
   }
 
+  function handleCopilotClick() {
+    if (typeof window !== 'undefined' && window.matchMedia('(max-width: 860px)').matches) {
+      setAiSheetOpen(true);
+      return;
+    }
+    void toggleCopilot();
+  }
+
+  function chooseAiAction(label: string) {
+    setAiSheetOpen(false);
+    onNotice?.(`${label} พร้อมให้ Neo ช่วยในห้องนี้`);
+  }
+
   return (
     <section className="chat-area">
       <header className="chat-header">
@@ -413,7 +436,8 @@ export default function ChatArea({
           <button
             type="button"
             className={`copilot-pill ${copilotOn ? 'is-on' : 'is-off'}`}
-            onClick={() => void toggleCopilot()}
+            onClick={handleCopilotClick}
+            aria-label="เปิดเมนู CUTINEO AI"
           >
             <Sparkles size={14} aria-hidden="true" />
             <span>{copilotOn ? 'Neo AI active' : 'AI paused'}</span>
@@ -422,7 +446,7 @@ export default function ChatArea({
           <button type="button" className="icon-button header-icon-button" aria-label="โทรหา customer" title="Call customer">
             <Phone size={17} aria-hidden="true" />
           </button>
-          <button type="button" className="icon-button header-icon-button" aria-label="ดูรายละเอียด" title="Conversation details">
+          <button type="button" className="icon-button header-icon-button" aria-label="ดูรายละเอียดลูกค้า" title="Conversation details" onClick={onOpenCustomerDetails}>
             <Info size={17} aria-hidden="true" />
           </button>
           <button type="button" className="icon-button header-icon-button" aria-label="เมนูเพิ่มเติม" title="More actions">
@@ -519,6 +543,22 @@ export default function ChatArea({
         </form>
         <p className="composer-disclaimer">ไม่ต้องใช้บัตรเครดิต <span>•</span> ยกเลิกได้ทุกเมื่อ</p>
       </footer>
+
+      {aiSheetOpen && (
+        <div className="mobile-sheet-backdrop" role="presentation" onClick={() => setAiSheetOpen(false)}>
+          <section className="ai-action-sheet" role="dialog" aria-modal="true" aria-labelledby="ai-sheet-title" onClick={(event) => event.stopPropagation()}>
+            <div className="sheet-heading">
+              <div className="sheet-title"><Sparkles size={18} aria-hidden="true" /><strong id="ai-sheet-title">CUTINEO AI</strong></div>
+              <button type="button" className="sheet-close" onClick={() => setAiSheetOpen(false)} aria-label="ปิดเมนู AI"><X size={18} aria-hidden="true" /></button>
+            </div>
+            <button type="button" onClick={() => chooseAiAction('ช่วยตอบลูกค้า')}>ช่วยตอบลูกค้า <span>→</span></button>
+            <button type="button" onClick={() => chooseAiAction('สรุปบทสนทนา')}>สรุปบทสนทนา <span>→</span></button>
+            <button type="button" onClick={() => chooseAiAction('Sales Memory')}>ดู Sales Memory <span>→</span></button>
+            <button type="button" onClick={() => chooseAiAction('Follow-up')}>สร้าง Follow-up <span>→</span></button>
+            <button type="button" onClick={() => chooseAiAction('ใบเสนอราคา')}>สร้างใบเสนอราคา <span>→</span></button>
+          </section>
+        </div>
+      )}
     </section>
   );
 }

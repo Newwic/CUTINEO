@@ -9,6 +9,7 @@ import { NEO_LOGO_PATH } from '../../lib/branding';
 import { integrations } from '../../config/integrations';
 import HeroInboxDemo from './HeroInboxDemo';
 import IntegrationStrip from './IntegrationStrip';
+import PwaInstallSection from '../pwa/PwaInstallSection';
 import styles from './HomepageV2.module.css';
 
 export interface HomepageV2Props {
@@ -112,6 +113,8 @@ export default function HomepageV2({ basePath = '', signupRoute = 'register', lo
         </section>
 
         <IntegrationStrip />
+
+        <PwaInstallSection />
 
         <section className={styles.statsSection} aria-label="จุดเด่น CUTINEO">
           <div className={styles.sectionShell}><div className={styles.statsGrid}><div><strong>1</strong><span>Unified Inbox</span></div><div><strong>24/7</strong><span>AI ช่วยตอบ</span></div><div><strong>3×</strong><span>ตอบไวขึ้น</span></div><div><strong>100%</strong><span>ข้อมูลเป็นของคุณ</span></div></div></div>

@@ -22,6 +22,7 @@ import { supabaseClient } from '@/lib/supabase/client';
 import { NEO_LOGO_PATH } from '@/lib/branding';
 import ChatArea from './components/ChatArea';
 import ConversationList from './components/ConversationList';
+import CustomerCRMDrawer from './components/CustomerCRMDrawer';
 import AIUsageCard from '../components/AIUsageCard';
 import type { InboxConversation } from './types';
 
@@ -126,6 +127,8 @@ export default function InboxPage() {
   const [activeNav, setActiveNav] = useState('Conversations');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileConversationsOpen, setMobileConversationsOpen] = useState(false);
+  const [mobileCustomerOpen, setMobileCustomerOpen] = useState(false);
+  const [mobileAiSignal, setMobileAiSignal] = useState(0);
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
@@ -231,6 +234,21 @@ export default function InboxPage() {
     return () => window.clearTimeout(timer);
   }, [notice]);
 
+  useEffect(() => {
+    const requestedId = new URLSearchParams(window.location.search).get('conversation');
+    if (requestedId && conversations.some((conversation) => conversation.id === requestedId)) {
+      setActiveConvId(requestedId);
+    }
+  }, [conversations]);
+
+  useEffect(() => {
+    if (!activeConvId) return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('conversation') === activeConvId) return;
+    url.searchParams.set('conversation', activeConvId);
+    window.history.replaceState(null, '', url);
+  }, [activeConvId]);
+
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConvId) || null,
     [activeConvId, conversations],
@@ -239,6 +257,7 @@ export default function InboxPage() {
   function selectConversation(id: string) {
     setActiveConvId(id);
     setMobileConversationsOpen(false);
+    setMobileCustomerOpen(false);
   }
 
   function updatePreview(conversationId: string, preview: string) {
@@ -290,12 +309,14 @@ export default function InboxPage() {
   }
 
   return (
-    <main className="cutineo-shell">
+    <>
+      <main className="cutineo-shell">
       <div
-        className={`mobile-scrim ${mobileNavOpen || mobileConversationsOpen ? 'is-visible' : ''}`}
+        className={`mobile-scrim ${mobileNavOpen || mobileConversationsOpen || mobileCustomerOpen ? 'is-visible' : ''}`}
         onClick={() => {
           setMobileNavOpen(false);
           setMobileConversationsOpen(false);
+          setMobileCustomerOpen(false);
         }}
         aria-hidden="true"
       />
@@ -394,6 +415,8 @@ export default function InboxPage() {
             conversation={activeConversation}
             onOpenNav={() => setMobileNavOpen(true)}
             onOpenConversations={() => setMobileConversationsOpen(true)}
+            onOpenCustomerDetails={() => setMobileCustomerOpen(true)}
+            openAiSignal={mobileAiSignal}
             onPreviewUpdate={updatePreview}
             onNotice={setNotice}
           />
@@ -432,6 +455,35 @@ export default function InboxPage() {
           </button>
         </div>
       )}
-    </main>
+      </main>
+
+    <nav className="mobile-bottom-nav" aria-label="เมนูหลักบนมือถือ">
+      <button type="button" className="is-active" onClick={() => setMobileConversationsOpen(true)}>
+        <MessageSquareText size={18} aria-hidden="true" /><span>Inbox</span>
+      </button>
+      <button type="button" onClick={() => setMobileCustomerOpen(true)}>
+        <UsersRound size={18} aria-hidden="true" /><span>ลูกค้า</span>
+      </button>
+      <button type="button" onClick={() => setNotice('Sales workspace พร้อมให้ทีมเริ่มจัดการดีล')}>
+        <PackageCheck size={18} aria-hidden="true" /><span>ขาย</span>
+      </button>
+      <button type="button" onClick={() => setMobileAiSignal((value) => value + 1)}>
+        <Sparkles size={18} aria-hidden="true" /><span>AI</span>
+      </button>
+      <button type="button" onClick={() => setMobileNavOpen(true)}>
+        <Settings2 size={18} aria-hidden="true" /><span>เพิ่มเติม</span>
+      </button>
+    </nav>
+
+    {mobileCustomerOpen && activeConversation && (
+      <div className="customer-detail-sheet" role="dialog" aria-modal="true" aria-labelledby="customer-detail-title">
+        <header className="sheet-heading">
+          <strong id="customer-detail-title">ข้อมูลลูกค้า</strong>
+          <button type="button" className="sheet-close" onClick={() => setMobileCustomerOpen(false)} aria-label="ปิดข้อมูลลูกค้า"><X size={18} aria-hidden="true" /></button>
+        </header>
+        <CustomerCRMDrawer conversation={activeConversation} />
+      </div>
+    )}
+    </>
   );
 }

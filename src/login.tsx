@@ -3,6 +3,7 @@ import { StrictMode, useEffect, useState, type FormEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { NEO_LOGO_PATH } from './lib/branding';
+import { PwaProvider } from './components/pwa/PwaProvider';
 import './login.css';
 
 type Language = 'th' | 'en';
@@ -208,6 +209,8 @@ function LoginApp() {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <LoginApp />
+    <PwaProvider serviceWorkerPath={`${import.meta.env.BASE_URL}sw.js`} enabled={import.meta.env.PROD}>
+      <LoginApp />
+    </PwaProvider>
   </StrictMode>,
 );
