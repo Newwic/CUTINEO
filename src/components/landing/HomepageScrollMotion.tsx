@@ -1,16 +1,8 @@
 'use client';
 
-import type { RefObject } from 'react';
-import { useHomepageScrollAnimations } from '../../hooks/useHomepageScrollAnimations';
 import styles from './HomepageV2.module.css';
 
-interface HomepageScrollMotionProps {
-  rootRef: RefObject<HTMLElement | null>;
-}
-
-export default function HomepageScrollMotion({ rootRef }: HomepageScrollMotionProps) {
-  useHomepageScrollAnimations(rootRef);
-
+export default function HomepageScrollMotion() {
   return (
     <div
       className={styles.globalProgress}

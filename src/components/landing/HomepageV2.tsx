@@ -12,6 +12,7 @@ import IntegrationStrip from './IntegrationStrip';
 import HomepageScrollMotion from './HomepageScrollMotion';
 import ScrollStory from './ScrollStory';
 import styles from './HomepageV2.module.css';
+import { useHomepageScrollAnimations } from '../../hooks/useHomepageScrollAnimations';
 
 export interface HomepageV2Props {
   basePath?: string;
@@ -38,6 +39,7 @@ const heroMessages = [
 export default function HomepageV2({ basePath = '', signupRoute = 'signup', loginRoute = 'login' }: HomepageV2Props) {
   const prefix = normalizePrefix(basePath);
   const pageRef = useRef<HTMLDivElement>(null);
+  useHomepageScrollAnimations(pageRef);
   const signupHref = (plan = 'Starter') => `${prefix}${signupRoute}?plan=${encodeURIComponent(plan)}`;
   const loginHref = `${prefix}${loginRoute}`;
   const featuresHref = pageHref(basePath, 'features');
@@ -47,7 +49,7 @@ export default function HomepageV2({ basePath = '', signupRoute = 'signup', logi
 
   return (
     <div className={styles.page} ref={pageRef} data-homepage-root>
-      <HomepageScrollMotion rootRef={pageRef} />
+      <HomepageScrollMotion />
       <Header basePath={basePath} signupRoute={signupRoute} loginRoute={loginRoute} />
 
       <main>
