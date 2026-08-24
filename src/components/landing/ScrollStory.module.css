@@ -75,6 +75,10 @@
   min-width: 0;
 }
 
+.desktopStoryVisual {
+  align-self: stretch;
+}
+
 .storyStep {
   display: flex;
   min-height: 74vh;
@@ -765,7 +769,7 @@
   .storySection { padding: 84px 0 92px; }
   .storyShell { width: min(100% - 32px, 780px); }
   .storyLayout { display: flex; flex-direction: column; gap: 0; }
-  .desktopStoryVisual { order: -1; width: 100%; margin-bottom: 16px; }
+  .desktopStoryVisual { align-self: auto; order: -1; width: 100%; margin-bottom: 16px; }
   .stickyVisual { top: 76px; }
   .storyStep { min-height: 62vh; padding: 54px 0; }
   .storyStep:first-child { padding-top: 40px; }
