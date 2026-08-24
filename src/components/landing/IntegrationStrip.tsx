@@ -27,7 +27,7 @@ export default function IntegrationStrip({ compact = false }: IntegrationStripPr
     <section className={styles.integrationSection} id="integrations" aria-labelledby="integration-title">
       <div className={styles.sectionShell}>
         <div className={styles.sectionKicker}>CONNECT YOUR WORKSPACE</div>
-        <MotionReveal className={styles.integrationHeadingRow} delay={60}>
+        <MotionReveal className={styles.integrationHeadingRow} delay={60} dataMotion="right">
           <div>
             <h2 id="integration-title">เชื่อมต่อช่องทางที่ลูกค้าของคุณใช้อยู่</h2>
             <p>ดูสถานะตาม adapter ที่มีในระบบจริง ช่องที่ยังไม่พร้อมจะถูกระบุเป็น Beta หรือเร็ว ๆ นี้อย่างชัดเจน</p>
@@ -39,7 +39,7 @@ export default function IntegrationStrip({ compact = false }: IntegrationStripPr
             ))}
           </div>
         </MotionReveal>
-        <MotionGroup className={styles.integrationGrid} delay={120}>
+        <MotionGroup className={styles.integrationGrid} delay={120} dataMotion="stagger">
           {displayedIntegrations.map((integration) => (
             <article className={styles.integrationCard} key={integration.id}>
               <div className={styles.integrationLogo}><img src={integration.logo} alt={`${integration.name} logo`} width="32" height="32" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} /></div>

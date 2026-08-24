@@ -62,7 +62,7 @@ export default function HeroInboxDemo() {
   const categoryCounts = useMemo(() => ({ inbox: 32, pending: 12, followup: 8 }), []);
 
   return (
-    <div className={styles.inboxDemo} aria-label="ตัวอย่าง CUTINEO Unified Inbox">
+    <div className={styles.inboxDemo} aria-label="ตัวอย่าง CUTINEO Unified Inbox" data-channel-hub>
       <div className={styles.demoTopbar}>
         <div className={styles.demoBrand}>
           <span className={styles.demoBrandLogo}>N</span>
@@ -128,15 +128,15 @@ export default function HeroInboxDemo() {
             </div>
             <button type="button">ดำเนินการต่อกับแอดมิน⌄</button>
           </header>
-          <div className={styles.demoMessages} aria-live="polite">
+          <div className={styles.demoMessages} aria-live="polite" data-chat-animation>
             <span className={styles.demoDate}>วันนี้ · 10:24</span>
-            <div className={`${styles.demoBubble} ${styles.demoBubbleCustomer}`}>{sentMessage || conversation.preview}</div>
-            <div className={`${styles.demoBubble} ${styles.demoBubbleAi}`}>
+            <div className={`${styles.demoBubble} ${styles.demoBubbleCustomer}`} data-chat-bubble>{sentMessage || conversation.preview}</div>
+            <div className={`${styles.demoBubble} ${styles.demoBubbleAi}`} data-chat-bubble>
               <span className={styles.demoAiLabel}><Sparkles size={12} /> AI Assistant</span>
               <span>{assistantReply}</span>
             </div>
-            <div className={`${styles.demoBubble} ${styles.demoBubbleCustomer} ${styles.demoBubbleShort}`}>ขอใบเสนอราคาครับ</div>
-            <span className={styles.demoTyping}><span /> Neo กำลังช่วยร่างคำตอบ...</span>
+            <div className={`${styles.demoBubble} ${styles.demoBubbleCustomer} ${styles.demoBubbleShort}`} data-chat-bubble>ขอใบเสนอราคาครับ</div>
+            <span className={styles.demoTyping} data-chat-bubble><span /> Neo กำลังช่วยร่างคำตอบ...</span>
           </div>
           <form className={styles.demoComposer} onSubmit={handleSubmit}>
             <input value={draft} onChange={(event) => setDraft(event.target.value)} placeholder="พิมพ์ข้อความตอบกลับ..." aria-label="ข้อความตัวอย่าง" />

@@ -735,6 +735,9 @@
 .portalStepDots { display: flex; align-items: center; gap: 5px; }
 .portalStepDots span { width: 5px; height: 5px; border-radius: 50%; background: #294551; transition: background .2s ease, transform .2s ease, box-shadow .2s ease; }
 .portalStepDots .portalStepDotActive { background: #62e8d0; box-shadow: 0 0 10px rgba(98, 232, 208, .75); transform: scale(1.35); }
+.portalStateRail { display: flex; min-width: 0; align-items: center; gap: 8px; margin-left: 12px; overflow: hidden; }
+.portalStateRail span { overflow: hidden; border: 1px solid rgba(129, 226, 210, .1); border-radius: 99px; padding: 4px 7px; color: #557983; font-size: 7px; font-weight: 850; letter-spacing: .08em; text-overflow: ellipsis; white-space: nowrap; transition: color .2s ease, border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+.portalStateRail .portalStateActive { border-color: rgba(105, 232, 209, .45); background: rgba(78, 215, 190, .12); box-shadow: 0 0 14px rgba(65, 220, 196, .12); color: #78eed8; }
 .portalBottomHint { display: inline-flex; align-items: center; gap: 5px; margin-left: auto; color: #67949c; font-size: 8px; }
 .portalBottomHint svg { color: #5fe1c9; }
 .portalBottomStep { max-width: 155px; overflow: hidden; margin-left: 12px; color: #77a1a6; font-size: 8px; font-weight: 750; letter-spacing: .08em; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; }
@@ -902,6 +905,7 @@
   .portalCornerBottom { bottom: 14px; left: 13px; }
   .portalBottomBar { min-height: 44px; padding: 0 12px; }
   .portalBottomHint { display: none; }
+  .portalStateRail { display: none; }
   .portalBottomStep { margin-left: auto; font-size: 7px; }
   .storyConclusion { grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 17px; }
   .storyConclusion > div:nth-child(2) strong { font-size: 17px; }

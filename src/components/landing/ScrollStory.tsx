@@ -79,6 +79,14 @@ export const scrollStorySteps: ScrollStoryStep[] = [
   },
 ];
 
+const portalDemoStates = [
+  { id: 'inbox', label: 'UNIFIED INBOX' },
+  { id: 'crm', label: 'CRM' },
+  { id: 'neo', label: 'NEO AI' },
+  { id: 'automation', label: 'AUTOMATION' },
+  { id: 'analytics', label: 'ANALYTICS' },
+] as const;
+
 const storyChannelIds = ['line', 'facebook', 'instagram', 'gmail', 'outlook'];
 const storyChannels = storyChannelIds
   .map((id) => integrations.find((integration) => integration.id === id))
@@ -112,6 +120,8 @@ function ChannelLogo({ integration }: { integration: Integration }) {
 
 function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; progress: number; stageRef: StageRef }) {
   const depth = Math.round(progress * 100).toString().padStart(2, '0');
+  const demoStateIndex = progress < .18 ? 0 : progress < .38 ? 1 : progress < .58 ? 2 : progress < .78 ? 3 : 4;
+  const demoState = portalDemoStates[demoStateIndex];
   const outerScale = phase(progress, 0, 0.34, 1, 15);
   const outerOpacity = 1 - smoothStep((progress - 0.2) / 0.16);
   const windowScale = phase(progress, 0.12, 0.56, 0.16, 15);
@@ -122,7 +132,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
   const finalOpacity = smoothStep((progress - 0.63) / 0.19);
 
   return (
-    <div className={styles.portalFrame} aria-label={`ภาพจำลอง Product Story ขั้นตอนที่ ${scrollStorySteps[activeStep].number}`}>
+    <div className={styles.portalFrame} data-story-frame data-demo-state={demoState.id} aria-label={`ภาพจำลอง Product Story ขั้นตอนที่ ${scrollStorySteps[activeStep].number}`}>
       <div className={styles.portalTopbar}>
         <div className={styles.portalWindowDots} aria-hidden="true"><span /><span /><span /></div>
         <span className={styles.portalTopLabel}>CUTINEO / PRODUCT STORY</span>
@@ -130,11 +140,11 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
         <div className={styles.portalProgressTrack} aria-hidden="true"><span style={{ transform: `scaleX(${progress})` }} /></div>
       </div>
 
-      <div className={styles.portalStage} ref={stageRef} aria-hidden="true">
+      <div className={styles.portalStage} data-story-stage ref={stageRef} aria-hidden="true">
         <div className={styles.portalBackdrop} />
         <div className={styles.portalGrid} />
-        <div className={`${styles.portalGlow} ${styles.portalGlowA}`} />
-        <div className={`${styles.portalGlow} ${styles.portalGlowB}`} />
+        <div className={`${styles.portalGlow} ${styles.portalGlowA}`} data-story-parallax />
+        <div className={`${styles.portalGlow} ${styles.portalGlowB}`} data-story-parallax />
 
         <div className={`${styles.portalLayer} ${styles.portalDoorLayer}`} style={layerStyle(outerScale, outerOpacity)}>
           <div className={styles.portalDoorFrame}>
@@ -206,6 +216,9 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
         <div className={styles.portalStepDots} aria-hidden="true">
           {scrollStorySteps.map((step, index) => <span className={index === activeStep ? styles.portalStepDotActive : ''} key={step.id} />)}
         </div>
+        <div className={styles.portalStateRail} aria-label="สถานะ Product Demo">
+          {portalDemoStates.map((state, index) => <span className={index === demoStateIndex ? styles.portalStateActive : ''} key={state.id}>{state.label}</span>)}
+        </div>
         <span className={styles.portalBottomHint}><ArrowDown size={13} /> เลื่อนเพื่อดำน้ำผ่านทุกขั้นตอน</span>
         <span className={styles.portalBottomStep}>{scrollStorySteps[activeStep].number} / {scrollStorySteps[activeStep].eyebrow}</span>
       </div>
@@ -273,7 +286,7 @@ export default function ScrollStory({ signupHref = '/signup?plan=Starter', detai
   }, [activeStep]);
 
   return (
-    <section className={styles.storySection} id="how-it-works" aria-labelledby="story-title">
+    <section className={styles.storySection} id="how-it-works" data-sticky-demo data-scroll-section="story" aria-labelledby="story-title">
       <div className={styles.storyShell}>
         <div className={styles.storyHeading}>
           <span className={styles.storyKicker}>ดู CUTINEO ทำงาน</span>
@@ -300,7 +313,7 @@ export default function ScrollStory({ signupHref = '/signup?plan=Starter', detai
           </div>
 
           <div className={styles.desktopStoryVisual}>
-            <div className={styles.stickyVisual}><PortalVisual activeStep={activeStep} progress={progress} stageRef={stageRef} /></div>
+            <div className={styles.stickyVisual} data-sticky-visual><PortalVisual activeStep={activeStep} progress={progress} stageRef={stageRef} /></div>
           </div>
         </div>
 

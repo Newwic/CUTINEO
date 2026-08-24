@@ -154,7 +154,7 @@ export default function CutineoSiteHeader({
   return (
     <header className={`cutineo-site-header${scrolled ? ' is-scrolled' : ''}`}>
       <div className="cutineo-site-header-inner">
-        <a className="cutineo-site-brand" href={logoHref} onClick={closeMenu} aria-label="กลับหน้าแรก CUTINEO">
+        <a className="cutineo-site-brand" href={logoHref} onClick={closeMenu} aria-label="กลับหน้าแรก CUTINEO" data-hero-logo>
           <img src={NEO_LOGO_PATH} alt="CUTINEO" />
           <span>CUTI<span>NEO</span></span>
         </a>

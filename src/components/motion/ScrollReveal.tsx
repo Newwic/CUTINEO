@@ -8,6 +8,7 @@ interface MotionBaseProps {
   className?: string;
   delay?: number;
   rootMargin?: string;
+  dataMotion?: string;
 }
 
 type MotionStyle = CSSProperties & { '--motion-delay'?: string };
@@ -43,7 +44,7 @@ function useMotionVisibility(rootMargin: string) {
   return { ref, ready, visible };
 }
 
-export function MotionReveal({ children, className = '', delay = 0, rootMargin = '0px 0px -8% 0px' }: MotionBaseProps) {
+export function MotionReveal({ children, className = '', delay = 0, rootMargin = '0px 0px -8% 0px', dataMotion }: MotionBaseProps) {
   const { ref, ready, visible } = useMotionVisibility(rootMargin);
   const motionStyle: MotionStyle = { '--motion-delay': `${delay}ms` };
 
@@ -51,6 +52,7 @@ export function MotionReveal({ children, className = '', delay = 0, rootMargin =
     <div
       ref={ref}
       className={`${styles.reveal} ${ready ? styles.ready : ''} ${visible ? styles.visible : ''} ${className}`}
+      data-scroll-reveal={dataMotion}
       style={motionStyle}
     >
       {children}
@@ -58,7 +60,7 @@ export function MotionReveal({ children, className = '', delay = 0, rootMargin =
   );
 }
 
-export function MotionGroup({ children, className = '', delay = 0, rootMargin = '0px 0px -8% 0px' }: MotionBaseProps) {
+export function MotionGroup({ children, className = '', delay = 0, rootMargin = '0px 0px -8% 0px', dataMotion }: MotionBaseProps) {
   const { ref, ready, visible } = useMotionVisibility(rootMargin);
   const motionStyle: MotionStyle = { '--motion-delay': `${delay}ms` };
 
@@ -66,6 +68,7 @@ export function MotionGroup({ children, className = '', delay = 0, rootMargin = 
     <div
       ref={ref}
       className={`${styles.group} ${ready ? styles.ready : ''} ${visible ? styles.visible : ''} ${className}`}
+      data-scroll-stagger={dataMotion === 'stagger' ? '' : undefined}
       style={motionStyle}
     >
       {children}

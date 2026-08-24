@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- this component is shared by Next and Vite */
 'use client';
 
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useRef } from 'react';
 import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import { AI_BOOST, PUBLIC_PLAN_CARDS } from '../../core/billing/catalog';
 import { integrations } from '../../config/integrations';
@@ -9,6 +9,7 @@ import Header from '../layout/Header';
 import { MotionGroup, MotionReveal } from '../motion/ScrollReveal';
 import HeroInboxDemo from './HeroInboxDemo';
 import IntegrationStrip from './IntegrationStrip';
+import HomepageScrollMotion from './HomepageScrollMotion';
 import ScrollStory from './ScrollStory';
 import styles from './HomepageV2.module.css';
 
@@ -36,7 +37,7 @@ const heroMessages = [
 
 export default function HomepageV2({ basePath = '', signupRoute = 'signup', loginRoute = 'login' }: HomepageV2Props) {
   const prefix = normalizePrefix(basePath);
-  const [heroScroll, setHeroScroll] = useState(0);
+  const pageRef = useRef<HTMLDivElement>(null);
   const signupHref = (plan = 'Starter') => `${prefix}${signupRoute}?plan=${encodeURIComponent(plan)}`;
   const loginHref = `${prefix}${loginRoute}`;
   const featuresHref = pageHref(basePath, 'features');
@@ -44,56 +45,27 @@ export default function HomepageV2({ basePath = '', signupRoute = 'signup', logi
   const aiSalesHref = pageHref(basePath, 'ai-sales');
   const pricingHref = pageHref(basePath, 'pricing');
 
-  useEffect(() => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) return undefined;
-
-    let frame = 0;
-    const update = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        setHeroScroll(Math.min(1, Math.max(0, window.scrollY / 560)));
-      });
-    };
-
-    update();
-    window.addEventListener('scroll', update, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', update);
-      if (frame) window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  const heroVisualStyle = {
-    '--hero-scroll': heroScroll,
-    transform: `translateY(${-heroScroll * 10}px) scale(${1 - heroScroll * 0.015})`,
-  } as CSSProperties;
-  const heroCopyStyle: CSSProperties = {
-    opacity: 1 - heroScroll * 0.16,
-    transform: `translateY(${-heroScroll * 6}px)`,
-  };
-
   return (
-    <div className={styles.page}>
+    <div className={styles.page} ref={pageRef} data-homepage-root>
+      <HomepageScrollMotion rootRef={pageRef} />
       <Header basePath={basePath} signupRoute={signupRoute} loginRoute={loginRoute} />
 
       <main>
-        <section className={styles.hero} id="top">
+        <section className={styles.hero} id="top" data-scroll-hero data-scroll-section="hero">
           <div className={styles.heroGrid}>
-            <div className={styles.heroCopy} style={heroCopyStyle}>
-              <div className={styles.heroBadge}><span /> Omnichannel CRM + AI Sales Assistant</div>
-              <h1>ทุกแชท ทุกลูกค้า<br />ทุกโอกาสขาย<br /><span>รวมไว้ในที่เดียว</span></h1>
-              <p className={styles.heroLead}>รวม LINE, Facebook, Instagram, Email และช่องทางที่ลูกค้าใช้ไว้ใน Inbox เดียว พร้อม AI ช่วยตอบ จำ ติดตาม และช่วยทีมขายทำงานได้เร็วขึ้น</p>
-              <div className={styles.heroActions}>
+            <div className={styles.heroCopy} data-hero-copy>
+              <div className={styles.heroBadge} data-hero-item="badge"><span /> Omnichannel CRM + AI Sales Assistant</div>
+              <h1 data-hero-item="headline">ทุกแชท ทุกลูกค้า<br />ทุกโอกาสขาย<br /><span>รวมไว้ในที่เดียว</span></h1>
+              <p className={styles.heroLead} data-hero-item="subtitle">รวม LINE, Facebook, Instagram, Email และช่องทางที่ลูกค้าใช้ไว้ใน Inbox เดียว พร้อม AI ช่วยตอบ จำ ติดตาม และช่วยทีมขายทำงานได้เร็วขึ้น</p>
+              <div className={styles.heroActions} data-hero-item="cta">
                 <a className={`${styles.primaryButton} ${styles.heroPrimary}`} href={signupHref()} data-cta="hero-start">เริ่มต้นใช้งานฟรี <ArrowRight size={17} /></a>
                 <a className={styles.secondaryButton} href={aiSalesHref} data-cta="hero-demo">ดู AI Sales <span className={styles.playCircle}>▶</span></a>
               </div>
-              <div className={styles.trustRow}><span>✓ ไม่ต้องใช้บัตรเครดิต</span><span>✓ ติดตั้งง่าย</span><span>✓ ยกเลิกได้ตลอดเวลา</span></div>
+              <div className={styles.trustRow} data-hero-item="trust"><span>✓ ไม่ต้องใช้บัตรเครดิต</span><span>✓ ติดตั้งง่าย</span><span>✓ ยกเลิกได้ตลอดเวลา</span></div>
             </div>
 
-            <div className={styles.heroVisual} style={heroVisualStyle}>
-              <div className={styles.heroGlow} />
+            <div className={styles.heroVisual} data-hero-item="visual">
+              <div className={styles.heroGlow} data-parallax="18" />
               <HeroInboxDemo />
               <div className={styles.heroMessageStream} aria-hidden="true">
                 {heroMessages.map(({ integration, text }, index) => integration && (
@@ -105,7 +77,7 @@ export default function HomepageV2({ basePath = '', signupRoute = 'signup', logi
               </div>
               <div className={styles.floatingChannels} aria-hidden="true">
                 {integrations.slice(0, 5).map((integration, index) => (
-                  <div className={`${styles.floatChannel} ${styles[`floatDelay${index}`]}`} style={{ top: `${30 + index * 82}px` }} key={integration.id}>
+                  <div className={`${styles.floatChannel} ${styles[`floatDelay${index}`]}`} data-channel-orbit style={{ top: `${30 + index * 82}px` }} key={integration.id}>
                     <img src={integration.logo} alt="" width="25" height="25" loading="lazy" />
                     <span className={styles.floatChannelLabel}>{integration.name}</span>
                   </div>
@@ -122,11 +94,11 @@ export default function HomepageV2({ basePath = '', signupRoute = 'signup', logi
 
         <section className={styles.previewSection} id="ai-sales-preview">
           <div className={styles.sectionShell}>
-            <MotionReveal className={styles.sectionHeading}>
+            <MotionReveal className={styles.sectionHeading} dataMotion="up">
               <div><div className={styles.sectionKicker}>AI SALES PREVIEW</div><h2>AI ไม่ได้แค่ตอบ <span>แต่ช่วยทีมขายเดินต่อ</span></h2></div>
               <p>ตั้งแต่ตอบคำถาม จนถึงความจำของดีล ใบเสนอราคา และการติดตาม ทุกขั้นตอนอยู่ใน Workflow เดียว</p>
             </MotionReveal>
-            <MotionGroup className={styles.previewGrid} delay={80}>
+            <MotionGroup className={styles.previewGrid} delay={80} dataMotion="stagger">
               <article className={styles.previewCard}><div className={styles.previewCardIcon}><Sparkles size={20} /></div><h3>ตอบจากข้อมูลธุรกิจ</h3><p>ใช้ FAQ และข้อมูลสินค้า ช่วยร่างคำตอบให้ทีมตรวจได้เร็วขึ้น</p></article>
               <article className={styles.previewCard}><div className={styles.previewCardIcon}><span>✦</span></div><h3>จำบริบทของดีล</h3><p>เห็นความสนใจของลูกค้า ประวัติการคุย และขั้นตอนถัดไปได้ทันที</p></article>
               <article className={styles.previewCard}><div className={styles.previewCardIcon}><span>↗</span></div><h3>ตามต่อจนปิดการขาย</h3><p>ร่าง Follow-up และ Quotation ให้ทีมตรวจสอบก่อนส่ง</p></article>
@@ -137,13 +109,28 @@ export default function HomepageV2({ basePath = '', signupRoute = 'signup', logi
 
         <ScrollStory signupHref={signupHref()} detailsHref={aiSalesHref} />
 
+        <section className={styles.statsSection} data-scroll-section="stats" aria-labelledby="stats-title">
+          <div className={styles.sectionShell}>
+            <div className={styles.sectionHeading} data-scroll-reveal="up">
+              <div><div className={styles.sectionKicker}>CUTINEO IN ONE VIEW</div><h2 id="stats-title">เห็นภาพรวม แล้วให้ทีมโฟกัสกับดีลสำคัญ</h2></div>
+              <p>ตัวเลขตัวอย่างจาก workspace จำลอง เพื่อให้เห็นว่าทุกช่องทางและทุก next step เดินต่อในระบบเดียวได้อย่างไร</p>
+            </div>
+            <div className={styles.statsGrid} data-scroll-stagger>
+              <div><strong data-counter data-counter-value="10000" data-counter-suffix="+">0</strong><span>Messages organized</span></div>
+              <div><strong data-counter data-counter-value="5">0</strong><span>Connected channels</span></div>
+              <div><strong data-counter data-counter-value="95" data-counter-suffix="%">0</strong><span>Reply-ready workflow</span></div>
+              <div><strong data-counter data-counter-value="24" data-counter-suffix="/7">0</strong><span>AI availability</span></div>
+            </div>
+          </div>
+        </section>
+
         <section className={styles.pricingSection} id="pricing-preview">
           <div className={styles.sectionShell}>
-            <MotionReveal className={styles.sectionHeading}>
+            <MotionReveal className={styles.sectionHeading} dataMotion="up">
               <div><div className={styles.sectionKicker}>SIMPLE PRICING</div><h2>เริ่มเล็กได้ <span>โตต่อได้</span></h2></div>
               <p>เลือกแพ็กเกจตามขนาดทีมและปริมาณ AI Messages แล้วขยายได้เมื่อธุรกิจโตขึ้น</p>
             </MotionReveal>
-            <MotionGroup className={styles.pricingGrid} delay={80}>
+            <MotionGroup className={styles.pricingGrid} delay={80} dataMotion="stagger">
               {PUBLIC_PLAN_CARDS.slice(0, 3).map((plan) => (
                 <article className={`${styles.planCard} ${plan.featured ? styles.planFeatured : ''}`} key={plan.name}>
                   {plan.featured && <span className={styles.popularBadge}>แนะนำ · MOST POPULAR</span>}
