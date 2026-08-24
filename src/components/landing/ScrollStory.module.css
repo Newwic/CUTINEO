@@ -2,7 +2,7 @@
   position: relative;
   overflow: visible;
   background: #f8fbfb;
-  padding: 112px 0 124px;
+  padding: 0 0 124px;
 }
 
 .storySection::before {
@@ -25,12 +25,6 @@
   margin: 0 auto;
 }
 
-.storyHeading {
-  max-width: 720px;
-  margin-bottom: 54px;
-}
-
-.storyKicker,
 .stepEyebrow,
 .portalEyebrow,
 .storyConclusion > div:nth-child(2) > span {
@@ -40,27 +34,6 @@
   letter-spacing: .16em;
   line-height: 1.4;
   text-transform: uppercase;
-}
-
-.storyHeading h2 {
-  margin: 13px 0 0;
-  color: #132943;
-  font-size: clamp(32px, 4.6vw, 56px);
-  font-weight: 850;
-  letter-spacing: -.06em;
-  line-height: 1.08;
-}
-
-.storyHeading h2 span {
-  color: #129d90;
-}
-
-.storyHeading p {
-  max-width: 650px;
-  margin: 20px 0 0;
-  color: #6d7f90;
-  font-size: 14px;
-  line-height: 1.85;
 }
 
 .storyLayout {
@@ -85,7 +58,7 @@
   align-items: center;
   border-bottom: 1px solid #e2eceb;
   padding: 54px 0;
-  scroll-margin-top: 112px;
+  scroll-margin-top: 76px;
 }
 
 .storyStep:first-child {
@@ -721,17 +694,47 @@
 .portalBottomHint svg { color: #129e90; }
 .portalBottomStep { max-width: 155px; overflow: hidden; margin-left: 12px; color: #718991; font-size: 8px; font-weight: 750; letter-spacing: .08em; text-overflow: ellipsis; white-space: nowrap; text-transform: uppercase; }
 
-/* Keep the product canvas in its own column on desktop. The copy and the
-   sticky visual can then breathe without covering one another. */
+/* Desktop turns the story into a full-viewport product scene. The left rail
+   carries the readable step copy while the live product canvas owns the rest
+   of the frame. */
 @media (min-width: 1024px) {
+  .storySection {
+    padding: 0 0 124px;
+  }
+
+  .storyShell {
+    width: 100%;
+  }
+
+  .storyLayout {
+    position: relative;
+    display: block;
+    min-height: calc(7 * (100dvh - 76px));
+  }
+
+  .storyLayout::before {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: clamp(360px, 39vw, 590px);
+    background: linear-gradient(90deg, #f8fbfb 0%, rgba(248, 251, 251, .98) 78%, rgba(248, 251, 251, 0) 100%);
+    content: '';
+    pointer-events: none;
+  }
+
   .storySteps {
     position: relative;
-    z-index: 1;
+    z-index: 4;
+    width: min(430px, 32vw);
+    margin-left: clamp(28px, 5vw, 96px);
   }
 
   .storyStep {
-    min-height: clamp(520px, 72vh, 760px);
-    border-bottom-color: #e2eceb;
+    min-height: calc(100dvh - 76px);
+    border-bottom-color: rgba(128, 224, 211, .2);
+    padding: 54px 0;
   }
 
   .storyStepCopy {
@@ -754,22 +757,45 @@
   }
 
   .desktopStoryVisual {
-    position: relative;
+    position: absolute;
     z-index: 1;
-    align-self: start;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
   }
 
   .stickyVisual {
-    height: auto;
+    position: sticky;
+    top: 76px;
+    height: calc(100dvh - 76px);
   }
 
   .portalFrame {
     width: 100%;
-    height: auto;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   .portalStage {
-    min-height: clamp(490px, 42vw, 620px);
+    height: calc(100% - 100px);
+    min-height: 0;
+  }
+
+  .portalLayer {
+    left: 68%;
+    width: min(58vw, 760px);
+    height: 80%;
+  }
+
+  .storyConclusion {
+    width: min(1180px, calc(100% - 40px));
+    margin-right: auto;
+    margin-left: auto;
   }
 }
 
@@ -800,7 +826,7 @@
 .storyConclusionLink:hover { border-color: #82cdc1; background: #f2fcfa; }
 
 @media (max-width: 1023px) {
-  .storySection { padding: 84px 0 92px; }
+  .storySection { padding: 0 0 92px; }
   .storyShell { width: min(100% - 32px, 780px); }
   .storyLayout { display: flex; flex-direction: column; gap: 0; }
   .desktopStoryVisual { align-self: auto; order: -1; width: 100%; margin-bottom: 16px; }
@@ -814,11 +840,8 @@
 }
 
 @media (max-width: 640px) {
-  .storySection { padding: 67px 0 74px; }
+  .storySection { padding: 0 0 74px; }
   .storyShell { width: min(100% - 24px, 520px); }
-  .storyHeading { margin-bottom: 30px; }
-  .storyHeading h2 { font-size: clamp(30px, 9.5vw, 42px); }
-  .storyHeading p { font-size: 13px; line-height: 1.8; }
   .storyStep { min-height: 68vh; padding: 44px 0 50px; }
   .storyStep h3 { font-size: 28px; }
   .storyStep p { font-size: 13px; }

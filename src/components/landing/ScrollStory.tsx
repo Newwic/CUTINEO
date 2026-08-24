@@ -65,7 +65,7 @@ export const scrollStorySteps: ScrollStoryStep[] = [
   {
     id: 'close',
     eyebrow: 'THE CUTINEO LOOP',
-    title: 'จากข้อความแรกจนถึงการปิดการขาย',
+    title: 'ปิดการขายในระบบเดียว',
     description: 'ทุกแชท ข้อมูลลูกค้า ใบเสนอราคา และ Follow-up เชื่อมต่อกันในที่เดียว เพื่อให้ทีมเห็นภาพเดียวกันและเดินดีลต่อได้',
   },
 ];
@@ -243,7 +243,7 @@ export default function ScrollStory({ signupHref = '/signup?plan=Starter', detai
       const stage = stageRef.current;
       const frameElement = stage?.parentElement;
       const rect = layout.getBoundingClientRect();
-      const stickyTop = window.matchMedia('(max-width: 1023px)').matches ? 82 : 104;
+      const stickyTop = window.matchMedia('(max-width: 1023px)').matches ? 82 : 76;
       const visualHeight = frameElement?.offsetHeight || Math.round(window.innerHeight * 0.72);
       const travel = Math.max(1, layout.offsetHeight - visualHeight - stickyTop);
       const nextProgress = clamp((stickyTop - rect.top) / travel);
@@ -286,14 +286,8 @@ export default function ScrollStory({ signupHref = '/signup?plan=Starter', detai
   }, [activeStep]);
 
   return (
-    <section className={styles.storySection} id="how-it-works" data-sticky-demo data-scroll-section="story" aria-labelledby="story-title">
+    <section className={styles.storySection} id="how-it-works" data-sticky-demo data-scroll-section="story" aria-label="Product Story ของ CUTINEO">
       <div className={styles.storyShell}>
-        <div className={styles.storyHeading}>
-          <span className={styles.storyKicker}>ดู CUTINEO ทำงาน</span>
-          <h2 id="story-title">จากข้อความแรก<br /><span>จนถึงการปิดการขาย</span></h2>
-          <p>เลื่อนลงเพื่อดู Product Story แบบทีละเฟรม ตั้งแต่แชทเข้า รวม Inbox ให้ AI ช่วยขาย จนถึงดีลที่ปิดได้ในระบบเดียว</p>
-        </div>
-
         <div className={styles.storyLayout} ref={layoutRef}>
           <div className={styles.storySteps}>
             {scrollStorySteps.map((step, index) => (
