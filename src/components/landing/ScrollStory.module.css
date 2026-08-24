@@ -1,6 +1,6 @@
 .storySection {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   background: #f8fbfb;
   padding: 112px 0 124px;
 }
@@ -8,7 +8,7 @@
 .storySection::before {
   position: absolute;
   top: 0;
-  right: -14vw;
+  right: 0;
   width: 48vw;
   height: 42vw;
   max-height: 620px;
