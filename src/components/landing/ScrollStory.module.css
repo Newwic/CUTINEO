@@ -751,6 +751,22 @@
     display: block;
   }
 
+  /* Keep the reading column visually separate from the full-bleed portal.
+     This soft veil prevents the portal's oversized labels/cards from sitting
+     underneath the active copy card while preserving the open scene on the
+     right. */
+  .storyLayout::before {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    bottom: 0;
+    left: calc((100% - 100vw) / 2);
+    width: min(56vw, 780px);
+    background: linear-gradient(90deg, #f8fbfb 0%, rgba(248, 251, 251, .98) 72%, rgba(248, 251, 251, 0) 100%);
+    content: '';
+    pointer-events: none;
+  }
+
   .storySteps {
     position: relative;
     z-index: 4;
