@@ -107,10 +107,10 @@ function phase(progress: number, start: number, end: number, from: number, to: n
   return from + (to - from) * smoothStep((progress - start) / (end - start));
 }
 
-function layerStyle(scale: number, opacity: number, rotate = 0): CSSProperties {
+function layerStyle(scale: number, opacity: number, rotate = 0, x = 0, y = 0): CSSProperties {
   return {
     opacity,
-    transform: `translate3d(-50%, -50%, 0) scale3d(${scale}, ${scale}, 1) rotate(${rotate}deg)`,
+    transform: `translate3d(-50%, -50%, 0) translate3d(${x}px, ${y}px, 0) scale3d(${scale}, ${scale}, 1) rotate(${rotate}deg)`,
   };
 }
 
@@ -122,17 +122,20 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
   const depth = Math.round(progress * 100).toString().padStart(2, '0');
   const demoStateIndex = progress < .18 ? 0 : progress < .38 ? 1 : progress < .58 ? 2 : progress < .78 ? 3 : 4;
   const demoState = portalDemoStates[demoStateIndex];
-  // Keep each portal readable before it dives. The previous timings made the
-  // next layer visible while the current layer was already several times
-  // larger than the viewport, which turned the story into visual noise.
-  const outerScale = phase(progress, 0.08, 0.52, 1, 15);
-  const outerOpacity = 1 - smoothStep((progress - 0.34) / 0.14);
-  const windowScale = phase(progress, 0.33, 0.72, 0.12, 15);
-  const windowOpacity = smoothStep((progress - 0.30) / 0.12) * (1 - smoothStep((progress - 0.58) / 0.14));
-  const gateScale = phase(progress, 0.57, 0.9, 0.12, 12);
-  const gateOpacity = smoothStep((progress - 0.55) / 0.12) * (1 - smoothStep((progress - 0.76) / 0.14));
-  const finalScale = phase(progress, 0.75, 0.98, 0.1, 1.02);
-  const finalOpacity = smoothStep((progress - 0.75) / 0.14);
+  // Keep every panel readable at viewport scale. The story now moves through
+  // the product with a restrained fade/slide handoff instead of a zoom dive.
+  const outerScale = phase(progress, 0, 0.2, 1, 1.01);
+  const outerOpacity = 1 - smoothStep((progress - 0.18) / 0.08);
+  const outerY = phase(progress, 0, 0.18, 0, -12);
+  const windowScale = phase(progress, 0.18, 0.28, 0.985, 1);
+  const windowOpacity = smoothStep((progress - 0.18) / 0.08) * (1 - smoothStep((progress - 0.38) / 0.08));
+  const windowY = phase(progress, 0.16, 0.28, 22, 0);
+  const gateScale = phase(progress, 0.38, 0.48, 0.985, 1);
+  const gateOpacity = smoothStep((progress - 0.38) / 0.08) * (1 - smoothStep((progress - 0.58) / 0.08));
+  const gateX = phase(progress, 0.36, 0.48, -22, 0);
+  const finalScale = phase(progress, 0.58, 0.68, 0.985, 1);
+  const finalOpacity = smoothStep((progress - 0.58) / 0.08);
+  const finalY = phase(progress, 0.56, 0.68, 22, 0);
 
   return (
     <div className={styles.portalFrame} data-story-frame data-demo-state={demoState.id} aria-label={`ภาพจำลอง Product Story ขั้นตอนที่ ${scrollStorySteps[activeStep].number}`}>
@@ -149,7 +152,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
         <div className={`${styles.portalGlow} ${styles.portalGlowA}`} data-story-parallax />
         <div className={`${styles.portalGlow} ${styles.portalGlowB}`} data-story-parallax />
 
-        <div className={`${styles.portalLayer} ${styles.portalDoorLayer}`} style={layerStyle(outerScale, outerOpacity)}>
+        <div className={`${styles.portalLayer} ${styles.portalDoorLayer}`} style={layerStyle(outerScale, outerOpacity, 0, 0, outerY)}>
           <div className={styles.portalDoorFrame}>
             <div className={styles.portalLayerMeta}><span>01 / INCOMING</span><span>CHANNEL PORTAL</span></div>
             <div className={styles.portalDoorHeading}><span className={styles.portalEyebrow}>THE FIRST MESSAGE</span><strong>ทุกข้อความ<br /><em>มีโอกาสขาย</em></strong></div>
@@ -166,7 +169,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
           </div>
         </div>
 
-        <div className={`${styles.portalLayer} ${styles.portalWindowLayer}`} style={layerStyle(windowScale, windowOpacity, -1.5)}>
+        <div className={`${styles.portalLayer} ${styles.portalWindowLayer}`} style={layerStyle(windowScale, windowOpacity, -0.5, 0, windowY)}>
           <div className={styles.portalWindowShell}>
             <div className={styles.portalLayerMeta}><span>02 / UNIFIED INBOX</span><span className={styles.portalGreenText}>4 NEW</span></div>
             <div className={styles.portalInboxBody}>
@@ -186,7 +189,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
           </div>
         </div>
 
-        <div className={`${styles.portalLayer} ${styles.portalGateLayer}`} style={layerStyle(gateScale, gateOpacity, 1.4)}>
+        <div className={`${styles.portalLayer} ${styles.portalGateLayer}`} style={layerStyle(gateScale, gateOpacity, 0.5, gateX, 0)}>
           <div className={styles.portalGateShell}>
             <div className={styles.portalGateRings}><span /><span /><span /></div>
             <div className={styles.portalGateCore}>
@@ -199,7 +202,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
           </div>
         </div>
 
-        <div className={`${styles.portalLayer} ${styles.portalFinalLayer}`} style={layerStyle(finalScale, finalOpacity)}>
+        <div className={`${styles.portalLayer} ${styles.portalFinalLayer}`} style={layerStyle(finalScale, finalOpacity, 0, 0, finalY)}>
           <div className={styles.portalFinalShell}>
             <div className={styles.portalFinalTop}><span>04 / DEAL CLOSED</span><b><CheckCircle2 size={12} /> CLOSED</b></div>
             <div className={styles.portalFinalMark}><img src={NEO_LOGO_PATH} alt="" width="34" height="34" /></div>
@@ -211,7 +214,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
         </div>
 
         <div className={styles.portalDepth}><span>DEPTH</span><strong>{depth}<small>%</small></strong></div>
-        <div className={`${styles.portalCorner} ${styles.portalCornerTop}`}>SCROLL / DIVE</div>
+        <div className={`${styles.portalCorner} ${styles.portalCornerTop}`}>SCROLL / FLOW</div>
         <div className={`${styles.portalCorner} ${styles.portalCornerBottom}`}>NEO SYSTEM 04</div>
       </div>
 
@@ -222,7 +225,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
         <div className={styles.portalStateRail} aria-label="สถานะ Product Demo">
           {portalDemoStates.map((state, index) => <span className={index === demoStateIndex ? styles.portalStateActive : ''} key={state.id}>{state.label}</span>)}
         </div>
-        <span className={styles.portalBottomHint}><ArrowDown size={13} /> เลื่อนเพื่อดำน้ำผ่านทุกขั้นตอน</span>
+        <span className={styles.portalBottomHint}><ArrowDown size={13} /> เลื่อนเพื่อดูทุกขั้นตอน</span>
         <span className={styles.portalBottomStep}>{scrollStorySteps[activeStep].number} / {scrollStorySteps[activeStep].eyebrow}</span>
       </div>
     </div>
@@ -300,7 +303,7 @@ export default function ScrollStory({ signupHref = '/signup?plan=Starter', detai
         <div className={styles.storyHeading}>
           <span className={styles.storyKicker}>ดู CUTINEO ทำงาน</span>
           <h2 id="story-title">จากข้อความแรก<br /><span>จนถึงการปิดการขาย</span></h2>
-          <p>เลื่อนลงเพื่อดำน้ำผ่าน Product Story แบบทีละเฟรม ตั้งแต่แชทเข้า รวม Inbox ให้ AI ช่วยขาย จนถึงดีลที่ปิดได้ในระบบเดียว</p>
+          <p>เลื่อนลงเพื่อดู Product Story แบบทีละเฟรม ตั้งแต่แชทเข้า รวม Inbox ให้ AI ช่วยขาย จนถึงดีลที่ปิดได้ในระบบเดียว</p>
         </div>
 
         <div className={styles.storyLayout} ref={layoutRef}>
