@@ -125,17 +125,17 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
   // Keep every panel readable at viewport scale. The story now moves through
   // the product with a restrained fade/slide handoff instead of a zoom dive.
   const outerScale = phase(progress, 0, 0.2, 1, 1.01);
-  const outerOpacity = 1 - smoothStep((progress - 0.18) / 0.08);
-  const outerY = phase(progress, 0, 0.18, 0, -12);
-  const windowScale = phase(progress, 0.18, 0.28, 0.985, 1);
-  const windowOpacity = smoothStep((progress - 0.18) / 0.08) * (1 - smoothStep((progress - 0.38) / 0.08));
-  const windowY = phase(progress, 0.16, 0.28, 22, 0);
-  const gateScale = phase(progress, 0.38, 0.48, 0.985, 1);
-  const gateOpacity = smoothStep((progress - 0.38) / 0.08) * (1 - smoothStep((progress - 0.58) / 0.08));
-  const gateX = phase(progress, 0.36, 0.48, -22, 0);
-  const finalScale = phase(progress, 0.58, 0.68, 0.985, 1);
-  const finalOpacity = smoothStep((progress - 0.58) / 0.08);
-  const finalY = phase(progress, 0.56, 0.68, 22, 0);
+  const outerOpacity = 1 - smoothStep((progress - 0.14) / 0.08);
+  const outerY = phase(progress, 0, 0.14, 0, -12);
+  const windowScale = phase(progress, 0.16, 0.24, 0.985, 1);
+  const windowOpacity = smoothStep((progress - 0.16) / 0.08) * (1 - smoothStep((progress - 0.32) / 0.08));
+  const windowY = phase(progress, 0.14, 0.24, 22, 0);
+  const gateScale = phase(progress, 0.32, 0.4, 0.985, 1);
+  const gateOpacity = smoothStep((progress - 0.32) / 0.08) * (1 - smoothStep((progress - 0.52) / 0.08));
+  const gateX = phase(progress, 0.3, 0.4, -22, 0);
+  const finalScale = phase(progress, 0.52, 0.6, 0.985, 1);
+  const finalOpacity = smoothStep((progress - 0.52) / 0.08);
+  const finalY = phase(progress, 0.5, 0.6, 22, 0);
 
   return (
     <div className={styles.portalFrame} data-story-frame data-demo-state={demoState.id} aria-label={`ภาพจำลอง Product Story ขั้นตอนที่ ${scrollStorySteps[activeStep].number}`}>
