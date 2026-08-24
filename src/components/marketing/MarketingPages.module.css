@@ -179,3 +179,37 @@
   .pricingRouteCard ul { min-height: 0; }
   .pricingRouteBoost { align-items: flex-start; flex-direction: column; }
 }
+
+/* Marketing motion language V3 ------------------------------------------- */
+
+.integrationCard {
+  transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+}
+
+.integrationCard:hover {
+  border-color: #b6e0d9;
+  box-shadow: 0 14px 28px rgba(33, 84, 84, .08);
+  transform: translateY(-3px);
+}
+
+.salesFlow { grid-template-columns: repeat(7, minmax(0, 1fr)); }
+
+@media (max-width: 1200px) {
+  .salesFlow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .salesArrow { display: none; }
+}
+
+@media (max-width: 900px) {
+  .salesFlow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .salesFlow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featureCard,
+  .integrationCard,
+  .resourceCard,
+  .salesFlow article { will-change: auto; transition: none; }
+}

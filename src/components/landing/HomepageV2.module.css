@@ -246,7 +246,7 @@
 .floatChannel:nth-child(-n + 5) { left: -32px; }
 .floatChannel:nth-child(n + 6) { right: -32px; }
 .floatChannel img { display: block; width: 30px; height: 30px; object-fit: contain; }
-.floatChannel small { max-width: 100%; overflow: hidden; color: #607386; font-size: 8px; font-weight: 750; line-height: 1.15; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.floatChannelLabel { display: block; width: 100%; max-width: 100%; overflow: hidden; color: #607386; font-size: 8px; font-weight: 750; line-height: 1.15; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .floatDelay0 { animation-delay: 0s; }
 .floatDelay1 { animation-delay: .6s; }
 .floatDelay2 { animation-delay: 1.2s; }
@@ -748,4 +748,598 @@
 @media (prefers-reduced-motion: reduce) {
   .storyPreviewCard,
   .previewCard { transition: none; }
+}
+
+/* Homepage typography & layout polish V1 --------------------------------- */
+.page {
+  --content-gutter: 48px;
+}
+
+.sectionShell {
+  width: min(1180px, calc(100% - var(--content-gutter)));
+}
+
+.hero {
+  padding: clamp(80px, 8vw, 116px) 0 clamp(86px, 8vw, 120px);
+}
+
+.heroGrid {
+  width: min(1380px, calc(100% - 64px));
+  grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr);
+  gap: clamp(40px, 5vw, 84px);
+}
+
+.heroBadge {
+  padding: 9px 15px;
+  font-size: 12px;
+}
+
+.heroCopy h1 {
+  max-width: 570px;
+  margin: 26px 0 24px;
+  font-size: clamp(42px, 4.15vw, 62px);
+  line-height: 1.08;
+}
+
+.heroLead {
+  max-width: 560px;
+  font-size: clamp(16px, 1.25vw, 18px);
+  line-height: 1.78;
+}
+
+.heroActions {
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.primaryButton,
+.secondaryButton,
+.lightButton,
+.planButton {
+  min-height: 50px;
+  padding-right: 21px;
+  padding-left: 21px;
+  font-size: 14px;
+}
+
+.trustRow {
+  gap: 12px 22px;
+  margin-top: 25px;
+  font-size: 13px;
+}
+
+.integrationSection {
+  padding-top: 78px;
+}
+
+.integrationHeadingRow {
+  align-items: flex-start;
+  gap: 32px;
+  margin: 16px 0 30px;
+}
+
+.integrationHeadingRow h2 {
+  max-width: 640px;
+  font-size: clamp(26px, 2.7vw, 34px);
+  line-height: 1.2;
+}
+
+.integrationHeadingRow p {
+  max-width: 610px;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.integrationGrid {
+  gap: 12px;
+}
+
+.integrationCard {
+  gap: 10px;
+  border-radius: 16px;
+  padding: 13px;
+}
+
+.integrationLogo {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+}
+
+.integrationLogo img {
+  width: 30px;
+  height: 30px;
+}
+
+.integrationCopy {
+  gap: 5px;
+}
+
+.integrationCopy strong {
+  font-size: 12px;
+}
+
+.integrationStatus {
+  padding: 3px 7px;
+  font-size: 9px;
+}
+
+.trademarkNote {
+  max-width: 920px;
+  margin-top: 22px;
+  font-size: 11px;
+  line-height: 1.75;
+}
+
+.previewLinkRow {
+  width: min(1180px, calc(100% - var(--content-gutter)));
+  margin: 28px auto 0;
+  justify-content: flex-start;
+}
+
+.previewSection,
+.storyPreviewSection,
+.pricingSection {
+  padding-top: 112px;
+  padding-bottom: 112px;
+}
+
+.sectionHeading {
+  max-width: 760px;
+}
+
+.sectionKicker {
+  font-size: 12px;
+}
+
+.sectionHeading h2 {
+  margin-top: 15px;
+  margin-bottom: 18px;
+  font-size: clamp(31px, 3.6vw, 46px);
+  line-height: 1.16;
+}
+
+.sectionHeading p {
+  max-width: 640px;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.previewGrid,
+.storyPreviewGrid {
+  gap: 18px;
+  margin-top: 44px;
+}
+
+.previewCard,
+.storyPreviewCard {
+  gap: 12px;
+  border-radius: 22px;
+  padding: 24px;
+}
+
+.previewCardIcon {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+}
+
+.previewCard h3,
+.storyPreviewCard h3 {
+  margin-top: 7px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.previewCard p,
+.storyPreviewCard p {
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.storyPreviewFlow {
+  gap: 15px;
+  margin-top: 38px;
+  font-size: 13px;
+}
+
+.textLink {
+  margin-top: 28px;
+  font-size: 14px;
+}
+
+.pricingGrid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 44px;
+}
+
+.planCard {
+  border-radius: 22px;
+  padding: 26px 23px 23px;
+}
+
+.planFeatured {
+  padding: 25px 22px 22px;
+}
+
+.planTop {
+  font-size: 14px;
+}
+
+.planCard h3 {
+  min-height: auto;
+  margin: 27px 0 17px;
+  font-size: 40px;
+  line-height: 1.08;
+}
+
+.planCard h3 small {
+  font-size: 12px;
+}
+
+.aiQuota {
+  gap: 5px;
+  padding: 13px;
+}
+
+.aiQuota strong {
+  font-size: 26px;
+}
+
+.aiQuota span {
+  font-size: 12px;
+}
+
+.planPositioning {
+  min-height: auto;
+  margin: 16px 0 0;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.planCard ul {
+  display: none;
+}
+
+.planCard .primaryButton {
+  width: 100%;
+  margin-top: 24px;
+}
+
+.boostCard {
+  gap: 24px;
+  margin-top: 28px;
+  border-radius: 21px;
+  padding: 22px 24px;
+}
+
+.boostCard h3 {
+  font-size: 20px;
+}
+
+.boostCard p {
+  font-size: 13px;
+}
+
+.boostCard > strong {
+  font-size: 28px;
+}
+
+.boostCard .secondaryButton {
+  min-height: 46px;
+  font-size: 13px;
+}
+
+.finalCta {
+  padding-bottom: 112px;
+}
+
+.finalCtaInner {
+  border-radius: 30px;
+  padding: 62px 72px;
+}
+
+.finalCtaInner h2 {
+  font-size: clamp(32px, 3.6vw, 46px);
+  line-height: 1.14;
+}
+
+.finalCtaInner p {
+  max-width: 560px;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.finalLogin {
+  font-size: 13px;
+}
+
+.footerGrid > div:first-child p {
+  max-width: 270px;
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.footerGrid > div > strong,
+.footerGrid > div > a {
+  font-size: 12px;
+}
+
+.footerBottom {
+  font-size: 11px;
+}
+
+@media (max-width: 980px) {
+  .heroGrid {
+    width: min(100% - 40px, 760px);
+    grid-template-columns: 1fr;
+    gap: 42px;
+  }
+
+  .heroCopy {
+    text-align: left;
+  }
+
+  .heroBadge {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .heroActions,
+  .trustRow {
+    justify-content: flex-start;
+  }
+
+  .pricingGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .finalCtaInner {
+    padding: 52px 44px;
+  }
+}
+
+@media (max-width: 760px) {
+  .page {
+    --content-gutter: 40px;
+  }
+
+  .sectionShell,
+  .heroGrid,
+  .previewLinkRow {
+    width: min(100% - 40px, 640px);
+    max-width: calc(100% - 40px);
+  }
+
+  .hero {
+    padding: 74px 0 78px;
+  }
+
+  .heroCopy h1 {
+    max-width: 620px;
+    font-size: clamp(38px, 7vw, 52px);
+  }
+
+  .heroLead {
+    max-width: 600px;
+    font-size: 16px;
+  }
+
+  .integrationSection {
+    padding-top: 68px;
+  }
+
+  .integrationHeadingRow {
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 25px;
+  }
+
+  .integrationHeadingRow p {
+    font-size: 15px;
+  }
+
+  .sectionHeading {
+    margin-right: 0;
+    margin-left: 0;
+    text-align: left;
+  }
+
+  .sectionHeading h2 {
+    font-size: clamp(29px, 7vw, 38px);
+  }
+
+  .sectionHeading p {
+    margin-right: 0;
+    margin-left: 0;
+    font-size: 15px;
+  }
+
+  .previewSection,
+  .storyPreviewSection,
+  .pricingSection {
+    padding-top: 80px;
+    padding-bottom: 82px;
+  }
+
+  .previewGrid,
+  .storyPreviewGrid {
+    grid-template-columns: 1fr;
+    margin-top: 32px;
+  }
+
+  .pricingGrid {
+    grid-template-columns: 1fr;
+    margin-top: 32px;
+  }
+
+  .planCard,
+  .planFeatured {
+    padding: 24px 21px 21px;
+  }
+
+  .boostCard {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .boostCard > strong {
+    justify-self: start;
+  }
+
+  .boostCard .secondaryButton {
+    justify-self: stretch;
+  }
+
+  .finalCta {
+    padding-bottom: 80px;
+  }
+
+  .finalCtaInner {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding: 42px 28px 34px;
+  }
+
+  .finalCtaInner h2 {
+    font-size: clamp(30px, 8vw, 38px);
+  }
+
+  .finalCtaInner p {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 430px) {
+  .page {
+    --content-gutter: 32px;
+  }
+
+  .sectionShell,
+  .heroGrid,
+  .previewLinkRow {
+    width: calc(100% - 32px);
+    max-width: calc(100% - 32px);
+  }
+
+  .hero {
+    padding-top: 62px;
+    padding-bottom: 68px;
+  }
+
+  .heroBadge {
+    max-width: 100%;
+    font-size: 11px;
+  }
+
+  .heroCopy h1 {
+    font-size: clamp(35px, 10vw, 43px);
+    line-height: 1.1;
+  }
+
+  .heroLead {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .primaryButton,
+  .secondaryButton,
+  .lightButton,
+  .planButton {
+    min-height: 48px;
+    font-size: 14px;
+  }
+
+  .integrationHeadingRow h2 {
+    font-size: 28px;
+  }
+
+  .integrationHeadingRow p,
+  .sectionHeading p {
+    font-size: 15px;
+  }
+
+  .previewCard,
+  .storyPreviewCard {
+    padding: 21px;
+  }
+
+  .previewCard h3,
+  .storyPreviewCard h3 {
+    font-size: 18px;
+  }
+
+  .previewCard p,
+  .storyPreviewCard p {
+    font-size: 14px;
+  }
+
+  .planCard h3 {
+    font-size: 36px;
+  }
+
+  .finalCtaInner {
+    border-radius: 23px;
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+}
+
+/* Homepage motion language V3 -------------------------------------------- */
+.heroCopy,
+.heroVisual { transition: opacity .28s ease, transform .28s ease; }
+
+.heroMessageStream {
+  position: absolute;
+  z-index: 6;
+  inset: 0;
+  pointer-events: none;
+}
+
+.heroMessage {
+  position: absolute;
+  display: flex;
+  max-width: 190px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #cfe8e4;
+  border-radius: 13px;
+  padding: 8px 10px 8px 8px;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 12px 24px rgba(29, 91, 90, .12);
+  color: #5b6e7d;
+  font-size: 9px;
+  line-height: 1.35;
+  opacity: 0;
+  animation: hero-message-flow 8s cubic-bezier(.22, 1, .36, 1) infinite;
+}
+
+.heroMessage img { width: 20px; height: 20px; flex: 0 0 auto; object-fit: contain; }
+.heroMessage span { display: grid; min-width: 0; gap: 2px; }
+.heroMessage strong { color: #159f91; font-size: 8px; letter-spacing: .04em; }
+.heroMessage1 { top: 18%; left: -6%; }
+.heroMessage2 { top: 44%; left: -10%; }
+.heroMessage3 { top: 69%; left: -5%; }
+
+.floatingChannels { transform: translateX(calc(var(--hero-scroll, 0) * 18px)); transition: transform .12s linear; }
+.floatChannel > span { max-width: 100%; overflow: hidden; color: #607386; font-size: 8px; font-weight: 750; line-height: 1.15; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+
+@keyframes hero-message-flow {
+  0%, 100% { opacity: 0; transform: translate(-22px, 10px) scale(.94); }
+  18% { opacity: 1; transform: translate(0, 0) scale(1); }
+  68% { opacity: 1; transform: translate(78px, 10px) scale(.98); }
+  86% { opacity: 0; transform: translate(135px, 18px) scale(.94); }
+}
+
+@media (max-width: 760px) {
+  .heroMessageStream { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heroCopy,
+  .heroVisual,
+  .floatingChannels { transition: none; }
+
+  .heroMessage { animation: none; opacity: .92; transform: none; }
 }

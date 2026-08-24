@@ -542,6 +542,10 @@
 .memoryRows { display: grid; gap: 13px; margin-top: 23px; }
 .memoryRows > div,
 .quotationRows > div { display: flex; min-width: 0; align-items: baseline; justify-content: space-between; gap: 15px; border-bottom: 1px solid #edf2f1; padding-bottom: 10px; }
+.sceneVisible .memoryRows > div { animation: story-row-reveal .48s cubic-bezier(.22, 1, .36, 1) both; }
+.sceneVisible .memoryRows > div:nth-child(2) { animation-delay: 80ms; }
+.sceneVisible .memoryRows > div:nth-child(3) { animation-delay: 160ms; }
+.sceneVisible .memoryRows > div:nth-child(4) { animation-delay: 240ms; }
 .memoryRows span,
 .quotationRows span { color: #91a0aa; font-size: 9px; }
 .memoryRows strong,
@@ -588,6 +592,38 @@
 .storyConclusion > div:nth-child(2) strong { color: #18324c; font-size: clamp(18px, 2.2vw, 26px); letter-spacing: -.04em; line-height: 1.25; }
 .storyConclusion > div:nth-child(2) p { margin: 0; color: #718692; font-size: 10px; line-height: 1.6; }
 .conclusionArrow { color: #159f91; }
+
+.storyConclusionActions { display: grid; justify-items: stretch; gap: 7px; min-width: 132px; }
+.storyConclusionPrimary,
+.storyConclusionLink { display: inline-flex; min-height: 34px; align-items: center; justify-content: center; gap: 6px; border-radius: 9px; padding: 0 10px; font-size: 9px; font-weight: 850; text-decoration: none; white-space: nowrap; }
+.storyConclusionPrimary { background: #159f91; box-shadow: 0 8px 16px rgba(21, 159, 145, .16); color: #fff; transition: transform .2s ease, background .2s ease; }
+.storyConclusionPrimary:hover { background: #0d887d; transform: translateY(-1px); }
+.storyConclusionLink { border: 1px solid #c8e6e1; color: #159f91; transition: background .2s ease, border-color .2s ease; }
+.storyConclusionLink:hover { border-color: #93d6cc; background: #f1fcfa; }
+
+/* Final product-story scene --------------------------------------------- */
+.closeScene { display: flex; min-height: 100%; flex-direction: column; justify-content: center; }
+.closeHeader { display: flex; min-width: 0; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.closeBrand { display: flex; min-width: 0; align-items: center; gap: 9px; }
+.closeBrand img { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 10px; object-fit: contain; }
+.closeBrand > div { display: grid; min-width: 0; gap: 4px; }
+.closeBrand span { color: #8a9aa2; font-size: 8px; font-weight: 850; letter-spacing: .12em; }
+.closeBrand strong { color: #243c55; font-size: 14px; line-height: 1.35; }
+.closeBadge { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; border-radius: 99px; padding: 6px 8px; background: #e6faf3; color: #168e70; font-size: 8px; font-weight: 850; }
+.closeGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 28px; }
+.closeItem { display: grid; min-width: 0; gap: 5px; border: 1px solid #e1eceb; border-radius: 15px; padding: 13px; background: #fff; box-shadow: 0 8px 18px rgba(35, 78, 84, .045); }
+.closeItem > span { display: grid; width: 27px; height: 27px; place-items: center; border-radius: 8px; background: #e9faf6; color: #159f91; }
+.closeItem small { color: #8d9ca4; font-size: 8px; line-height: 1.4; }
+.closeItem strong { overflow: hidden; color: #304860; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.closeStatement { display: flex; min-width: 0; align-items: center; gap: 9px; margin-top: 22px; border: 1px solid #bde7df; border-radius: 15px; padding: 13px; background: linear-gradient(120deg, #eafaf7, #fff); color: #159f91; }
+.closeStatement > div { display: grid; min-width: 0; gap: 3px; }
+.closeStatement strong { color: #2d574f; font-size: 11px; line-height: 1.45; }
+.closeStatement span { color: #73908c; font-size: 9px; }
+
+@keyframes story-row-reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 @keyframes story-float {
   0%, 100% { transform: translateY(0); }
@@ -648,6 +684,10 @@
   .storyConclusion { grid-template-columns: auto minmax(0, 1fr); gap: 12px; padding: 17px; }
   .conclusionArrow { display: none; }
   .storyConclusion > div:nth-child(2) strong { font-size: 17px; }
+  .storyConclusionActions { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; min-width: 0; }
+  .closeGrid { gap: 8px; }
+  .closeItem { padding: 10px; }
+  .closeBrand strong { font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -659,4 +699,7 @@
   }
 
   .channelCard { animation: none; }
+  .sceneVisible .memoryRows > div { animation: none; }
+  .storyConclusionPrimary,
+  .storyConclusionLink { transition: none; }
 }

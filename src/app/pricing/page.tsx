@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowRight, Check, Sparkles } from 'lucide-react';
 import Header from '@/components/layout/Header';
+import { MotionGroup, MotionReveal } from '@/components/motion/ScrollReveal';
 import { AI_BOOST, PLAN_CATALOG, PLAN_ORDER, formatPlanPrice } from '@/core/billing/catalog';
 
 export const metadata: Metadata = {
@@ -12,20 +13,19 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#071016] text-white">
+      <Header activeKey="pricing" />
       <div className="mx-auto max-w-7xl px-5 py-7 sm:px-8 lg:px-12">
-        <Header activeKey="pricing" />
-
-        <section className="mx-auto max-w-3xl py-16 text-center sm:py-20">
+        <MotionReveal className="mx-auto max-w-3xl py-16 text-center sm:py-20" delay={60}>
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-teal-300/20 bg-teal-300/10 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.18em] text-teal-200"><Sparkles size={14} /> AI-powered pricing</p>
           <h1 className="text-[clamp(30px,5vw,54px)] font-black leading-tight tracking-tight">เลือกแพ็กเกจที่โตไปพร้อมธุรกิจ</h1>
           <p className="mt-5 text-base leading-8 text-slate-300">เริ่มจาก AI ช่วยตอบ แล้วขยับไปสู่ AI Sales Automation เมื่อทีมและยอดขายเติบโต</p>
-        </section>
+        </MotionReveal>
 
-        <section className="grid items-stretch gap-5 lg:grid-cols-4">
+        <MotionGroup className="grid items-stretch gap-5 lg:grid-cols-4" delay={80}>
           {PLAN_ORDER.map((planId) => {
             const plan = PLAN_CATALOG[planId];
             return (
-              <article key={planId} className={`relative flex min-w-0 flex-col rounded-3xl border p-6 ${plan.featured ? 'border-teal-300 bg-teal-300/[0.12] shadow-2xl shadow-teal-500/15 lg:-translate-y-3' : 'border-white/10 bg-white/[0.05]'}`}>
+              <article key={planId} className={`relative flex min-w-0 flex-col rounded-3xl border p-6 transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-teal-200/70 ${plan.featured ? 'border-teal-300 bg-teal-300/[0.12] shadow-2xl shadow-teal-500/15 lg:-translate-y-3' : 'border-white/10 bg-white/[0.05]'}`}>
                 {plan.featured && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-teal-300 px-4 py-1 text-[11px] font-black text-slate-950">แนะนำ · MOST POPULAR</span>}
                 <div className="flex items-start justify-between gap-3">
                   <div><p className="text-lg font-black">{plan.name}</p><p className="mt-2 text-sm leading-6 text-slate-300">{plan.positioning}</p></div>
@@ -41,12 +41,12 @@ export default function PricingPage() {
               </article>
             );
           })}
-        </section>
+        </MotionGroup>
 
-        <section className="mx-auto my-12 flex max-w-4xl flex-col items-start justify-between gap-5 rounded-3xl border border-teal-300/25 bg-teal-300/[0.08] p-6 sm:flex-row sm:items-center sm:p-8">
+        <MotionReveal className="mx-auto my-12 flex max-w-4xl flex-col items-start justify-between gap-5 rounded-3xl border border-teal-300/25 bg-teal-300/[0.08] p-6 sm:flex-row sm:items-center sm:p-8" delay={120}>
           <div><p className="text-xs font-black uppercase tracking-[0.16em] text-teal-200">AI BOOST</p><h2 className="mt-2 text-2xl font-black">เพิ่มโควตาเฉพาะรอบบิลนี้</h2><p className="mt-2 text-sm leading-6 text-slate-300">{AI_BOOST.description} ไม่ใช่โควตาถาวรของแพ็กเกจ</p></div>
           <div className="shrink-0 text-left sm:text-right"><strong className="block text-3xl font-black text-teal-200">฿{AI_BOOST.priceThb}</strong><span className="text-xs text-slate-400">+{AI_BOOST.messages.toLocaleString('th-TH')} AI Messages</span></div>
-        </section>
+        </MotionReveal>
 
         <p className="mx-auto max-w-2xl pb-12 text-center text-xs leading-6 text-slate-500">AI Message คือข้อความตอบกลับที่สร้างโดย AI ข้อความจากลูกค้าไม่นับเป็น AI Message และโควตาจะ reset ตาม Billing Cycle</p>
       </div>

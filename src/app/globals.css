@@ -46,12 +46,12 @@ select {
 /* Modern SaaS public navigation */
 .cutineo-site-header {
   position: sticky;
-  top: 14px;
+  top: 12px;
   z-index: 40;
-  width: min(1220px, calc(100% - 32px));
-  margin: 14px auto 0;
+  width: min(1240px, calc(100% - 40px));
+  margin: 12px auto 0;
   border: 1px solid rgba(210, 226, 226, .9);
-  border-radius: 22px;
+  border-radius: 20px;
   background: rgba(255, 255, 255, .78);
   box-shadow: 0 8px 28px rgba(31, 68, 74, .08);
   backdrop-filter: blur(18px) saturate(140%);
@@ -68,10 +68,10 @@ select {
 .cutineo-site-header-inner {
   display: flex;
   min-width: 0;
-  min-height: 72px;
+  min-height: 70px;
   align-items: center;
-  gap: clamp(18px, 3vw, 42px);
-  padding: 10px 14px 10px 18px;
+  gap: clamp(20px, 3vw, 38px);
+  padding: 9px 15px 9px 19px;
 }
 
 .cutineo-site-brand {
@@ -107,7 +107,7 @@ select {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: clamp(18px, 2.4vw, 32px);
+  gap: clamp(20px, 2.3vw, 30px);
   margin-right: auto;
 }
 
@@ -115,7 +115,7 @@ select {
   position: relative;
   padding: 10px 0;
   color: #56657a;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
   transition: color .18s ease;
@@ -151,13 +151,13 @@ select {
   min-width: 0;
   flex: 0 0 auto;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   white-space: nowrap;
 }
 
 .cutineo-site-login {
   color: #52627a;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   text-decoration: none;
   transition: color .18s ease;
@@ -170,15 +170,15 @@ select {
 .cutineo-site-cta {
   display: inline-flex;
   min-width: 0;
-  min-height: 42px;
+  min-height: 44px;
   align-items: center;
   justify-content: center;
   border-radius: 13px;
-  padding: 0 17px;
+  padding: 0 19px;
   background: #159f91;
   box-shadow: 0 9px 20px rgba(21, 159, 145, .2);
   color: #fff;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
@@ -3004,4 +3004,38 @@ select:focus-visible {
 
   .pwa-install-shell { padding: 22px 17px; }
   .pwa-install-section { padding-right: 12px; padding-left: 12px; }
+}
+
+/* Shared public-header motion: compact without changing its anchor position. */
+.cutineo-site-header-inner {
+  transition: min-height .28s ease, padding .28s ease;
+}
+
+.cutineo-site-header.is-scrolled .cutineo-site-header-inner {
+  min-height: 64px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.cutineo-cta-short { display: none; }
+
+@media (max-width: 880px) {
+  .cutineo-site-header.is-scrolled .cutineo-site-header-inner {
+    min-height: 58px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+}
+
+@media (max-width: 560px) {
+  .cutineo-site-header.is-scrolled .cutineo-site-header-inner {
+    min-height: 54px;
+  }
+
+  .cutineo-cta-full { display: none; }
+  .cutineo-cta-short { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cutineo-site-header-inner { transition: none; }
 }

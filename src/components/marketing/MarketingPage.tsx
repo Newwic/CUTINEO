@@ -7,6 +7,7 @@ import {
   Bot,
   BookOpen,
   Check,
+  CheckCircle2,
   Clock3,
   FileText,
   HelpCircle,
@@ -25,6 +26,7 @@ import {
 import { integrations, integrationCategories, type Integration, type IntegrationStatus } from '../../config/integrations';
 import Header from '../layout/Header';
 import ScrollStory from '../landing/ScrollStory';
+import { MotionGroup, MotionReveal } from '../motion/ScrollReveal';
 import styles from './MarketingPages.module.css';
 
 export type MarketingPageKind = 'features' | 'integrations' | 'ai-sales' | 'resources';
@@ -54,9 +56,10 @@ const aiSalesFlow = [
   { icon: MessageCircle, title: 'AI Reply', text: 'ตอบคำถามจาก FAQ และ Product Knowledge' },
   { icon: Sparkles, title: 'Sales Memory', text: 'จำบริบท ความสนใจ และสถานะดีล' },
   { icon: FileText, title: 'AI Summary', text: 'สรุปบทสนทนาให้ทีมรับช่วงต่อได้เร็ว' },
-  { icon: Clock3, title: 'AI Follow-up', text: 'เตือนและร่างข้อความเมื่อลูกค้าเงียบ' },
   { icon: PackageCheck, title: 'Quotation', text: 'สร้าง Draft ให้คนตรวจและอนุมัติ' },
+  { icon: Clock3, title: 'AI Follow-up', text: 'เตือนและร่างข้อความเมื่อลูกค้าเงียบ' },
   { icon: Activity, title: 'Pipeline', text: 'มองเห็นดีลตั้งแต่แชทจนถึงปิดการขาย' },
+  { icon: CheckCircle2, title: 'Close Deal', text: 'ปิดดีลพร้อมบริบทครบใน Workspace เดียว' },
 ];
 
 function normalizePrefix(basePath = '') {
@@ -86,7 +89,7 @@ function IntegrationLogo({ integration }: { integration: Integration }) {
 function PageIntro({ kind, title, accent, description, basePath }: { kind: MarketingPageKind; title: string; accent: string; description: string; basePath?: string }) {
   return (
     <section className={styles.pageIntro}>
-      <div className={styles.contentShell}>
+      <MotionReveal className={styles.contentShell} delay={60}>
         <span className={styles.eyebrow}>CUTINEO · {kind.replace('-', ' ').toUpperCase()}</span>
         <h1>{title}<br /><span>{accent}</span></h1>
         <p>{description}</p>
@@ -94,7 +97,7 @@ function PageIntro({ kind, title, accent, description, basePath }: { kind: Marke
           <a className={styles.primaryButton} href={`${normalizePrefix(basePath)}${basePath ? 'register.html' : 'signup'}?plan=Starter`} data-cta={`page-${kind}-start`}>เริ่มต้นใช้งานฟรี <ArrowRight size={16} /></a>
           <a className={styles.secondaryButton} href={hrefFor(basePath ?? '', 'pricing')}>ดูแพ็กเกจราคา</a>
         </div>
-      </div>
+      </MotionReveal>
     </section>
   );
 }
@@ -119,8 +122,8 @@ function FeaturesContent({ basePath = '' }: { basePath?: string }) {
     <>
       <section className={styles.contentSection}>
         <div className={styles.contentShell}>
-          <div className={styles.sectionHeader}><span className={styles.eyebrow}>ONE WORKSPACE, MORE SALES</span><h2>เครื่องมือที่ทำให้ทีมขาย<br /><span>ทำงานต่อจากบริบทเดียวกัน</span></h2><p>เลือกใช้เฉพาะสิ่งที่ทีมต้องการในวันนี้ แล้วขยาย workflow ได้เมื่อธุรกิจโตขึ้น</p></div>
-          <div className={styles.featureGrid}>{featureItems.map((item) => { const Icon = item.icon; return <article className={styles.featureCard} key={item.title}><div className={styles.featureIcon}><Icon size={21} /></div><h3>{item.title}</h3><p>{item.description}</p><small>{item.detail}</small></article>; })}</div>
+          <MotionReveal className={styles.sectionHeader}><span className={styles.eyebrow}>ONE WORKSPACE, MORE SALES</span><h2>เครื่องมือที่ทำให้ทีมขาย<br /><span>ทำงานต่อจากบริบทเดียวกัน</span></h2><p>เลือกใช้เฉพาะสิ่งที่ทีมต้องการในวันนี้ แล้วขยาย workflow ได้เมื่อธุรกิจโตขึ้น</p></MotionReveal>
+          <MotionGroup className={styles.featureGrid} delay={80}>{featureItems.map((item) => { const Icon = item.icon; return <article className={styles.featureCard} key={item.title}><div className={styles.featureIcon}><Icon size={21} /></div><h3>{item.title}</h3><p>{item.description}</p><small>{item.detail}</small></article>; })}</MotionGroup>
         </div>
       </section>
       <section className={styles.featureCallout}><div className={styles.contentShell}><div><span className={styles.eyebrow}>NEXT STEP</span><h2>อยากเห็น AI Sales ทำงานจริง?</h2><p>ดู Product Story ตั้งแต่ข้อความแรกจนถึง Follow-up และการปิดดีล</p></div><a className={styles.primaryButton} href={hrefFor(basePath, 'ai-sales')}>ดู AI Sales <ArrowRight size={16} /></a></div></section>
@@ -132,8 +135,8 @@ function IntegrationsContent() {
   return (
     <section className={styles.contentSection} id="guide">
       <div className={styles.contentShell}>
-        <div className={styles.sectionHeader}><span className={styles.eyebrow}>CONNECT YOUR WORKSPACE</span><h2>ช่องทางที่ลูกค้าของคุณใช้อยู่</h2><p>สถานะด้านล่างอ้างอิงจาก adapter/config ที่มีในระบบปัจจุบัน ไม่แสดงช่องทางที่ยังไม่พร้อมเป็นการเชื่อมต่อจริง</p></div>
-        <div className={styles.integrationGroups}>{integrationCategories.map((category) => <section key={category.id} aria-labelledby={`${category.id}-title`}><h3 id={`${category.id}-title`}>{category.label}</h3><div className={styles.integrationGrid}>{integrations.filter((integration) => integration.category === category.id).map((integration) => <article className={styles.integrationCard} key={integration.id}><IntegrationLogo integration={integration} /><div><strong>{integration.name}</strong><span className={`${styles.statusBadge} ${statusClass(integration.status)}`}>{statusLabel(integration.status)}</span><p>{integration.description}</p></div></article>)}</div></section>)}</div>
+        <MotionReveal className={styles.sectionHeader}><span className={styles.eyebrow}>CONNECT YOUR WORKSPACE</span><h2>ช่องทางที่ลูกค้าของคุณใช้อยู่</h2><p>สถานะด้านล่างอ้างอิงจาก adapter/config ที่มีในระบบปัจจุบัน ไม่แสดงช่องทางที่ยังไม่พร้อมเป็นการเชื่อมต่อจริง</p></MotionReveal>
+        <div className={styles.integrationGroups}>{integrationCategories.map((category, categoryIndex) => <section key={category.id} aria-labelledby={`${category.id}-title`}><h3 id={`${category.id}-title`}>{category.label}</h3><MotionGroup className={styles.integrationGrid} delay={categoryIndex * 80}>{integrations.filter((integration) => integration.category === category.id).map((integration) => <article className={styles.integrationCard} key={integration.id}><IntegrationLogo integration={integration} /><div><strong>{integration.name}</strong><span className={`${styles.statusBadge} ${statusClass(integration.status)}`}>{statusLabel(integration.status)}</span><p>{integration.description}</p></div></article>)}</MotionGroup></section>)}</div>
         <p className={styles.trademarkNote}>ชื่อผลิตภัณฑ์ โลโก้ และเครื่องหมายการค้าของบุคคลที่สามเป็นทรัพย์สินของเจ้าของแต่ละราย การแสดงเครื่องหมายใช้เพื่อระบุบริการที่ CUTINEO รองรับหรือมีแผนรองรับเท่านั้น</p>
       </div>
     </section>
@@ -145,12 +148,15 @@ function AiSalesContent({ basePath = '' }: { basePath?: string }) {
     <>
       <section className={styles.contentSection}>
         <div className={styles.contentShell}>
-          <div className={styles.sectionHeader}><span className={styles.eyebrow}>AI SALES WORKFLOW</span><h2>AI ไม่ได้แค่ตอบ<br /><span>แต่ช่วยทีมขายเดินดีลต่อ</span></h2><p>ทุกขั้นยังอยู่ภายใต้การควบคุมของทีม ตั้งแต่ร่างคำตอบ สรุปความต้องการ จนถึงการติดตามและใบเสนอราคา</p></div>
-          <div className={styles.salesFlow}>{aiSalesFlow.map((item, index) => { const Icon = item.icon; return <article key={item.title}><div className={styles.salesFlowIcon}><Icon size={20} /></div><span>0{index + 1}</span><h3>{item.title}</h3><p>{item.text}</p>{index < aiSalesFlow.length - 1 && <ArrowRight className={styles.salesArrow} size={17} />}</article>; })}</div>
+          <MotionReveal className={styles.sectionHeader}><span className={styles.eyebrow}>AI SALES WORKFLOW</span><h2>AI ไม่ได้แค่ตอบ<br /><span>แต่ช่วยทีมขายเดินดีลต่อ</span></h2><p>ทุกขั้นยังอยู่ภายใต้การควบคุมของทีม ตั้งแต่ร่างคำตอบ สรุปความต้องการ จนถึงการติดตามและใบเสนอราคา</p></MotionReveal>
+          <MotionGroup className={styles.salesFlow} delay={80}>{aiSalesFlow.map((item, index) => { const Icon = item.icon; return <article key={item.title}><div className={styles.salesFlowIcon}><Icon size={20} /></div><span>0{index + 1}</span><h3>{item.title}</h3><p>{item.text}</p>{index < aiSalesFlow.length - 1 && <ArrowRight className={styles.salesArrow} size={17} />}</article>; })}</MotionGroup>
           <div className={styles.salesTrust}><ShieldCheck size={18} /><span>ข้อมูลลูกค้าและ API credential ไม่ถูกใส่ไว้ใน Landing Demo และ AI ทุก request ต้องผ่าน policy/tenant check ฝั่งระบบ</span></div>
         </div>
       </section>
-      <ScrollStory />
+      <ScrollStory
+        signupHref={`${normalizePrefix(basePath)}${basePath ? 'register.html' : 'signup'}?plan=Pro`}
+        detailsHref={hrefFor(basePath, 'ai-sales')}
+      />
       <section className={styles.featureCallout}><div className={styles.contentShell}><div><span className={styles.eyebrow}>READY TO TRY</span><h2>เริ่มจาก AI ช่วยตอบ แล้วโตไปพร้อมทีม</h2></div><a className={styles.primaryButton} href={`${normalizePrefix(basePath)}${basePath ? 'register.html' : 'signup'}?plan=Pro`} data-cta="ai-sales-start">เริ่มต้นกับ Pro <ArrowRight size={16} /></a></div></section>
     </>
   );
@@ -168,7 +174,7 @@ function ResourcesContent({ basePath = '' }: { basePath?: string }) {
     { icon: UsersRound, title: 'เกี่ยวกับเรา', text: 'แนวคิดของ CUTINEO และทีมที่สร้างเครื่องมือสำหรับทีมขาย', status: 'กำลังเตรียม', href: '#about' },
   ];
 
-  return <section className={styles.contentSection}><div className={styles.contentShell}><div className={styles.sectionHeader}><span className={styles.eyebrow}>RESOURCE HUB</span><h2>ทุกอย่างที่ช่วยให้เริ่มใช้ CUTINEO ได้เร็วขึ้น</h2><p>บางส่วนกำลังเตรียมเนื้อหาเต็ม แต่ route และโครงสร้างพร้อมต่อยอดแล้ว</p></div><div className={styles.resourceGrid}>{resources.map((resource) => { const Icon = resource.icon; return <a className={styles.resourceCard} href={resource.href} key={resource.title}><div className={styles.resourceIcon}><Icon size={20} /></div><div><span>{resource.status}</span><h3>{resource.title}</h3><p>{resource.text}</p></div><ArrowRight size={17} /></a>; })}</div></div></section>;
+  return <section className={styles.contentSection}><div className={styles.contentShell}><MotionReveal className={styles.sectionHeader}><span className={styles.eyebrow}>RESOURCE HUB</span><h2>ทุกอย่างที่ช่วยให้เริ่มใช้ CUTINEO ได้เร็วขึ้น</h2><p>บางส่วนกำลังเตรียมเนื้อหาเต็ม แต่ route และโครงสร้างพร้อมต่อยอดแล้ว</p></MotionReveal><MotionGroup className={styles.resourceGrid} delay={80}>{resources.map((resource) => { const Icon = resource.icon; return <a className={styles.resourceCard} href={resource.href} key={resource.title}><div className={styles.resourceIcon}><Icon size={20} /></div><div><span>{resource.status}</span><h3>{resource.title}</h3><p>{resource.text}</p></div><ArrowRight size={17} /></a>; })}</MotionGroup></div></section>;
 }
 
 export default function MarketingPage({ kind, basePath = '' }: { kind: MarketingPageKind; basePath?: string }) {

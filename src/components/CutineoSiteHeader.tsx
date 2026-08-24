@@ -85,6 +85,17 @@ export default function CutineoSiteHeader({
     };
   }, []);
 
+  useEffect(() => {
+    if (!menuOpen) return undefined;
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+
+    document.addEventListener('keydown', closeOnEscape);
+    return () => document.removeEventListener('keydown', closeOnEscape);
+  }, [menuOpen]);
+
   function closeMenu() {
     setMenuOpen(false);
   }
@@ -168,7 +179,10 @@ export default function CutineoSiteHeader({
 
         <div className="cutineo-site-actions">
           <a className="cutineo-site-login" href={loginHref} onClick={(event) => handleAction(event, onLogin)}>{loginLabel}</a>
-          <a className="cutineo-site-cta" href={startHref} data-cta="header-start" onClick={(event) => handleAction(event, onStart)}>{startLabel}</a>
+          <a className="cutineo-site-cta" href={startHref} data-cta="header-start" onClick={(event) => handleAction(event, onStart)}>
+            <span className="cutineo-cta-full">{startLabel}</span>
+            <span className="cutineo-cta-short">เริ่มต้น</span>
+          </a>
           {languageButton('cutineo-desktop-language')}
         </div>
 

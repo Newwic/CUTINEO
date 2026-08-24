@@ -4,6 +4,7 @@
 import { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { integrations, integrationCategories, type IntegrationStatus } from '../../config/integrations';
+import { MotionGroup, MotionReveal } from '../motion/ScrollReveal';
 import styles from './HomepageV2.module.css';
 
 function StatusBadge({ status }: { status: IntegrationStatus }) {
@@ -26,7 +27,7 @@ export default function IntegrationStrip({ compact = false }: IntegrationStripPr
     <section className={styles.integrationSection} id="integrations" aria-labelledby="integration-title">
       <div className={styles.sectionShell}>
         <div className={styles.sectionKicker}>CONNECT YOUR WORKSPACE</div>
-        <div className={styles.integrationHeadingRow}>
+        <MotionReveal className={styles.integrationHeadingRow} delay={60}>
           <div>
             <h2 id="integration-title">เชื่อมต่อช่องทางที่ลูกค้าของคุณใช้อยู่</h2>
             <p>ดูสถานะตาม adapter ที่มีในระบบจริง ช่องที่ยังไม่พร้อมจะถูกระบุเป็น Beta หรือเร็ว ๆ นี้อย่างชัดเจน</p>
@@ -37,8 +38,8 @@ export default function IntegrationStrip({ compact = false }: IntegrationStripPr
               <button type="button" className={activeCategory === category.id ? styles.filterActive : ''} onClick={() => setActiveCategory(category.id)} key={category.id}>{category.label}</button>
             ))}
           </div>
-        </div>
-        <div className={styles.integrationGrid}>
+        </MotionReveal>
+        <MotionGroup className={styles.integrationGrid} delay={120}>
           {displayedIntegrations.map((integration) => (
             <article className={styles.integrationCard} key={integration.id}>
               <div className={styles.integrationLogo}><img src={integration.logo} alt={`${integration.name} logo`} width="32" height="32" loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} /></div>
@@ -48,7 +49,7 @@ export default function IntegrationStrip({ compact = false }: IntegrationStripPr
               </div>
             </article>
           ))}
-        </div>
+        </MotionGroup>
         <p className={styles.trademarkNote}>ชื่อ ผลิตภัณฑ์ โลโก้ และเครื่องหมายการค้าของบุคคลที่สามเป็นทรัพย์สินของเจ้าของแต่ละราย การแสดงเครื่องหมายดังกล่าวใช้เพื่อระบุบริการที่ CUTINEO รองรับหรือมีแผนรองรับ และไม่ได้หมายถึงการรับรอง CUTINEO โดยเจ้าของเครื่องหมายการค้า</p>
       </div>
     </section>

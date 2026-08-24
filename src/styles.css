@@ -838,3 +838,37 @@ button:focus-visible, a:focus-visible { outline: 3px solid rgba(35, 196, 178, .4
   .ai-boost-price { min-width: 0; text-align: left; }
   .ai-boost-price span { white-space: normal; }
 }
+
+/* Shared public-header motion: compact without changing its anchor position. */
+.cutineo-site-header-inner {
+  transition: min-height .28s ease, padding .28s ease;
+}
+
+.cutineo-site-header.is-scrolled .cutineo-site-header-inner {
+  min-height: 64px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.cutineo-cta-short { display: none; }
+
+@media (max-width: 880px) {
+  .cutineo-site-header.is-scrolled .cutineo-site-header-inner {
+    min-height: 58px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+}
+
+@media (max-width: 560px) {
+  .cutineo-site-header.is-scrolled .cutineo-site-header-inner {
+    min-height: 54px;
+  }
+
+  .cutineo-cta-full { display: none; }
+  .cutineo-cta-short { display: inline; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cutineo-site-header-inner { transition: none; }
+}

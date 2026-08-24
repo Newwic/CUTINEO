@@ -20,7 +20,7 @@ import { NEO_LOGO_PATH } from '../../lib/branding';
 import styles from './ScrollStory.module.css';
 
 export interface ScrollStoryStep {
-  id: 'channels' | 'inbox' | 'ai-reply' | 'memory' | 'quotation' | 'followup';
+  id: 'channels' | 'inbox' | 'ai-reply' | 'memory' | 'quotation' | 'followup' | 'close';
   number: string;
   eyebrow: string;
   title: string;
@@ -69,6 +69,13 @@ export const scrollStorySteps: ScrollStoryStep[] = [
     eyebrow: 'AI FOLLOW-UP',
     title: 'ไม่พลาดการ Follow-up',
     description: 'ถ้าส่งราคาแล้วลูกค้าเงียบ CUTINEO ช่วยเตือนและร่างข้อความติดตาม เพื่อให้ทุกดีลมี Next step',
+  },
+  {
+    id: 'close',
+    number: '07',
+    eyebrow: 'THE CUTINEO LOOP',
+    title: 'จากข้อความแรกจนถึงการปิดการขาย',
+    description: 'ทุกแชท ข้อมูลลูกค้า ใบเสนอราคา และ Follow-up เชื่อมต่อกันในที่เดียว เพื่อให้ทีมเห็นภาพเดียวกันและเดินดีลต่อได้',
   },
 ];
 
@@ -123,6 +130,7 @@ function StoryVisual({ activeStep }: { activeStep: number }) {
         <Scene visible={safeStep === 3}><MemoryScene /></Scene>
         <Scene visible={safeStep === 4}><QuotationScene /></Scene>
         <Scene visible={safeStep === 5}><FollowUpScene /></Scene>
+        <Scene visible={safeStep === 6}><CloseScene /></Scene>
       </div>
 
       <ol className={styles.storyProgress} aria-label="ความคืบหน้าของ Product Story">
@@ -276,7 +284,36 @@ function FollowUpScene() {
   );
 }
 
-export default function ScrollStory() {
+function CloseScene() {
+  const closeItems = [
+    { label: 'ทุกแชท', value: 'Unified Inbox', icon: MessageCircle },
+    { label: 'ทุกข้อมูลลูกค้า', value: 'AI Memory', icon: UserRound },
+    { label: 'ทุกใบเสนอราคา', value: 'Quotation', icon: FileText },
+    { label: 'ทุก Follow-up', value: 'Next step', icon: Clock3 },
+  ];
+
+  return (
+    <div className={styles.closeScene}>
+      <div className={styles.closeHeader}>
+        <div className={styles.closeBrand}><img src={NEO_LOGO_PATH} alt="" width="34" height="34" /><div><span>CUTINEO WORKSPACE</span><strong>ดีลนี้พร้อมปิดการขาย</strong></div></div>
+        <span className={styles.closeBadge}><CheckCircle2 size={13} /> Closed</span>
+      </div>
+      <div className={styles.closeGrid}>
+        {closeItems.map(({ label, value, icon: Icon }) => (
+          <div className={styles.closeItem} key={label}><span><Icon size={15} /></span><small>{label}</small><strong>{value}</strong></div>
+        ))}
+      </div>
+      <div className={styles.closeStatement}><Sparkles size={17} /><div><strong>จากข้อความแรก จนถึงการปิดการขาย</strong><span>อยู่ในที่เดียวกับ CUTINEO</span></div></div>
+    </div>
+  );
+}
+
+interface ScrollStoryProps {
+  signupHref?: string;
+  detailsHref?: string;
+}
+
+export default function ScrollStory({ signupHref = '/signup?plan=Starter', detailsHref = '/ai-sales' }: ScrollStoryProps) {
   const [activeStep, setActiveStep] = useState(0);
   const stepRefs = useRef<Array<HTMLElement | null>>([]);
 
@@ -347,7 +384,10 @@ export default function ScrollStory() {
         <div className={styles.storyConclusion}>
           <div className={styles.conclusionIcon}><img src={NEO_LOGO_PATH} alt="CUTINEO" width="42" height="42" /></div>
           <div><span>THE CUTINEO LOOP</span><strong>ทุกแชท → ทุกดีล → ในระบบเดียว</strong><p>จาก Inbox ถึง AI Sales Workflow ทีมเห็นภาพเดียวกันและเดินงานต่อได้ทันที</p></div>
-          <ArrowRight className={styles.conclusionArrow} size={24} aria-hidden="true" />
+          <div className={styles.storyConclusionActions}>
+            <a className={styles.storyConclusionPrimary} href={signupHref}>เริ่มต้นใช้งาน <ArrowRight size={14} /></a>
+            <a className={styles.storyConclusionLink} href={detailsHref}>ดู AI Sales</a>
+          </div>
         </div>
       </div>
     </section>

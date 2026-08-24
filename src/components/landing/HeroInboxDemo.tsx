@@ -41,6 +41,7 @@ export default function HeroInboxDemo() {
   const [sentMessage, setSentMessage] = useState('');
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return undefined;
     const timer = window.setInterval(() => setReplyIndex((current) => (current + 1) % replies.length), 3600);
     return () => window.clearInterval(timer);
   }, []);
