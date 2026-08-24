@@ -6,7 +6,7 @@
   --mint: #e9fbf7;
   --line: #dfebe9;
   min-width: 0;
-  overflow: hidden;
+  overflow: clip;
   background: #fbfefd;
   color: var(--navy);
   font-family: "Noto Sans Thai", "DM Sans", Inter, ui-sans-serif, system-ui, sans-serif;
