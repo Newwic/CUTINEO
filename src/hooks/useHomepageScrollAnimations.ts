@@ -29,13 +29,21 @@ export function useHomepageScrollAnimations(rootRef: RefObject<HTMLElement | nul
 
     if (prefersReducedMotion()) {
       root.classList.add('motion-reduced');
+      root.dataset.motionReduced = 'true';
       const progress = root.querySelector<HTMLElement>('[data-scroll-progress] > span');
       if (progress) progress.style.transform = 'scaleX(1)';
-      return () => root.classList.remove('motion-reduced');
+      return () => {
+        root.classList.remove('motion-reduced');
+        delete root.dataset.motionReduced;
+      };
     }
 
     registerScrollTrigger();
     root.classList.add('motion-gsap-ready');
+    // Keep the runtime flag outside React's className reconciliation. The
+    // PWA provider updates its context after mount, and React can otherwise
+    // overwrite an imperative class on the page root.
+    root.dataset.motionGsapReady = 'true';
 
     const context = gsap.context(() => {
       const progress = root.querySelector<HTMLElement>('[data-scroll-progress] > span');
@@ -111,12 +119,15 @@ export function useHomepageScrollAnimations(rootRef: RefObject<HTMLElement | nul
           const hubY = hubRect.top + hubRect.height / 2;
           channels.forEach((channel, index) => {
             const rect = channel.getBoundingClientRect();
-            const multiplier = .48 + (index % 3) * .06;
+            // Keep the orbit readable while still hinting that channels are
+            // being pulled into the unified inbox. A full convergence made
+            // the floating cards sit on top of the dashboard content.
+            const multiplier = .28 + (index % 3) * .04;
             gsap.to(channel, {
               x: (hubX - (rect.left + rect.width / 2)) * multiplier,
               y: (hubY - (rect.top + rect.height / 2)) * multiplier,
-              scale: .76,
-              opacity: .3,
+              scale: .84,
+              opacity: .58,
               ease: 'none',
               scrollTrigger: { trigger: hero, start: 'top top', end: '+=620', scrub: 1 },
             });
@@ -247,6 +258,7 @@ export function useHomepageScrollAnimations(rootRef: RefObject<HTMLElement | nul
     return () => {
       window.cancelAnimationFrame(refreshFrame);
       root.classList.remove('motion-gsap-ready');
+      delete root.dataset.motionGsapReady;
       context.revert();
     };
   }, [rootRef]);

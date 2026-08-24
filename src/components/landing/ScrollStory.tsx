@@ -122,14 +122,17 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
   const depth = Math.round(progress * 100).toString().padStart(2, '0');
   const demoStateIndex = progress < .18 ? 0 : progress < .38 ? 1 : progress < .58 ? 2 : progress < .78 ? 3 : 4;
   const demoState = portalDemoStates[demoStateIndex];
-  const outerScale = phase(progress, 0, 0.34, 1, 15);
-  const outerOpacity = 1 - smoothStep((progress - 0.2) / 0.16);
-  const windowScale = phase(progress, 0.12, 0.56, 0.16, 15);
-  const windowOpacity = Math.min(1, 0.28 + smoothStep((progress - 0.08) / 0.16)) * (1 - smoothStep((progress - 0.39) / 0.18));
-  const gateScale = phase(progress, 0.37, 0.79, 0.11, 15);
-  const gateOpacity = smoothStep((progress - 0.32) / 0.14) * (1 - smoothStep((progress - 0.65) / 0.18));
-  const finalScale = phase(progress, 0.67, 0.9, 0.09, 1.03);
-  const finalOpacity = smoothStep((progress - 0.63) / 0.19);
+  // Keep each portal readable before it dives. The previous timings made the
+  // next layer visible while the current layer was already several times
+  // larger than the viewport, which turned the story into visual noise.
+  const outerScale = phase(progress, 0.08, 0.52, 1, 15);
+  const outerOpacity = 1 - smoothStep((progress - 0.34) / 0.14);
+  const windowScale = phase(progress, 0.33, 0.72, 0.12, 15);
+  const windowOpacity = smoothStep((progress - 0.30) / 0.12) * (1 - smoothStep((progress - 0.58) / 0.14));
+  const gateScale = phase(progress, 0.57, 0.9, 0.12, 12);
+  const gateOpacity = smoothStep((progress - 0.55) / 0.12) * (1 - smoothStep((progress - 0.76) / 0.14));
+  const finalScale = phase(progress, 0.75, 0.98, 0.1, 1.02);
+  const finalOpacity = smoothStep((progress - 0.75) / 0.14);
 
   return (
     <div className={styles.portalFrame} data-story-frame data-demo-state={demoState.id} aria-label={`ภาพจำลอง Product Story ขั้นตอนที่ ${scrollStorySteps[activeStep].number}`}>
@@ -253,7 +256,13 @@ export default function ScrollStory({ signupHref = '/signup?plan=Starter', detai
       const visualHeight = frameElement?.offsetHeight || Math.round(window.innerHeight * 0.72);
       const travel = Math.max(1, layout.offsetHeight - visualHeight - stickyTop);
       const nextProgress = clamp((stickyTop - rect.top) / travel);
-      const nextStep = Math.min(scrollStorySteps.length - 1, Math.floor(nextProgress * scrollStorySteps.length));
+      // The copy card is taller than the sticky viewport. Shift the active
+      // marker slightly forward so the card currently entering the viewport
+      // is the one the user can actually read.
+      const nextStep = Math.min(
+        scrollStorySteps.length - 1,
+        Math.floor(Math.min(0.999, nextProgress + 0.065) * scrollStorySteps.length),
+      );
 
       if (stage) stage.style.setProperty('--portal-progress', String(nextProgress));
       if (Math.abs(nextProgress - lastProgress) > 0.001) {
