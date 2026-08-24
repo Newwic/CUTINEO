@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Clock3,
   FileText,
-  MessageCircle,
   Send,
   Sparkles,
   UserRound,
@@ -21,7 +20,6 @@ import styles from './ScrollStory.module.css';
 
 export interface ScrollStoryStep {
   id: 'channels' | 'inbox' | 'ai-reply' | 'memory' | 'quotation' | 'followup' | 'close';
-  number: string;
   eyebrow: string;
   title: string;
   description: string;
@@ -30,49 +28,42 @@ export interface ScrollStoryStep {
 export const scrollStorySteps: ScrollStoryStep[] = [
   {
     id: 'channels',
-    number: '01',
     eyebrow: 'เริ่มจากทุกช่องทาง',
     title: 'ลูกค้าทักจากทุกช่องทาง',
     description: 'LINE, Facebook, Instagram, Gmail และช่องทางอื่น ๆ ไหลเข้าสู่ CUTINEO โดยเห็นสถานะการรองรับอย่างชัดเจน',
   },
   {
     id: 'inbox',
-    number: '02',
     eyebrow: 'ONE WORKSPACE',
     title: 'รวมทุกข้อความไว้ใน Inbox เดียว',
     description: 'ทีมไม่ต้องเปิดหลายแอป ทุกบทสนทนาอยู่ใน Workspace เดียว พร้อมบริบทที่ส่งต่องานได้ทันที',
   },
   {
     id: 'ai-reply',
-    number: '03',
     eyebrow: 'AI AUTO REPLY',
     title: 'AI ช่วยตอบลูกค้า',
     description: 'ใช้ข้อมูลสินค้า FAQ และ Knowledge Base ช่วยร่างคำตอบได้เร็วขึ้น โดยทีมยังเป็นผู้ตรวจสอบก่อนส่ง',
   },
   {
     id: 'memory',
-    number: '04',
     eyebrow: 'AI SALES MEMORY',
     title: 'AI จำลูกค้าได้',
     description: 'รู้ว่าลูกค้าเคยถามอะไร สนใจสินค้าไหน และดีลอยู่ขั้นตอนไหน เพื่อให้ทุกคนในทีมตอบต่อได้อย่างต่อเนื่อง',
   },
   {
     id: 'quotation',
-    number: '05',
     eyebrow: 'QUOTATION FLOW',
     title: 'สร้างใบเสนอราคาจากบทสนทนา',
     description: 'AI ช่วยเตรียม Quotation Draft จากข้อมูลในแชท ให้ฝ่ายขายตรวจและอนุมัติก่อนส่งได้เร็วขึ้น',
   },
   {
     id: 'followup',
-    number: '06',
     eyebrow: 'AI FOLLOW-UP',
     title: 'ไม่พลาดการ Follow-up',
     description: 'ถ้าส่งราคาแล้วลูกค้าเงียบ CUTINEO ช่วยเตือนและร่างข้อความติดตาม เพื่อให้ทุกดีลมี Next step',
   },
   {
     id: 'close',
-    number: '07',
     eyebrow: 'THE CUTINEO LOOP',
     title: 'จากข้อความแรกจนถึงการปิดการขาย',
     description: 'ทุกแชท ข้อมูลลูกค้า ใบเสนอราคา และ Follow-up เชื่อมต่อกันในที่เดียว เพื่อให้ทีมเห็นภาพเดียวกันและเดินดีลต่อได้',
@@ -80,11 +71,10 @@ export const scrollStorySteps: ScrollStoryStep[] = [
 ];
 
 const portalDemoStates = [
+  { id: 'channels', label: 'CHANNELS' },
   { id: 'inbox', label: 'UNIFIED INBOX' },
-  { id: 'crm', label: 'CRM' },
   { id: 'neo', label: 'NEO AI' },
-  { id: 'automation', label: 'AUTOMATION' },
-  { id: 'analytics', label: 'ANALYTICS' },
+  { id: 'close', label: 'DEAL CLOSED' },
 ] as const;
 
 const storyChannelIds = ['line', 'facebook', 'instagram', 'gmail', 'outlook'];
@@ -119,26 +109,25 @@ function ChannelLogo({ integration }: { integration: Integration }) {
 }
 
 function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; progress: number; stageRef: StageRef }) {
-  const depth = Math.round(progress * 100).toString().padStart(2, '0');
-  const demoStateIndex = progress < .18 ? 0 : progress < .38 ? 1 : progress < .58 ? 2 : progress < .78 ? 3 : 4;
+  const demoStateIndex = progress < .23 ? 0 : progress < .48 ? 1 : progress < .73 ? 2 : 3;
   const demoState = portalDemoStates[demoStateIndex];
-  // Keep every panel readable at viewport scale. The story now moves through
-  // the product with a restrained fade/slide handoff instead of a zoom dive.
-  const outerScale = phase(progress, 0, 0.2, 1, 1.01);
-  const outerOpacity = 1 - smoothStep((progress - 0.14) / 0.08);
-  const outerY = phase(progress, 0, 0.14, 0, -12);
-  const windowScale = phase(progress, 0.16, 0.24, 0.985, 1);
-  const windowOpacity = smoothStep((progress - 0.16) / 0.08) * (1 - smoothStep((progress - 0.32) / 0.08));
-  const windowY = phase(progress, 0.14, 0.24, 22, 0);
-  const gateScale = phase(progress, 0.32, 0.4, 0.985, 1);
-  const gateOpacity = smoothStep((progress - 0.32) / 0.08) * (1 - smoothStep((progress - 0.52) / 0.08));
-  const gateX = phase(progress, 0.3, 0.4, -22, 0);
-  const finalScale = phase(progress, 0.52, 0.6, 0.985, 1);
-  const finalOpacity = smoothStep((progress - 0.52) / 0.08);
-  const finalY = phase(progress, 0.5, 0.6, 22, 0);
+  // Each scene keeps the same footprint so only the product state changes.
+  // This gives the scroll story a calm, readable handoff instead of stacked cards.
+  const outerScale = phase(progress, 0, 0.18, 0.985, 1.01);
+  const outerOpacity = 1 - smoothStep((progress - 0.18) / 0.08);
+  const outerY = phase(progress, 0, 0.18, 0, -14);
+  const windowScale = phase(progress, 0.18, 0.27, 0.97, 1);
+  const windowOpacity = smoothStep((progress - 0.18) / 0.08) * (1 - smoothStep((progress - 0.43) / 0.08));
+  const windowY = phase(progress, 0.18, 0.27, 24, 0);
+  const gateScale = phase(progress, 0.43, 0.52, 0.97, 1);
+  const gateOpacity = smoothStep((progress - 0.43) / 0.08) * (1 - smoothStep((progress - 0.68) / 0.08));
+  const gateX = phase(progress, 0.43, 0.52, -24, 0);
+  const finalScale = phase(progress, 0.68, 0.77, 0.97, 1);
+  const finalOpacity = smoothStep((progress - 0.68) / 0.08);
+  const finalY = phase(progress, 0.68, 0.77, 24, 0);
 
   return (
-    <div className={styles.portalFrame} data-story-frame data-demo-state={demoState.id} aria-label={`ภาพจำลอง Product Story ขั้นตอนที่ ${scrollStorySteps[activeStep].number}`}>
+    <div className={styles.portalFrame} data-story-frame data-demo-state={demoState.id} aria-label={`ภาพจำลอง Product Story: ${scrollStorySteps[activeStep].eyebrow}`}>
       <div className={styles.portalTopbar}>
         <div className={styles.portalWindowDots} aria-hidden="true"><span /><span /><span /></div>
         <span className={styles.portalTopLabel}>CUTINEO / PRODUCT STORY</span>
@@ -154,13 +143,13 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
 
         <div className={`${styles.portalLayer} ${styles.portalDoorLayer}`} style={layerStyle(outerScale, outerOpacity, 0, 0, outerY)}>
           <div className={styles.portalDoorFrame}>
-            <div className={styles.portalLayerMeta}><span>01 / INCOMING</span><span>CHANNEL PORTAL</span></div>
+            <div className={styles.portalLayerMeta}><span>INCOMING</span><span>CHANNELS</span></div>
             <div className={styles.portalDoorHeading}><span className={styles.portalEyebrow}>THE FIRST MESSAGE</span><strong>ทุกข้อความ<br /><em>มีโอกาสขาย</em></strong></div>
             <div className={styles.portalChannelGrid}>
               {storyChannels.slice(0, 4).map((integration, index) => (
                 <div className={styles.portalChannel} key={integration.id}>
                   <span className={styles.portalChannelIcon}><ChannelLogo integration={integration} /></span>
-                  <span><strong>{integration.name}</strong><small>{index === 0 ? 'ข้อความใหม่ · 04' : 'connected'}</small></span>
+                  <span><strong>{integration.name}</strong><small>{index === 0 ? 'ข้อความใหม่' : 'connected'}</small></span>
                   <i />
                 </div>
               ))}
@@ -171,7 +160,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
 
         <div className={`${styles.portalLayer} ${styles.portalWindowLayer}`} style={layerStyle(windowScale, windowOpacity, -0.5, 0, windowY)}>
           <div className={styles.portalWindowShell}>
-            <div className={styles.portalLayerMeta}><span>02 / UNIFIED INBOX</span><span className={styles.portalGreenText}>4 NEW</span></div>
+            <div className={styles.portalLayerMeta}><span>UNIFIED INBOX</span><span className={styles.portalGreenText}>4 NEW</span></div>
             <div className={styles.portalInboxBody}>
               <div className={styles.portalInboxSide}>
                 <span className={styles.portalSideTitle}>INBOX</span>
@@ -194,7 +183,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
             <div className={styles.portalGateRings}><span /><span /><span /></div>
             <div className={styles.portalGateCore}>
               <span className={styles.portalGateIcon}><Sparkles size={17} /></span>
-              <span className={styles.portalEyebrow}>03 / NEO SALES ENGINE</span>
+              <span className={styles.portalEyebrow}>NEO SALES ENGINE</span>
               <strong>ตอบ · จำ · ตาม</strong>
               <p>AI เข้าใจบริบทของลูกค้า แล้วส่งต่องานขายให้ทีมได้ทันที</p>
               <div className={styles.portalGatePills}><span><Bot size={12} /> AI Reply</span><span><UserRound size={12} /> Memory</span><span><Clock3 size={12} /> Follow-up</span></div>
@@ -204,7 +193,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
 
         <div className={`${styles.portalLayer} ${styles.portalFinalLayer}`} style={layerStyle(finalScale, finalOpacity, 0, 0, finalY)}>
           <div className={styles.portalFinalShell}>
-            <div className={styles.portalFinalTop}><span>04 / DEAL CLOSED</span><b><CheckCircle2 size={12} /> CLOSED</b></div>
+            <div className={styles.portalFinalTop}><span>DEAL CLOSED</span><b><CheckCircle2 size={12} /> CLOSED</b></div>
             <div className={styles.portalFinalMark}><img src={NEO_LOGO_PATH} alt="" width="34" height="34" /></div>
             <span className={styles.portalEyebrow}>FROM FIRST MESSAGE TO CLOSED DEAL</span>
             <strong>ทุกแชท<br /><em>จบที่ดีล</em></strong>
@@ -213,9 +202,8 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
           </div>
         </div>
 
-        <div className={styles.portalDepth}><span>DEPTH</span><strong>{depth}<small>%</small></strong></div>
         <div className={`${styles.portalCorner} ${styles.portalCornerTop}`}>SCROLL / FLOW</div>
-        <div className={`${styles.portalCorner} ${styles.portalCornerBottom}`}>NEO SYSTEM 04</div>
+        <div className={`${styles.portalCorner} ${styles.portalCornerBottom}`}>NEO SYSTEM</div>
       </div>
 
       <div className={styles.portalBottomBar}>
@@ -226,7 +214,7 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
           {portalDemoStates.map((state, index) => <span className={index === demoStateIndex ? styles.portalStateActive : ''} key={state.id}>{state.label}</span>)}
         </div>
         <span className={styles.portalBottomHint}><ArrowDown size={13} /> เลื่อนเพื่อดูทุกขั้นตอน</span>
-        <span className={styles.portalBottomStep}>{scrollStorySteps[activeStep].number} / {scrollStorySteps[activeStep].eyebrow}</span>
+        <span className={styles.portalBottomStep}>{scrollStorySteps[activeStep].eyebrow}</span>
       </div>
     </div>
   );
@@ -315,7 +303,6 @@ export default function ScrollStory({ signupHref = '/signup?plan=Starter', detai
                 key={step.id}
               >
                 <div className={styles.storyStepCopy}>
-                  <span className={styles.stepNumber}>{step.number}</span>
                   <span className={styles.stepEyebrow}>{step.eyebrow}</span>
                   <h3>{step.title}</h3>
                   <p>{step.description}</p>
