@@ -4,6 +4,7 @@ import { LineAdapter } from '@/core/adapters/line.adapter';
 import { getUserFromRequest } from '@/lib/supabase/auth';
 import { enforceRateLimit } from '@/lib/rate-limit';
 import { requireSupabaseServer } from '@/lib/supabase/server';
+import { getTenantMemberships } from '@/lib/tenant-access';
 
 export const runtime = 'nodejs';
 
@@ -71,12 +72,18 @@ export async function POST(request: NextRequest) {
     const { conversationId, content, messageType, tenantId } = parsedBody.data;
 
     const db = requireSupabaseServer();
+    const memberships = await getTenantMemberships(db, user.id);
+    const tenantIds = memberships.map((membership) => membership.tenantId);
+    if (tenantIds.length === 0) {
+      return NextResponse.json({ error: 'You are not a member of a workspace' }, { status: 403 });
+    }
     const { data: conversation, error: conversationError } = await db
       .from('conversations')
       .select(
         'id, tenant_id, channel_id, contact_id, channels(id, tenant_id, platform, credentials)',
       )
       .eq('id', conversationId)
+      .in('tenant_id', tenantIds)
       .maybeSingle();
 
     if (conversationError) throw conversationError;

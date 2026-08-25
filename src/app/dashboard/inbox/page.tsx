@@ -18,7 +18,12 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { supabaseClient } from '@/lib/supabase/client';
+import {
+  bootstrapSupabaseSession,
+  clearSupabaseSession,
+  supabaseClient,
+} from '@/lib/supabase/client';
+import { clearPrivateCaches } from '@/lib/pwa/cache';
 import { NEO_LOGO_PATH } from '@/lib/branding';
 import ChatArea from './components/ChatArea';
 import ConversationList from './components/ConversationList';
@@ -124,6 +129,7 @@ export default function InboxPage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [isDemoMode, setIsDemoMode] = useState(false);
+  const [canManageSettings, setCanManageSettings] = useState(false);
   const [activeNav, setActiveNav] = useState('Conversations');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileConversationsOpen, setMobileConversationsOpen] = useState(false);
@@ -135,34 +141,34 @@ export default function InboxPage() {
     let mounted = true;
     const client = supabaseClient;
 
-    function setDemoPreview() {
-      if (!mounted) return;
-      setConversations(DEMO_CONVERSATIONS);
-      setActiveConvId((current) => current || DEMO_CONVERSATIONS[0].id);
-      setIsDemoMode(true);
-      setLoadError('');
-      setLoading(false);
+    function redirectToLogin() {
+      if (mounted) window.location.replace('/login?next=%2Finbox');
     }
 
     async function fetchLiveConversations() {
       if (!client) {
-        setDemoPreview();
+        setConversations([]);
+        setActiveConvId(null);
+        setLoadError('ระบบ Authentication ยังไม่ได้ตั้งค่า กรุณาติดต่อ Owner');
+        setLoading(false);
         return;
       }
 
-      const { data: sessionData } = await client.auth.getSession();
+      const session = await bootstrapSupabaseSession();
       if (!mounted) return;
-      if (!sessionData.session) {
-        setDemoPreview();
+      if (!session) {
+        redirectToLogin();
         return;
       }
 
-      const { data, error } = await client
-        .from('conversations')
-        .select(
-          'id, tenant_id, channel_id, contact_id, status, assigned_to, last_message_preview, last_message_at, created_at, updated_at, contacts(id, display_name, phone, email, avatar_url, tags, notes, created_at), channels(id, tenant_id, platform, name, is_active)',
-        )
-        .order('last_message_at', { ascending: false });
+      const response = await fetch('/api/inbox', { credentials: 'include', cache: 'no-store' });
+      const payload = await response.json().catch(() => null) as {
+        conversations?: unknown;
+        memberships?: Array<{ role?: string }>;
+        error?: string;
+      } | null;
+      const data = payload?.conversations;
+      const error = response.ok ? null : new Error(payload?.error || 'Unable to load inbox');
 
       if (!mounted) return;
       if (error) {
@@ -170,6 +176,7 @@ export default function InboxPage() {
         setConversations([]);
         setActiveConvId(null);
         setIsDemoMode(false);
+        setCanManageSettings(false);
         setLoadError(`โหลด conversations ไม่สำเร็จ: ${error.message}`);
         setLoading(false);
         return;
@@ -179,15 +186,17 @@ export default function InboxPage() {
         setConversations([]);
         setActiveConvId(null);
         setIsDemoMode(false);
+        setCanManageSettings(false);
         setLoadError('รูปแบบข้อมูล conversations จาก Supabase ไม่ถูกต้อง');
         setLoading(false);
         return;
       }
 
       if (data.length === 0) {
-        setConversations([]);
-        setActiveConvId(null);
-        setIsDemoMode(false);
+        setConversations(DEMO_CONVERSATIONS);
+        setActiveConvId(DEMO_CONVERSATIONS[0].id);
+        setIsDemoMode(true);
+        setCanManageSettings(Boolean(payload?.memberships?.some(({ role }) => role === 'owner' || role === 'admin')));
         setLoadError('ยังไม่พบ conversation ใน workspace นี้ หรือบัญชีนี้ยังไม่ได้เป็นสมาชิกของ tenant');
         setLoading(false);
         return;
@@ -196,6 +205,7 @@ export default function InboxPage() {
       setConversations(data);
       setActiveConvId((current) => current && data.some((item) => item.id === current) ? current : data[0].id);
       setIsDemoMode(false);
+      setCanManageSettings(Boolean(payload?.memberships?.some(({ role }) => role === 'owner' || role === 'admin')));
       setLoading(false);
     }
 
@@ -217,7 +227,7 @@ export default function InboxPage() {
       .subscribe();
 
     const authSubscription = client.auth.onAuthStateChange((_event, session) => {
-      if (!session) setDemoPreview();
+      if (!session) redirectToLogin();
       else void fetchLiveConversations();
     });
 
@@ -226,6 +236,20 @@ export default function InboxPage() {
       void client.removeChannel(realtime);
       authSubscription.data.subscription.unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    async function verifyRestoredPage() {
+      const response = await fetch('/api/auth/session', { credentials: 'include', cache: 'no-store' });
+      if (!response.ok) window.location.replace('/login?next=%2Finbox');
+    }
+
+    function handlePageShow(event: PageTransitionEvent) {
+      if (event.persisted) void verifyRestoredPage();
+    }
+
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
   }, []);
 
   useEffect(() => {
@@ -280,12 +304,24 @@ export default function InboxPage() {
     }
   }
 
+  async function handleSecureSignOut() {
+    try {
+      await clearSupabaseSession();
+      await clearPrivateCaches();
+    } finally {
+      window.location.replace('/login');
+    }
+  }
+
   async function signOut() {
+    await handleSecureSignOut();
+    return;
+
     if (!supabaseClient) {
       setNotice('กำลังดูอยู่ใน Demo mode — ยังไม่มี session ให้ sign out');
       return;
     }
-    await supabaseClient.auth.signOut();
+    await supabaseClient?.auth.signOut();
     setNotice('ออกจากระบบแล้ว');
   }
 
@@ -324,7 +360,7 @@ export default function InboxPage() {
       <aside className={`cutineo-sidebar ${mobileNavOpen ? 'is-mobile-open' : ''}`} aria-label="เมนูหลัก">
         <div className="sidebar-top">
           <div className="sidebar-brand-row">
-            <Link href="/" className="sidebar-brand" aria-label="CUTINEO home">
+            <Link href={"/inbox" as never} className="sidebar-brand" aria-label="CUTINEO Inbox">
               <Image
                 className="brand-logo"
                 src={NEO_LOGO_PATH}
@@ -442,7 +478,12 @@ export default function InboxPage() {
 
       <div className="topbar-status" aria-label="สถานะระบบ">
         <span className="system-online-dot" />
-        <span>{isDemoMode ? 'Demo preview' : 'Live workspace'}</span>
+        <span>{isDemoMode ? 'ยังไม่ได้เชื่อมต่อช่องทาง' : 'Live workspace'}</span>
+        {isDemoMode && canManageSettings && (
+          <Link href={"/settings" as never} className="inbox-settings-link">
+            ตั้งค่าช่องทาง
+          </Link>
+        )}
         <Bell size={15} aria-hidden="true" />
       </div>
 

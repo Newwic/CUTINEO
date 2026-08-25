@@ -97,7 +97,7 @@ export default function CustomerChatWidget({ apiUrl = '/api/chat-stream' }: Cust
 
   useEffect(() => () => abortRef.current?.abort(), []);
 
-  if (pathname?.startsWith('/dashboard/inbox')) return null;
+  if (pathname?.startsWith('/inbox') || pathname?.startsWith('/dashboard/inbox')) return null;
 
   const stopStreaming = () => {
     abortRef.current?.abort();

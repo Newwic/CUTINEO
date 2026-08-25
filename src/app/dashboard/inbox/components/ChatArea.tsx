@@ -16,7 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { supabaseClient } from '@/lib/supabase/client';
+import { getCurrentSupabaseSession, supabaseClient } from '@/lib/supabase/client';
 import { NEO_LOGO_PATH } from '@/lib/branding';
 import {
   messageRole,
@@ -201,11 +201,18 @@ export default function ChatArea({
     setMessages([]);
 
     async function fetchMessages() {
-      const { data, error: fetchError } = await liveClient
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
+      const session = await getCurrentSupabaseSession();
+      if (!session) {
+        setError('Session หมดอายุ กรุณาเข้าสู่ระบบใหม่');
+        return;
+      }
+      const response = await fetch(`/api/inbox/${encodeURIComponent(conversationId)}/messages`, {
+        credentials: 'include',
+        cache: 'no-store',
+      });
+      const payload = await response.json().catch(() => null) as { messages?: unknown; error?: string } | null;
+      const data = payload?.messages;
+      const fetchError = response.ok ? null : new Error(payload?.error || 'Unable to load messages');
 
       if (!mounted) return;
       if (fetchError) {
@@ -263,15 +270,14 @@ export default function ChatArea({
 
   async function persistLiveMessage(localId: string, content: string) {
     if (conversation.isDemo || !supabaseClient) return;
-    const { data: sessionData } = await supabaseClient.auth.getSession();
-    if (!sessionData.session) return;
+    const session = await getCurrentSupabaseSession();
+    if (!session) return;
 
     try {
       const response = await fetch('/api/messages/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${sessionData.session.access_token}`,
         },
         body: JSON.stringify({
           conversationId: conversation.id,
@@ -361,14 +367,13 @@ export default function ChatArea({
     onNotice?.(nextValue ? 'Neo AI กลับมาดูแลห้องนี้แล้ว' : 'หยุด Neo AI ชั่วคราวสำหรับห้องนี้แล้ว');
 
     if (conversation.isDemo || !supabaseClient) return;
-    const { data: sessionData } = await supabaseClient.auth.getSession();
-    if (!sessionData.session) return;
+    const session = await getCurrentSupabaseSession();
+    if (!session) return;
     try {
       const response = await fetch('/api/conversations/assignment', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${sessionData.session.access_token}`,
         },
         body: JSON.stringify({
           conversationId: conversation.id,

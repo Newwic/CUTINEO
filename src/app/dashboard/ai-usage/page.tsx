@@ -3,7 +3,7 @@
 import NextLink from 'next/link';
 import { ArrowLeft, ArrowUpRight, CheckCircle2, CircleDollarSign, Sparkles } from 'lucide-react';
 import { useEffect, useState, type ReactNode } from 'react';
-import { supabaseClient } from '@/lib/supabase/client';
+import { getCurrentSupabaseSession, supabaseClient } from '@/lib/supabase/client';
 
 function Link({ href, children, className }: { href: string; children: ReactNode; className?: string }) {
   return <NextLink href={href as never} className={className}>{children}</NextLink>;
@@ -20,9 +20,9 @@ export default function CustomerAIUsagePage() {
     let mounted = true;
     async function load() {
       if (!supabaseClient) return;
-      const { data } = await supabaseClient.auth.getSession();
-      if (!data.session) return;
-      const response = await fetch('/api/billing/usage', { headers: { Authorization: `Bearer ${data.session.access_token}` } });
+      const session = await getCurrentSupabaseSession();
+      if (!session) return;
+      const response = await fetch('/api/billing/usage', { credentials: 'include', cache: 'no-store' });
       if (!response.ok) return;
       const result = await response.json() as { usage?: Usage };
       if (mounted && result.usage) { setUsage(result.usage); setDemo(false); }
@@ -32,9 +32,9 @@ export default function CustomerAIUsagePage() {
   }, []);
   async function buyBoost() {
     if (demo || !supabaseClient) { setNotice('Demo mode: เชื่อมบัญชีจริงเพื่อซื้อ AI Boost'); return; }
-    const { data } = await supabaseClient.auth.getSession();
-    if (!data.session) return;
-    const response = await fetch('/api/billing/ai-boost', { method: 'POST', headers: { Authorization: `Bearer ${data.session.access_token}`, 'Content-Type': 'application/json' }, body: '{}' });
+    const session = await getCurrentSupabaseSession();
+    if (!session) return;
+    const response = await fetch('/api/billing/ai-boost', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: '{}' });
     const result = await response.json().catch(() => ({})) as { message?: string; error?: string };
     setNotice(result.message ?? result.error ?? 'สร้างคำขอแล้ว');
   }

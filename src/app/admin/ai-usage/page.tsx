@@ -1,9 +1,13 @@
 'use client';
 
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { ArrowLeft, BarChart3, CircleDollarSign, MessageSquare, RefreshCw, Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { supabaseClient } from '@/lib/supabase/client';
+import { getCurrentSupabaseSession, supabaseClient } from '@/lib/supabase/client';
+
+function Link({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) {
+  return <NextLink href={href as never} className={className}>{children}</NextLink>;
+}
 
 type CompanyUsage = {
   companyId: string;
@@ -41,9 +45,11 @@ export default function AIUsageAdminPage() {
     async function load() {
       setLoading(true);
       if (!supabaseClient) { setError('ต้องตั้งค่า Supabase ก่อนใช้ Admin AI Usage'); setLoading(false); return; }
+      const session = await getCurrentSupabaseSession();
+      if (!session) { setError('Authentication required'); setLoading(false); return; }
       const { data } = await supabaseClient.auth.getSession();
       if (!data.session) { setError('กรุณาเข้าสู่ระบบด้วยบัญชี Admin'); setLoading(false); return; }
-      const response = await fetch(`/api/admin/ai-usage?sort=${sort}`, { headers: { Authorization: `Bearer ${data.session.access_token}` } });
+      const response = await fetch(`/api/admin/ai-usage?sort=${sort}`, { credentials: 'include', cache: 'no-store' });
       const result = await response.json().catch(() => ({})) as DashboardPayload & { error?: string };
       if (!mounted) return;
       if (!response.ok) setError(result.error ?? 'โหลดข้อมูลไม่สำเร็จ');

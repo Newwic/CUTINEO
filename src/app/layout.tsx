@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import CustomerChatWidget from '../components/CustomerChatWidget';
 import { PwaProvider } from '../components/pwa/PwaProvider';
+import AuthSessionBridge from '../components/auth/AuthSessionBridge';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://newwic.github.io/CUTINEO/'),
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="th">
       <body>
         <PwaProvider serviceWorkerPath="/sw.js">
+          <AuthSessionBridge />
           {children}
           <CustomerChatWidget />
         </PwaProvider>

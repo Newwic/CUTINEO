@@ -1,26 +1,19 @@
-import type { Metadata } from 'next';
-import HomepageV2 from '@/components/landing/HomepageV2';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import {
+  CUTINEO_ACCESS_COOKIE,
+  CUTINEO_REFRESH_COOKIE,
+  getUserFromCookieTokens,
+} from '@/lib/supabase/session';
 
-export const metadata: Metadata = {
-  title: 'CUTINEO — รวมทุกแชท พร้อม AI ช่วยขาย',
-  description: 'รวม LINE, Facebook, Instagram, Email และช่องทางลูกค้าไว้ใน Inbox เดียว พร้อม AI ช่วยตอบ จำ ติดตาม และจัดการงานขาย',
-};
+export const dynamic = 'force-dynamic';
 
-const structuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
-  name: 'CUTINEO',
-  applicationCategory: 'BusinessApplication',
-  operatingSystem: 'Web',
-  description: 'รวมทุกแชท พร้อม AI ช่วยขาย',
-  offers: { '@type': 'AggregateOffer', priceCurrency: 'THB', lowPrice: '490', offerCount: '4' },
-};
-
-export default function HomePage() {
-  return (
-    <>
-      <HomepageV2 basePath="" signupRoute="signup" loginRoute="login" />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
-    </>
+/** The product entry point is auth-only; the public marketing pages keep their own routes. */
+export default async function HomePage() {
+  const cookieStore = cookies();
+  const user = await getUserFromCookieTokens(
+    cookieStore.get(CUTINEO_ACCESS_COOKIE)?.value,
+    cookieStore.get(CUTINEO_REFRESH_COOKIE)?.value,
   );
+  redirect(user ? '/inbox' : '/login');
 }

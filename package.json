@@ -8,7 +8,8 @@
     "build:pages": "vite build",
     "start": "next start",
     "lint": "next lint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/auth-flow.test.mjs"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
@@ -31,7 +32,7 @@
     "@vitejs/plugin-react": "^5.0.2",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.1",
-    "eslint-config-next": "14.2.24",
+    "eslint-config-next": "14.2.35",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.2",

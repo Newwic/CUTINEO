@@ -2,7 +2,7 @@
 
 import { Sparkles } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { supabaseClient } from '@/lib/supabase/client';
+import { getCurrentSupabaseSession, supabaseClient } from '@/lib/supabase/client';
 
 interface Usage {
   used: number;
@@ -35,11 +35,9 @@ export default function AIUsageCard({ onNotice }: { onNotice?: (message: string)
     let mounted = true;
     async function loadUsage() {
       if (!supabaseClient) return;
-      const { data } = await supabaseClient.auth.getSession();
-      if (!data.session) return;
-      const response = await fetch('/api/billing/usage', {
-        headers: { Authorization: `Bearer ${data.session.access_token}` },
-      });
+      const session = await getCurrentSupabaseSession();
+      if (!session) return;
+      const response = await fetch('/api/billing/usage', { credentials: 'include', cache: 'no-store' });
       if (!response.ok) return;
       const payload = await response.json() as { usage?: Usage };
       if (mounted && payload.usage) {
@@ -58,11 +56,14 @@ export default function AIUsageCard({ onNotice }: { onNotice?: (message: string)
     }
     setLoading(true);
     try {
+      const currentSession = await getCurrentSupabaseSession();
+      if (!currentSession) throw new Error('Authentication required');
       const { data } = await supabaseClient.auth.getSession();
       if (!data.session) throw new Error('กรุณาเข้าสู่ระบบก่อน');
       const response = await fetch('/api/billing/ai-boost', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${data.session.access_token}`, 'Content-Type': 'application/json' },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({}),
       });
       const payload = await response.json().catch(() => ({})) as { error?: string; message?: string };

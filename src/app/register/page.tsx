@@ -1,10 +1,5 @@
-import type { Metadata } from 'next';
-import LoginForm from '../login/LoginForm';
-
-export const metadata: Metadata = {
-  title: 'สร้างบัญชี | CUTINEO',
-};
+import { redirect } from 'next/navigation';
 
 export default function RegisterPage() {
-  return <LoginForm initialMode="signup" />;
+  redirect('/login?registration=disabled');
 }
