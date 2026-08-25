@@ -30,8 +30,6 @@ export function useHomepageScrollAnimations(rootRef: RefObject<HTMLElement | nul
     if (prefersReducedMotion()) {
       root.classList.add('motion-reduced');
       root.dataset.motionReduced = 'true';
-      const progress = root.querySelector<HTMLElement>('[data-scroll-progress] > span');
-      if (progress) progress.style.transform = 'scaleX(1)';
       return () => {
         root.classList.remove('motion-reduced');
         delete root.dataset.motionReduced;
@@ -46,19 +44,6 @@ export function useHomepageScrollAnimations(rootRef: RefObject<HTMLElement | nul
     root.dataset.motionGsapReady = 'true';
 
     const context = gsap.context(() => {
-      const progress = root.querySelector<HTMLElement>('[data-scroll-progress] > span');
-      if (progress) {
-        gsap.set(progress, { scaleX: 0, transformOrigin: 'left center' });
-        ScrollTrigger.create({
-          start: 0,
-          end: 'max',
-          onUpdate: (self) => {
-            gsap.set(progress, { scaleX: self.progress });
-            progress.parentElement?.setAttribute('aria-valuenow', String(Math.round(self.progress * 100)));
-          },
-        });
-      }
-
       const pageHeaderLogo = root.querySelector<HTMLElement>('[data-hero-logo]');
       const hero = root.querySelector<HTMLElement>('[data-scroll-hero]');
       const heroVisual = root.querySelector<HTMLElement>('[data-hero-item="visual"]');

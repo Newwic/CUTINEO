@@ -162,46 +162,12 @@
   white-space: nowrap;
 }
 
-.portalLive {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  gap: 5px;
-  margin-left: auto;
-  color: #129e90;
-  font-size: 8px;
-  font-weight: 850;
-  letter-spacing: .1em;
-  white-space: nowrap;
-}
-
-.portalLive i,
 .portalStatusDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background: #18b7a4;
   box-shadow: 0 0 0 4px rgba(24, 183, 164, .12), 0 0 16px rgba(24, 183, 164, .34);
-}
-
-.portalProgressTrack {
-  position: absolute;
-  right: 0;
-  bottom: -1px;
-  left: 0;
-  height: 2px;
-  overflow: hidden;
-  background: rgba(18, 158, 144, .1);
-}
-
-.portalProgressTrack span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #129e90, #65d7c5, #8490dc);
-  box-shadow: 0 0 16px rgba(18, 158, 144, .34);
-  transform-origin: left center;
-  transition: transform .08s linear;
 }
 
 .portalStage {
@@ -848,7 +814,6 @@
   .portalFrame { border-radius: 22px; }
   .portalTopbar { min-height: 46px; padding: 0 12px; }
   .portalTopLabel { font-size: 8px; }
-  .portalLive { font-size: 7px; }
   .portalStage { min-height: 455px; }
   .portalLayer { width: 86%; height: 82%; }
   .portalDoorFrame { padding: 20px; border-radius: 20px; }
@@ -891,7 +856,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .storyStepCopy,
-  .portalProgressTrack span,
   .portalLayer,
   .portalStepDots span,
   .storyConclusionPrimary,

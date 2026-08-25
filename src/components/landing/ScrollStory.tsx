@@ -131,8 +131,6 @@ function PortalVisual({ activeStep, progress, stageRef }: { activeStep: number; 
       <div className={styles.portalTopbar}>
         <div className={styles.portalWindowDots} aria-hidden="true"><span /><span /><span /></div>
         <span className={styles.portalTopLabel}>CUTINEO / PRODUCT STORY</span>
-        <span className={styles.portalLive}><i /> SCROLL LIVE</span>
-        <div className={styles.portalProgressTrack} aria-hidden="true"><span style={{ transform: `scaleX(${progress})` }} /></div>
       </div>
 
       <div className={styles.portalStage} data-story-stage ref={stageRef} aria-hidden="true">

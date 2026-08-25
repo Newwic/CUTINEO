@@ -9,7 +9,6 @@ import Header from '../layout/Header';
 import { MotionGroup, MotionReveal } from '../motion/ScrollReveal';
 import HeroInboxDemo from './HeroInboxDemo';
 import IntegrationStrip from './IntegrationStrip';
-import HomepageScrollMotion from './HomepageScrollMotion';
 import ScrollStory from './ScrollStory';
 import styles from './HomepageV2.module.css';
 import { useHomepageScrollAnimations } from '../../hooks/useHomepageScrollAnimations';
@@ -49,7 +48,6 @@ export default function HomepageV2({ basePath = '', signupRoute = 'signup', logi
 
   return (
     <div className={styles.page} ref={pageRef} data-homepage-root>
-      <HomepageScrollMotion />
       <Header basePath={basePath} signupRoute={signupRoute} loginRoute={loginRoute} />
 
       <main>

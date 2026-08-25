@@ -1325,30 +1325,6 @@
 .floatingChannels { transform: translateX(calc(var(--hero-scroll, 0) * 18px)); transition: transform .12s linear; }
 .floatChannel > span { max-width: 100%; overflow: hidden; color: #607386; font-size: 8px; font-weight: 750; line-height: 1.15; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 
-/* GSAP scroll language --------------------------------------------------- */
-.globalProgress {
-  position: fixed;
-  z-index: 120;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 2px;
-  overflow: hidden;
-  background: rgba(19, 171, 154, .08);
-  pointer-events: none;
-}
-
-.globalProgress span {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, #16ae9d, #69ddc9 62%, #9290e8);
-  box-shadow: 0 0 13px rgba(24, 183, 162, .68);
-  transform: scaleX(0);
-  transform-origin: left center;
-  will-change: transform;
-}
-
 .page[data-motion-gsap-ready] .floatChannel { animation-play-state: paused; }
 
 .page[data-motion-gsap-ready] [data-scroll-reveal],
@@ -1359,7 +1335,6 @@
 }
 
 @media (max-width: 1023px) {
-  .globalProgress { height: 2px; }
   .page[data-motion-gsap-ready] .floatChannel { animation-play-state: running; }
 }
 
