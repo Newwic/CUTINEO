@@ -31,7 +31,9 @@ export async function GET(request: NextRequest) {
     const platformAdmin = await isPlatformAdmin(db, user);
     const memberships = await getTenantMemberships(db, user.id);
     const requestedCompany = request.nextUrl.searchParams.get('companyId');
-    const ownAdminIds = memberships.filter((membership) => membership.role !== 'agent').map((membership) => membership.tenantId);
+    const ownAdminIds = memberships
+      .filter((membership) => membership.role === 'owner' || membership.role === 'admin')
+      .map((membership) => membership.tenantId);
     if (!platformAdmin && ownAdminIds.length === 0) return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     const companyIds = platformAdmin
       ? null

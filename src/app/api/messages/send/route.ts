@@ -106,6 +106,9 @@ export async function POST(request: NextRequest) {
     if (!membership) {
       return NextResponse.json({ error: 'You are not a member of this workspace' }, { status: 403 });
     }
+    if (membership.role === 'viewer') {
+      return NextResponse.json({ error: 'Viewer access is read-only' }, { status: 403 });
+    }
 
     const userRate = await enforceRateLimit(
       `messages:send:user:${user.id}:tenant:${conversation.tenant_id}`,

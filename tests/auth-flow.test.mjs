@@ -69,3 +69,17 @@ test('settings performs a server-side Owner/Admin check', () => {
   assert.match(settings, /role === 'owner' \|\| role === 'admin'/);
   assert.match(settings, /redirect\('\/inbox\?error=forbidden'\)/);
 });
+
+test('Viewer is read-only in both UI and API', () => {
+  const roleAccess = read('src/lib/tenant-access.ts');
+  const sendRoute = read('src/app/api/messages/send/route.ts');
+  const chatArea = read('src/app/dashboard/inbox/components/ChatArea.tsx');
+  const migration = read('supabase/migrations/004_add_viewer_role.sql');
+  const adminRoute = read('src/app/api/admin/ai-usage/route.ts');
+
+  assert.match(roleAccess, /'owner' \| 'admin' \| 'agent' \| 'viewer'/);
+  assert.match(sendRoute, /membership\.role === 'viewer'/);
+  assert.match(chatArea, /canSend/);
+  assert.match(migration, /'viewer'/);
+  assert.match(adminRoute, /membership\.role === 'owner' \|\| membership\.role === 'admin'/);
+});

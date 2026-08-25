@@ -219,7 +219,7 @@ select {
 }
 
 .cutineo-mobile-nav-meta {
-  display: none;
+  display: flex;
 }
 
 .cutineo-menu-toggle {
@@ -1984,6 +1984,12 @@ select:focus-visible {
 .composer-disclaimer span {
   padding: 0 5px;
   color: #344155;
+}
+
+.composer-readonly-notice {
+  margin: 0 0 8px;
+  color: #fbbf24;
+  font-size: 11px;
 }
 
 .topbar-status {

@@ -27,6 +27,7 @@ import {
 
 interface ChatAreaProps {
   conversation: InboxConversation;
+  canSend?: boolean;
   onOpenNav?: () => void;
   onOpenConversations?: () => void;
   onOpenCustomerDetails?: () => void;
@@ -146,6 +147,7 @@ function normalizeLiveMessages(data: unknown): InboxMessage[] {
 
 export default function ChatArea({
   conversation,
+  canSend = true,
   onOpenNav,
   onOpenConversations,
   onOpenCustomerDetails,
@@ -323,6 +325,10 @@ export default function ChatArea({
 
   function handleSend(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!canSend) {
+      onNotice?.('Viewer access is read-only');
+      return;
+    }
     const content = input.trim();
     if (!content || streamingId) return;
 
@@ -511,11 +517,12 @@ export default function ChatArea({
         )}
       </div>
 
-      <footer className="composer-area">
+      <footer className={`composer-area ${canSend ? '' : 'composer-readonly'}`}>
         <div className="composer-status-row">
           <span className="composer-context"><Zap size={13} aria-hidden="true" /> Replying as <strong>Team CUTINEO</strong></span>
           <span className="composer-shortcut">Enter to send <span>•</span> Shift + Enter for new line</span>
         </div>
+        {!canSend && <p className="composer-readonly-notice">Viewer access is read-only</p>}
         <form className="composer" onSubmit={handleSend}>
           <button type="button" className="composer-tool" aria-label="แนบไฟล์" title="Attach file">
             <Paperclip size={18} aria-hidden="true" />
@@ -532,7 +539,7 @@ export default function ChatArea({
             }}
             placeholder={`Reply to ${name}...`}
             aria-label="พิมพ์ข้อความตอบกลับ"
-            disabled={Boolean(streamingId)}
+            disabled={!canSend || Boolean(streamingId)}
           />
           <button type="button" className="composer-tool composer-emoji" aria-label="เพิ่มอีโมจิ" title="Add emoji">
             <Smile size={18} aria-hidden="true" />
@@ -540,7 +547,7 @@ export default function ChatArea({
           <button
             type="submit"
             className="send-button"
-            disabled={!input.trim() || Boolean(streamingId)}
+            disabled={!canSend || !input.trim() || Boolean(streamingId)}
             aria-label="ส่งข้อความ"
           >
             <Send size={17} aria-hidden="true" />

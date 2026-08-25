@@ -2,7 +2,7 @@ import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 export interface TenantMembership {
   tenantId: string;
-  role: 'owner' | 'admin' | 'agent';
+  role: 'owner' | 'admin' | 'agent' | 'viewer';
 }
 
 export async function getTenantMemberships(db: SupabaseClient, userId: string): Promise<TenantMembership[]> {
@@ -12,7 +12,7 @@ export async function getTenantMemberships(db: SupabaseClient, userId: string): 
     .eq('user_id', userId);
   if (error) throw error;
   return (data ?? []).flatMap((row) => {
-    if (row.role !== 'owner' && row.role !== 'admin' && row.role !== 'agent') return [];
+    if (row.role !== 'owner' && row.role !== 'admin' && row.role !== 'agent' && row.role !== 'viewer') return [];
     return [{ tenantId: row.tenant_id as string, role: row.role }];
   });
 }

@@ -115,6 +115,11 @@ const navItems = [
   { label: 'Settings', icon: Settings2 },
 ];
 
+type InboxMembership = {
+  tenantId: string;
+  role: 'owner' | 'admin' | 'agent' | 'viewer';
+};
+
 function isLiveConversationList(value: unknown): value is InboxConversation[] {
   return Array.isArray(value) && value.every((conversation) => (
     Boolean(conversation)
@@ -130,6 +135,10 @@ export default function InboxPage() {
   const [loadError, setLoadError] = useState('');
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [canManageSettings, setCanManageSettings] = useState(false);
+  const [memberships, setMemberships] = useState<InboxMembership[]>([]);
+  const [userLabel, setUserLabel] = useState('ผู้ใช้งาน');
+  const [userInitials, setUserInitials] = useState('CU');
+  const [userRole, setUserRole] = useState('สมาชิก');
   const [activeNav, setActiveNav] = useState('Conversations');
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [mobileConversationsOpen, setMobileConversationsOpen] = useState(false);
@@ -161,10 +170,17 @@ export default function InboxPage() {
         return;
       }
 
+      const metadataName = typeof session.user.user_metadata?.full_name === 'string'
+        ? session.user.user_metadata.full_name.trim()
+        : '';
+      const sessionLabel = metadataName || session.user.email || 'ผู้ใช้งาน';
+      setUserLabel(sessionLabel);
+      setUserInitials(sessionLabel.split(/\s+/).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'CU');
+
       const response = await fetch('/api/inbox', { credentials: 'include', cache: 'no-store' });
       const payload = await response.json().catch(() => null) as {
         conversations?: unknown;
-        memberships?: Array<{ role?: string }>;
+        memberships?: InboxMembership[];
         error?: string;
       } | null;
       const data = payload?.conversations;
@@ -177,6 +193,7 @@ export default function InboxPage() {
         setActiveConvId(null);
         setIsDemoMode(false);
         setCanManageSettings(false);
+        setMemberships([]);
         setLoadError(`โหลด conversations ไม่สำเร็จ: ${error.message}`);
         setLoading(false);
         return;
@@ -187,6 +204,7 @@ export default function InboxPage() {
         setActiveConvId(null);
         setIsDemoMode(false);
         setCanManageSettings(false);
+        setMemberships([]);
         setLoadError('รูปแบบข้อมูล conversations จาก Supabase ไม่ถูกต้อง');
         setLoading(false);
         return;
@@ -197,6 +215,8 @@ export default function InboxPage() {
         setActiveConvId(DEMO_CONVERSATIONS[0].id);
         setIsDemoMode(true);
         setCanManageSettings(Boolean(payload?.memberships?.some(({ role }) => role === 'owner' || role === 'admin')));
+        setMemberships(payload?.memberships ?? []);
+        setUserRole(payload?.memberships?.find(({ role }) => role)?.role || 'สมาชิก');
         setLoadError('ยังไม่พบ conversation ใน workspace นี้ หรือบัญชีนี้ยังไม่ได้เป็นสมาชิกของ tenant');
         setLoading(false);
         return;
@@ -206,6 +226,8 @@ export default function InboxPage() {
       setActiveConvId((current) => current && data.some((item) => item.id === current) ? current : data[0].id);
       setIsDemoMode(false);
       setCanManageSettings(Boolean(payload?.memberships?.some(({ role }) => role === 'owner' || role === 'admin')));
+      setMemberships(payload?.memberships ?? []);
+      setUserRole(payload?.memberships?.find(({ role }) => role)?.role || 'สมาชิก');
       setLoading(false);
     }
 
@@ -277,6 +299,11 @@ export default function InboxPage() {
     () => conversations.find((conversation) => conversation.id === activeConvId) || null,
     [activeConvId, conversations],
   );
+
+  const activeMembership = activeConversation && !activeConversation.isDemo
+    ? memberships.find((membership) => membership.tenantId === activeConversation.tenant_id)
+    : undefined;
+  const canSendMessages = Boolean(activeConversation?.isDemo || (activeMembership && activeMembership.role !== 'viewer'));
 
   function selectConversation(id: string) {
     setActiveConvId(id);
@@ -427,8 +454,8 @@ export default function InboxPage() {
             <HelpCircle size={17} aria-hidden="true" /> Help center
           </button>
           <div className="sidebar-profile">
-            <span className="profile-avatar">NS</span>
-            <span className="profile-copy"><strong>New S.</strong><small>Admin</small></span>
+            <span className="profile-avatar">{userInitials}</span>
+            <span className="profile-copy"><strong>{userLabel}</strong><small>{userRole}</small></span>
             <button type="button" className="profile-action" onClick={() => void signOut()} aria-label="ออกจากระบบ" title="Sign out">
               <LogOut size={16} aria-hidden="true" />
             </button>
@@ -449,6 +476,7 @@ export default function InboxPage() {
         {activeConversation ? (
           <ChatArea
             conversation={activeConversation}
+            canSend={canSendMessages}
             onOpenNav={() => setMobileNavOpen(true)}
             onOpenConversations={() => setMobileConversationsOpen(true)}
             onOpenCustomerDetails={() => setMobileCustomerOpen(true)}
