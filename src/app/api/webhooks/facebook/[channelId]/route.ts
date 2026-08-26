@@ -31,13 +31,14 @@ async function findChannel(channelId: string) {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { channelId: string } },
+  { params }: { params: Promise<{ channelId: string }> },
 ) {
   try {
+    const { channelId } = await params;
     const mode = request.nextUrl.searchParams.get('hub.mode') ?? '';
     const token = request.nextUrl.searchParams.get('hub.verify_token') ?? '';
     const challenge = request.nextUrl.searchParams.get('hub.challenge') ?? '';
-    const channel = await findChannel(params.channelId);
+    const channel = await findChannel(channelId);
     const configuredToken = credentialsOf(channel?.credentials).verifyToken;
 
     if (
@@ -59,9 +60,10 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { channelId: string } },
+  { params }: { params: Promise<{ channelId: string }> },
 ) {
   try {
+    const { channelId } = await params;
     const declaredLength = Number(request.headers.get('content-length') ?? 0);
     if (declaredLength > MAX_BODY_BYTES) {
       return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
@@ -72,7 +74,7 @@ export async function POST(
       return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
     }
 
-    const channel = await findChannel(params.channelId);
+    const channel = await findChannel(channelId);
     if (!channel) return NextResponse.json({ error: 'Channel not found' }, { status: 404 });
 
     const appSecret = credentialsOf(channel.credentials).appSecret;
