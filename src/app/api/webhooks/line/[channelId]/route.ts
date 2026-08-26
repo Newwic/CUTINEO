@@ -110,9 +110,10 @@ async function findOrCreateConversation(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { channelId: string } },
+  { params }: { params: Promise<{ channelId: string }> },
 ) {
   try {
+    const { channelId } = await params;
     const declaredLength = Number(request.headers.get('content-length') ?? 0);
     if (declaredLength > MAX_BODY_BYTES) {
       return NextResponse.json({ error: 'Payload too large' }, { status: 413 });
@@ -129,7 +130,7 @@ export async function POST(
     const { data: channel, error: channelError } = await db
       .from('channels')
       .select('*')
-      .eq('id', params.channelId)
+      .eq('id', channelId)
       .eq('platform', 'line')
       .eq('is_active', true)
       .maybeSingle();

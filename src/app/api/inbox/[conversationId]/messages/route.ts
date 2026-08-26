@@ -7,12 +7,13 @@ export const runtime = 'nodejs';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { conversationId: string } },
+  { params }: { params: Promise<{ conversationId: string }> },
 ) {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
 
   try {
+    const { conversationId } = await params;
     const db = requireSupabaseServer();
     const memberships = await getTenantMemberships(db, user.id);
     const tenantIds = memberships.map((membership) => membership.tenantId);
@@ -21,7 +22,7 @@ export async function GET(
     const { data: conversation, error: conversationError } = await db
       .from('conversations')
       .select('id, tenant_id')
-      .eq('id', params.conversationId)
+      .eq('id', conversationId)
       .in('tenant_id', tenantIds)
       .maybeSingle();
     if (conversationError) throw conversationError;

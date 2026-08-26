@@ -83,3 +83,32 @@ test('Viewer is read-only in both UI and API', () => {
   assert.match(migration, /'viewer'/);
   assert.match(adminRoute, /membership\.role === 'owner' \|\| membership\.role === 'admin'/);
 });
+
+test('Phase 1 establishes a canonical organization boundary and role model', () => {
+  const migration = read('supabase/migrations/005_organizations_rbac_tenant_boundary.sql');
+  const organizationAccess = read('src/lib/organization-access.ts');
+  const tenantAccess = read('src/lib/tenant-access.ts');
+
+  assert.match(migration, /CREATE TABLE IF NOT EXISTS public\.organizations/);
+  assert.match(migration, /CREATE TABLE IF NOT EXISTS public\.organization_members/);
+  assert.match(migration, /CREATE TABLE IF NOT EXISTS public\.roles/);
+  assert.match(migration, /RPV Industrial Supply Co\., Ltd\./);
+  assert.match(migration, /organization_id UUID/);
+  assert.match(migration, /CREATE OR REPLACE FUNCTION public\.is_organization_member/);
+  assert.match(migration, /CREATE TRIGGER audit_logs_immutable/);
+  assert.match(organizationAccess, /getOrganizationMemberships/);
+  assert.match(organizationAccess, /assertStockWriteAccess/);
+  assert.match(tenantAccess, /getOrganizationMemberships/);
+  assert.doesNotMatch(tenantAccess, /\.from\(['"]tenant_members['"]\)/);
+});
+
+test('Stock role policy excludes legacy Inbox agents and viewers from writes', () => {
+  const organizationAccess = read('src/lib/organization-access.ts');
+
+  assert.match(organizationAccess, /role === 'warehouse'/);
+  assert.match(organizationAccess, /role === 'viewer'/);
+  assert.match(organizationAccess, /'agent'/);
+  assert.match(organizationAccess, /export function canWriteStock/);
+  assert.match(organizationAccess, /role === 'company_owner'/);
+  assert.match(organizationAccess, /role === 'admin'/);
+});

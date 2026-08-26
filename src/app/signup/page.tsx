@@ -1,12 +1,12 @@
 import { redirect } from 'next/navigation';
 
 interface SignupPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     plan?: string;
-  };
+  }>;
 }
 
-export default function SignupPage({ searchParams }: SignupPageProps) {
-  void searchParams;
+export default async function SignupPage({ searchParams }: SignupPageProps) {
+  await searchParams;
   redirect('/login?registration=disabled');
 }

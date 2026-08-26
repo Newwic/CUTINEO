@@ -22,9 +22,9 @@ const nextConfig = {
       },
     ];
   },
-  experimental: {
-    typedRoutes: true,
-  },
+  typedRoutes: true,
 };
 
 export default nextConfig;
+
+import('@opennextjs/cloudflare').then((m) => m.initOpenNextCloudflareForDev());

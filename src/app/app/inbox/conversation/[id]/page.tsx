@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 
-export default function ConversationDeepLink({ params }: { params: { id: string } }) {
-  redirect(`/inbox?conversation=${encodeURIComponent(params.id)}`);
+export default async function ConversationDeepLink({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  redirect(`/inbox?conversation=${encodeURIComponent(id)}`);
 }
